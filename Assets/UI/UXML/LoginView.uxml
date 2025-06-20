@@ -1,20 +1,26 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/USS/LoginView.uss?fileID=7433441132597879392&amp;guid=dd85c5becfad17648b85c3baf1398a95&amp;type=3#LoginView" />
     <ui:VisualElement class="login-container">
-        <ui:Label text="Ambio" class="logo" />
+        <ui:Image name="logoImage" class="ambio-logo" style="background-image: url(&quot;project://database/Assets/Art/UI/logo.png?fileID=21300000&amp;guid=6fe66b90e693d7e479eae7bc6a09efcb&amp;type=3#logo&quot;);" />
         <ui:Label text="Creating Creativity, Crafting Spaces!" class="subtitle" />
         <ui:VisualElement class="input-group">
             <ui:Label text="Email Address" class="input-label" />
-            <ui:TextField name="emailField" class="input" />
+            <ui:VisualElement class="input">
+                <ui:Image class="input-icon email-icon" />
+                <ui:TextField name="emailField" class="input-field" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement class="input-group">
             <ui:Label text="Password" class="input-label" />
-            <ui:TextField name="passwordField" is-password="true" class="input" />
+            <ui:VisualElement class="input">
+                <ui:Image class="input-icon password-icon" />
+                <ui:TextField name="passwordField" is-password="true" class="input-field" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:Label text="Forgot Password?" class="forgot-password" />
         <ui:Button name="signInButton" class="sign-in">
-        <ui:Label text="Sign In" />
-        </ui:Button>>
+            <ui:Label text="Sign In" />
+        </ui:Button>
         <ui:VisualElement class="signup-wrapper">
             <ui:Label text="Don’t have an account?" />
             <ui:Label text=" Sign Up" class="signup-link" />
