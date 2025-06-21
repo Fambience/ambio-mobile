@@ -1,0 +1,14 @@
+<ui:UXML xmlns="UnityEngine.UIElements" xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/CompleteProfile.uss?fileID=7433441132597879392&amp;guid=bdcd0fb6f6c34a99895ac7f7b782aa7d&amp;type=3#CompleteProfile" />
+    <ui:VisualElement class="container">
+        <ui:VisualElement class="top-bar">
+            <ui:Button name="backButton" class="back-button" />
+            <ui:VisualElement class="progress-bar">
+                <ui:VisualElement class="progress-fill" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label name="title" text="Complete Your Profile!" class="title" />
+        <ui:Label name="subtitle" text="Where is your home located?" class="subtitle" />
+        <ui:VisualElement name="dropdownWrapper" style="flex-direction: column-reverse; background-color: rgb(255, 255, 255);" />
+    </ui:VisualElement>
+</ui:UXML>
