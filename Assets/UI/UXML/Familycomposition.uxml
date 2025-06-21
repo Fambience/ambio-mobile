@@ -1,0 +1,21 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/HousematesScreen.uss" />
+
+    <ui:VisualElement class="container">
+        <ui:VisualElement class="top-bar">
+            <ui:Button name="backButton">←</ui:Button>
+            <ui:VisualElement class="progress-bar">
+                <ui:VisualElement class="progress-fill" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:Label name="title" class="title" text="Who do you share your home with?" />
+
+        <ui:VisualElement name="checkboxGroup" class="checkbox-group" />
+
+        <ui:Button name="completeButton" class="primary-button">
+            <ui:Label text="Complete" />
+            <ui:Label text="→" class="arrow" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

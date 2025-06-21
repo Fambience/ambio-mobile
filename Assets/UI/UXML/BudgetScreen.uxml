@@ -1,0 +1,21 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="../USS/BudgeScreen.uss"/>
+    <ui:VisualElement class="container">
+
+        <ui:VisualElement class="top-bar">
+            <ui:Button name="backButton">←</ui:Button>
+            <ui:VisualElement class="progress-bar">
+                <ui:VisualElement class="progress-fill" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:Label name="budgetTitle" class="title" text="What's your budget?" />
+
+        <ui:VisualElement name="budgetOptions" class="radio-group">
+            <ui:RadioButton text="Below $1000" />
+            <ui:RadioButton text="$1000 - $3000" />
+            <ui:RadioButton text="$3000 - $5000" />
+            <ui:RadioButton text="Above $5000" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

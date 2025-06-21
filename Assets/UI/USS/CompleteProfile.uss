@@ -1,0 +1,558 @@
+@font-face {
+    src:url("../Fonts/Inter/static/Inter_24pt-Regular.ttf");
+}
+
+.container {
+    flex-direction: column;
+    padding: 20px;
+    background-color: #f6f1ee;
+    height: 100%;
+    width: 100%;
+    font-size: 14px;
+    color: #333;
+}
+
+.top-bar {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0;
+    justify-content: flex-start;
+}
+
+.back-button {
+    font-size: 20px;
+    background-color: transparent;
+    border-color: black;
+    color: #333;
+    margin-right: 0;
+}
+
+.progress-bar {
+    margin-top: 10px;
+    width: 180px;
+    height: 8px;
+    background-color: #d3d3d3;
+    border-radius: 5px;
+    overflow: hidden;
+    align-self: flex-start;
+}
+
+.progress-fill {
+    width: 30px;
+    height: 100%;
+    background-color: #8b4d2d;
+}
+
+.title {
+    font-size: 22px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: #111;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+.dropdown-wrapper {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.title, .subtitle {
+    white-space: normal;
+    overflow: visible;
+}
+
+/* ==== MAIN DROPDOWN FIELD FIXES ==== */
+.unity-popup-field,
+.unity-base-popup-field {
+    background-color: white !important;
+    border-width: 0 !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    color: #111 !important;
+    height: 36px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    -unity-font: url("../Fonts/Inter/static/Inter_24pt-Regular.ttf");
+}
+
+/* Force input field background */
+.unity-popup-field__input,
+.unity-base-field__input {
+    background-color: white !important;
+    border-radius: 8px !important;
+    border-width: 0 !important;
+    color: #111 !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}
+
+/* Arrow styling */
+.unity-popup-field__arrow {
+    color: #555 !important;
+}
+
+/* ==== DROPDOWN CONTAINER FIXES ==== */
+.unity-base-dropdown,
+.unity-base-dropdown__container-outer,
+.unity-base-dropdown__container-inner,
+.unity-base-dropdown__container {
+    background-color: white !important;
+    border-radius: 8px !important;
+    border-width: 1px !important;
+    border-color: #ddd !important;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Scroll view inside dropdown - more specific targeting */
+.unity-scroll-view,
+.unity-scroll-view__content-container,
+.unity-scroll-view__content-viewport,
+.unity-base-dropdown .unity-scroll-view,
+.unity-base-dropdown .unity-scroll-view__content-container {
+    background-color: white !important;
+    border-radius: 8px !important;
+}
+
+/* Target the actual dropdown list background */
+.unity-base-dropdown__list-view,
+.unity-list-view {
+    background-color: white !important;
+}
+
+/* ==== DROPDOWN ITEMS FIXES ==== */
+.unity-base-dropdown__item,
+.unity-base-dropdown__item > *,
+.unity-list-view__item {
+    background-color: white !important;
+    color: #222 !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    border-radius: 0 !important;
+    font-family: "Inter", sans-serif;
+    margin: 0 !important;
+    border: none !important;
+}
+
+/* Hover state */
+.unity-base-dropdown__item:hover,
+.unity-list-view__item:hover {
+    background-color: #f8f8f8 !important;
+    color: #222 !important;
+}
+
+/* Selected state - this is crucial to prevent blue */
+.unity-base-dropdown__item:checked,
+.unity-base-dropdown__item--selected,
+.unity-list-view__item--selected {
+    background-color: #f0f0f0 !important;
+    color: #222 !important;
+}
+
+/* Remove checkmark */
+.unity-base-dropdown__checkmark {
+    display: none !important;
+}
+
+/* Text labels */
+.unity-base-dropdown__label {
+    color: #222 !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+    font-family: "Inter", sans-serif;
+}
+
+/* ==== SPECIFIC ID TARGETING ==== */
+#locationDropdown {
+    background-color: white !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    color: #111 !important;
+    height: 36px !important;
+    -unity-font-style: normal;
+    -unity-text-align: middle-left;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    border-width: 0 !important;
+    border-color: transparent !important;
+}
+
+/* ==== ADDITIONAL OVERRIDES TO PREVENT BLUE ==== */
+/* Target any potential selection styling */
+.unity-popup-field:focus,
+.unity-popup-field:active,
+.unity-base-popup-field:focus,
+.unity-base-popup-field:active {
+    background-color: white !important;
+    border-color: #ccc !important;
+}
+
+/* Prevent Unity's default selection colors */
+.unity-base-dropdown__item:focus,
+.unity-base-dropdown__item:active {
+    background-color: #f0f0f0 !important;
+    color: #222 !important;
+}
+
+/* Override any default Unity blue selections */
+* {
+    -unity-selection-color: rgba(240, 240, 240, 0.5) !important;
+}
+
+/* ==== TARGETED FIX BASED ON HIERARCHY ==== */
+/* Target the specific viewport that's causing the blue background */
+#unity-content-viewport,
+.unity-scroll-view__content-viewport {
+    background-color: white !important;
+    background-image: none !important;
+    background: white !important;
+}
+
+/* Target the content container */
+#unity-content-and-vertical-scroll-container,
+.unity-scroll-view__content-and-vertical-scroll-container {
+    background-color: white !important;
+    background-image: none !important;
+}
+
+/* Target the scroll view container */
+.unity-scroll-view--scroll,
+.unity-scroll-view--vertical-horizontal {
+    background-color: white !important;
+}
+
+/* Target the main dropdown containers from your hierarchy */
+.unity-base-dropdown__container-outer,
+.unity-base-dropdown__container-inner {
+    background-color: white !important;
+    border-radius: 8px !important;
+    border-width: 1px !important;
+    border-color: #ddd !important;
+}
+
+/* Target the scroll view itself */
+.unity-scroll-view {
+    background-color: white !important;
+}
+
+/* Target all dropdown items */
+.unity-base-dropdown__item {
+    background-color: white !important;
+    color: #222 !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    border: none !important;
+}
+
+/* Hover and selected states */
+.unity-base-dropdown__item:hover {
+    background-color: #f8f8f8 !important;
+    color: #222 !important;
+}
+
+.unity-base-dropdown__item:checked,
+.unity-base-dropdown__item--selected {
+    background-color: #f0f0f0 !important;
+    color: #222 !important;
+}
+
+/* Nuclear option for any remaining blue elements */
+.unity-base-dropdown * {
+    background-color: white !important;
+    background-image: none !important;
+}
+@font-face {
+    src:url("../Fonts/Inter/static/Inter_24pt-Regular.ttf");
+}
+
+.container {
+    flex-direction: column;
+    padding: 20px;
+    background-color: #f6f1ee;
+    height: 100%;
+    width: 100%;
+    font-size: 14px;
+    color: #333;
+}
+
+.top-bar {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0;
+    justify-content: flex-start;
+}
+
+.back-button {
+    font-size: 20px;
+    background-color: transparent;
+    border-color: black;
+    color: #333;
+    margin-right: 0;
+}
+
+.progress-bar {
+    margin-top: 10px;
+    width: 180px;
+    height: 8px;
+    background-color: #d3d3d3;
+    border-radius: 5px;
+    overflow: hidden;
+    align-self: flex-start;
+}
+
+.progress-fill {
+    width: 30px;
+    height: 100%;
+    background-color: #8b4d2d;
+}
+
+.title {
+    font-size: 22px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: #111;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+.dropdown-wrapper {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.title, .subtitle {
+    white-space: normal;
+    overflow: visible;
+}
+
+/* ==== MAIN DROPDOWN FIELD FIXES ==== */
+.unity-popup-field,
+.unity-base-popup-field {
+    background-color: white !important;
+    border-width: 0 !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    color: #111 !important;
+    height: 36px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    -unity-font: url("../Fonts/Inter/static/Inter_24pt-Regular.ttf");
+}
+
+/* Force input field background */
+.unity-popup-field__input,
+.unity-base-field__input {
+    background-color: white !important;
+    border-radius: 8px !important;
+    border-width: 0 !important;
+    color: #111 !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}
+
+/* Arrow styling */
+.unity-popup-field__arrow {
+    color: #555 !important;
+}
+
+/* ==== DROPDOWN CONTAINER FIXES ==== */
+.unity-base-dropdown,
+.unity-base-dropdown__container-outer,
+.unity-base-dropdown__container-inner,
+.unity-base-dropdown__container {
+    background-color: white !important;
+    border-radius: 8px !important;
+    border-width: 1px !important;
+    border-color: #ddd !important;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Scroll view inside dropdown - more specific targeting */
+.unity-scroll-view,
+.unity-scroll-view__content-container,
+.unity-scroll-view__content-viewport,
+.unity-base-dropdown .unity-scroll-view,
+.unity-base-dropdown .unity-scroll-view__content-container {
+    background-color: white !important;
+    border-radius: 8px !important;
+}
+
+/* Target the actual dropdown list background */
+.unity-base-dropdown__list-view,
+.unity-list-view {
+    background-color: white !important;
+}
+
+/* ==== DROPDOWN ITEMS FIXES ==== */
+.unity-base-dropdown__item,
+.unity-base-dropdown__item > *,
+.unity-list-view__item {
+    background-color: white !important;
+    color: #222 !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    border-radius: 0 !important;
+    font-family: "Inter", sans-serif;
+    margin: 0 !important;
+    border: none !important;
+}
+
+/* Hover state */
+.unity-base-dropdown__item:hover,
+.unity-list-view__item:hover {
+    background-color: #f8f8f8 !important;
+    color: #222 !important;
+}
+
+/* Selected state - this is crucial to prevent blue */
+.unity-base-dropdown__item:checked,
+.unity-base-dropdown__item--selected,
+.unity-list-view__item--selected {
+    background-color: #f0f0f0 !important;
+    color: #222 !important;
+}
+
+/* Remove checkmark */
+.unity-base-dropdown__checkmark {
+    display: none !important;
+}
+
+/* Text labels */
+.unity-base-dropdown__label {
+    color: #222 !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+    font-family: "Inter", sans-serif;
+}
+
+/* ==== SPECIFIC ID TARGETING ==== */
+#locationDropdown {
+    background-color: white !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    color: #111 !important;
+    height: 36px !important;
+    -unity-font-style: normal;
+    -unity-text-align: middle-left;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    border-width: 0 !important;
+    border-color: transparent !important;
+}
+
+/* ==== ADDITIONAL OVERRIDES TO PREVENT BLUE ==== */
+/* Target any potential selection styling */
+.unity-popup-field:focus,
+.unity-popup-field:active,
+.unity-base-popup-field:focus,
+.unity-base-popup-field:active {
+    background-color: white !important;
+    border-color: #ccc !important;
+}
+
+/* Prevent Unity's default selection colors */
+.unity-base-dropdown__item:focus,
+.unity-base-dropdown__item:active {
+    background-color: #f0f0f0 !important;
+    color: #222 !important;
+}
+
+/* Override any default Unity blue selections */
+* {
+    -unity-selection-color: rgba(240, 240, 240, 0.5) !important;
+}
+
+/* ==== TARGETED FIX BASED ON EXACT HIERARCHY ==== */
+/* Target the content container that holds all items */
+#unity-content-container,
+.unity-scroll-view__content-container {
+    background-color: white !important;
+    background-image: none !important;
+    background: white !important;
+}
+
+/* Target the content viewport */
+#unity-content-viewport,
+.unity-scroll-view__content-viewport {
+    background-color: white !important;
+    background-image: none !important;
+    background: white !important;
+}
+
+/* Target the main scroll view */
+.unity-scroll-view,
+.unity-scroll-view--scroll {
+    background-color: white !important;
+    background-image: none !important;
+}
+
+/* Target dropdown container elements */
+.unity-base-dropdown__container-inner,
+.unity-base-dropdown__container-outer {
+    background-color: white !important;
+    border-radius: 8px !important;
+    border: 1px solid #ddd !important;
+}
+
+/* Target ALL dropdown items and their states */
+.unity-base-dropdown__item,
+.unity-base-dropdown__item-content {
+    background-color: white !important;
+    color: #222 !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    border: none !important;
+    margin: 0 !important;
+}
+
+/* CRITICAL: Target the selected/focused item (this is likely causing the blue) */
+.unity-base-dropdown__item:focus,
+.unity-base-dropdown__item:selected,
+.unity-base-dropdown__item--selected,
+.unity-base-dropdown__item:focus-visible,
+.unity-base-dropdown__item[tabindex="0"] {
+    background-color: #f0f0f0 !important;
+    color: #222 !important;
+    outline: none !important;
+    border: none !important;
+}
+
+/* Target hover state */
+.unity-base-dropdown__item:hover {
+    background-color: #f8f8f8 !important;
+    color: #222 !important;
+}
+
+/* Target the text labels inside items */
+.unity-base-dropdown__label,
+.unity-text-element {
+    color: #222 !important;
+    background-color: transparent !important;
+}
+
+/* Remove checkmarks */
+.unity-base-dropdown__checkmark {
+    display: none !important;
+}
+
+/* NUCLEAR OPTION: Force everything in the dropdown to be white */
+.unity-base-dropdown,
+.unity-base-dropdown * {
+    background-color: white !important;
+    background-image: none !important;
+    background: white !important;
+}
+
+/* Override Unity's focus ring and selection colors */
+.unity-base-dropdown__item * {
+    background-color: transparent !important;
+    -unity-background-image-tint-color: transparent !important;
+}
