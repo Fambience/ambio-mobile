@@ -1,129 +1,183 @@
+/* Main Scroll Container */
+.main-scroll {
+    width: 100%;
+    height: 100%;
+}
+
+/* Main Container */
 .login-container {
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 5%;
+    justify-content: flex-start;
+    padding: 60px 32px 40px 32px;
     background-color: #F5F0ED;
     width: 100%;
-    height: 100%;
-    gap: 16px;
+    min-height: 100%;
+    max-width: none;
+    margin: 0;
 }
 
-/* Logo image */
+/* Logo Section */
+.logo-section {
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 80px;
+    margin-top: 400px;
+}
+
 .ambio-logo {
-    width: 120px;
-    height: 120px;
+    width: 400px;
+    height: 300px;
     background-size: contain;
     background-repeat: no-repeat;
     margin-bottom: 12px;
 }
 
 .subtitle {
-    font-size: 18px;
-    color: #000000;
+    font-size: 60px;
+    color: #333333;
     -unity-font-style: bold;
-    text-align: center;
-    margin-bottom: 20px;
+    unity-text-align: middle-center; /* ✅ Unity-specific horizontal+vertical centering */
+    text-align: center;              /* Optional but safe */
+    white-space: normal;
+    max-width: 1000px;
+    width: 100%;
+}
+
+/* Form Section */
+.form-section {
+    width: 100%;
+    max-width: 900px;
+    flex-direction: column;
 }
 
 .input-group {
     width: 100%;
-    margin-bottom: 12px;
+    margin-bottom: 60px;
 }
 
 .input-label {
-    font-size: 14px;
-    color: #000000;
-    margin-bottom: 4px;
+    font-size: 35px;
+    color: #333333;
+    -unity-font-style: bold;
+    margin-bottom: 8px;
 }
 
-/* Full wrapper */
-.input {
+/* Input Wrapper */
+.input-wrapper {
     flex-direction: row;
     align-items: center;
-    border-width: 1px;
-    border-color: #8B4C39;
-    border-radius: 15px;
-    height: 48px;
+    border-width: 1.5px;
+    border-color: #D4B5A0;
+    border-radius: 50px;
+    height: 100px;
     width: 100%;
-    background-color: white;
+    background-color: #FFFFFF;
     overflow: hidden;
 }
 
-/* Left-side icon */
+.input-wrapper {
+    border-color: #8B4C39;
+}
+
+/* Icons */
 .input-icon {
-    width: 24px;
-    height: 24px;
-    margin-left: 12px;
-    margin-right: 8px;
+    width: 40px;
+    height: 40px;
+    margin-left: 14px;
+    margin-right: 10px;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
-/* Mail icon */
 .email-icon {
-
-    background-size: contain;
-    background-repeat: no-repeat;
+    background-image: resource("mail-icon"); /* Replace with your email icon resource */
 }
 
-/* Lock icon */
 .password-icon {
-    background-image: resource("lock-icon"); /* Replace with your icon */
-    background-size: contain;
-    background-repeat: no-repeat;
+    background-image: resource("lock-icon"); /* Replace with your lock icon resource */
 }
 
-/* Actual input field */
+/* Input Field */
 .input-field {
     flex-grow: 1;
     height: 100%;
-    font-size: 14px;
-    padding-left: 0;
-    padding-right: 12px;
+    font-size: 35px;
+    padding-right: 0px;
+    border-width: 0;
+    background-color: white;
 }
-.input-field .unity-text-input {
-    border-width: 0;            /* ✅ explicitly remove border */
-    border-color: transparent !important;  /* just in case Unity still renders it */
+
+.input-field > .unity-text-input {
+    border-width: 0;
+    border-color: transparent;
     background-color: transparent;
     margin: 0;
-    padding: 10px 0;
-    color: black;
-    font-size: 14px;
-    border-radius: 50px !important;           /* remove any inner rounding if not needed */
+    padding: 0;
+    color: #333333;
+    font-size: 35px;
+    border-radius: 0;
 }
 
-/* Button */
-.sign-in {
-    background-color: #986047;
-    color: white;
-    width: 100%;
-    height: 48px;
-    border-radius: 25px;
-    justify-content: center;
-    align-items: center;
-    margin-top: 60px;
+.input-field > .unity-text-input:focus {
+    border-width: 0;
+    border-color: transparent;
 }
 
-.sign-in Label {
-    color: white;
-    font-size: 16px;
-    -unity-font-style: bold;
-}
-
+/* Forgot Password Link */
 .forgot-password {
     align-self: flex-end;
-    font-size: 12px;
-    color: #986047;
-    margin-top: -12px;
-    margin-bottom: 12px;
+    font-size: 30px;
+    color: #8B4C39;
+    margin-bottom: 24px;
+    }
+
+.forgot-password:hover {
+    color: #6B3629;
 }
 
-.signup-wrapper {
+/* Sign In Button */
+.sign-in-button {
+    background-color: #8B4C39;
+    color: #FFFFFF;
+    width: 100%;
+    height: 100px;
+    border-radius: 50px;
+    border-width: 0;
+    font-size: 35px;
+    -unity-font-style: bold;
+    margin-bottom: 32px;
+    margin-top: 12px;
+    }
+
+.sign-in-button:hover {
+    background-color: #6B3629;
+}
+
+.sign-in-button:active {
+    background-color: #5A2A1F;
+}
+
+/* Sign Up Section */
+.signup-section {
     flex-direction: row;
     justify-content: center;
-    margin-top: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.signup-text {
+    font-size: 35px;
+    color: #666666;
 }
 
 .signup-link {
+    font-size: 35px;
     color: #8B4C39;
     -unity-font-style: bold;
+    }
+
+.signup-link:hover {
+    color: #6B3629;
+    text-decoration: underline;
 }
