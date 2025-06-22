@@ -1,0 +1,162 @@
+:root {
+}
+
+.signup-container {
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 100%;
+    max-width: none;
+    background-color: rgb(245, 240, 237);
+    padding: 0;
+    margin: 0;
+}
+
+.header-section {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 40%;
+    padding: 60px 32px 40px 32px;
+    margin-bottom: 40px;
+}
+
+.back-button {
+    width: 44px;
+    height: 44px;
+    background-color: transparent;
+    border-width: 0;
+    padding: 0;
+    margin: 0;
+    margin-right: 20px;
+    border-radius: 8px;
+}
+
+.back-button:hover {
+    background-color: rgba(139, 76, 57, 0.1);
+}
+
+.back-icon {
+    width: 24px;
+    height: 24px;
+    background-image: resource('back-arrow-icon');
+    background-size: contain;
+    background-repeat: no-repeat;
+    -unity-background-image-tint-color: rgb(139, 76, 57);
+}
+
+.app-title {
+    font-size: 48px;
+    color: rgb(139, 76, 57);
+    -unity-font-style: bold;
+    margin-left: 20px;
+    flex-grow: 1;
+}
+
+.form-section {
+    flex-direction: column;
+    padding: 0 32px;
+    flex-grow: 1;
+    max-width: 1100px;
+    justify-content: flex-start;
+    align-self: auto;
+    align-items: stretch;
+}
+
+.input-group {
+    width: 100%;
+    margin-bottom: 32px;
+}
+
+.input-label {
+    font-size: 35px;
+    color: rgb(51, 51, 51);
+    -unity-font-style: bold;
+    margin-bottom: 8px;
+    margin-left: 4px;
+}
+
+.input-wrapper {
+    flex-direction: row;
+    align-items: center;
+    border-width: 1px;
+    border-color: rgb(212, 181, 160);
+    border-radius: 12px;
+    height: 56px;
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+    padding: 0 16px;
+}
+
+.input-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    -unity-background-image-tint-color: rgb(139, 76, 57);
+}
+
+.email-icon {
+    background-image: resource('mail-icon');
+}
+
+.password-icon {
+    background-image: resource('lock-icon');
+}
+
+.input-field {
+    flex-grow: 1;
+    height: 100%;
+    font-size: 16px;
+    border-width: 0;
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+}
+
+.input-field > .unity-text-input {
+    border-width: 0;
+    border-color: transparent;
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+    color: rgb(51, 51, 51);
+    font-size: 16px;
+    border-radius: 0;
+}
+
+.input-field > .unity-text-input:focus {
+    border-width: 0;
+    border-color: transparent;
+}
+
+.input-field .unity-text-input--placeholder {
+    color: rgb(153, 153, 153);
+}
+
+.continue-button {
+    background-color: rgb(139, 76, 57);
+    color: rgb(255, 255, 255);
+    width: 100%;
+    height: 56px;
+    border-radius: 28px;
+    border-width: 0;
+    font-size: 18px;
+    -unity-font-style: bold;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.continue-button:hover {
+    background-color: rgb(107, 54, 41);
+}
+
+.continue-button:active {
+    background-color: rgb(90, 42, 31);
+    transform: ;
+}
+
+.continue-button:disabled {
+    background-color: rgb(204, 204, 204);
+    color: rgb(102, 102, 102);
+}
