@@ -1,7 +1,7 @@
 ﻿.container {
     flex-direction: column;
     padding: 24px;
-    background-color: #fefaf7;
+    background-color: #F5F0ED;
     height: 100%;
     width: 100%;
     justify-content: space-between;
@@ -10,55 +10,148 @@
 .top-bar {
     flex-direction: row;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 32px;
+}
+
+
+.back-button {
+    width: 45px;
+    height: 45px;
+    background-color: transparent;
+    border-width: 0;
+    font-size: 18px;
+    color: #333333;
+    padding: 0;
+    justify-content: center;
+    margin-top: 20%;
+    align-items: center;
+}
+
+.back-icon {
+    width: 45px;
+    height: 45px;
+    background-image: resource("back-icon");
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 
 .progress-bar {
     flex-grow: 1;
-    height: 8px;
-    background-color: #d6c3bb;
-    border-radius: 4px;
-    margin-left: 12px;
+    height: 25px;
+    background-color: #D4B5A0;
+    border-radius: 25px;
+    margin-left: 50px;
+    margin-right: 95px;
     overflow: hidden;
+    margin-top: 20%;
+    max-width: 1000px;
 }
 
 .progress-fill {
-    width: 120px;
+    width: 60%;
     height: 100%;
-    background-color: #8b4d2d;
+    background-color: #8B4C39;
     border-radius: 4px;
 }
 
 .title {
-    font-size: 22px;
-    font-weight: bold;
-    color: #111;
-    margin: 20px 0;
+    margin-top: 50px;
+    font-size: 45px;
+    -unity-font-style: bold;
+    color: #333333;
+    margin-bottom: 40px;
+    white-space: normal;
+    max-width: 800px;
+    margin-left: 100px;
 }
 
 .checkbox-group {
-    flex-direction: column;
-    row-gap: 10px;
+    margin-left: 100px;
+    padding-left: 5%;
+    max-width: 800px;
+    height: 400px;
 }
 
-.toggle {
-    color: #222;
-    font-size: 16px;
-    unity-font-style: normal;
+.checkbox-item {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 24px;
+    height: 24px;
+}
+
+/* Custom Checkbox Styling */
+.custom-checkbox {
+    width: 35px;
+    height: 35px;
+    margin-right: 16px;
+    margin: 0;
+    padding: 0;
+    margin-top: 4%;
+}
+
+/* Hide the default toggle styling */
+.custom-checkbox > .unity-toggle__input {
+    width: 35px;
+    height: 35px;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    border-width: 2px;
+    border-color: #8B4C39;
+    border-radius: 3px;
+    margin-top: 4%;
+}
+
+.custom-checkbox > .unity-toggle__input:checked {
+    background-color: #8B4C39;
+    border-color: #8B4C39;
+}
+
+/* Hide the default checkmark and create custom one */
+.custom-checkbox .unity-toggle__checkmark {
+    display: none;
+}
+
+.checkbox-label {
+    font-size: 35px;
+    color: #333333;
+    margin-left: 16px;
+    flex-grow: 1;
 }
 
 .primary-button {
+    max-width: 900px;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 12px 16px;
-    background-color: #8b4d2d;
+    padding: 16px 24px;
+    background-color: #8B4C39;
     color: white;
-    border-radius: 12px;
-    font-size: 16px;
+    border-radius: 50px;
+    border-width: 0;
+    margin-top: 20px;
+    height: 100px;
+    margin-left: 2%;
+    margin-right: 2%;
 }
 
-.primary-button .arrow {
-    font-size: 18px;
-    margin-left: 8px;
+.primary-button:hover {
+    background-color: #6B3629;
+}
+
+.primary-button:active {
+    background-color: #5A2A1F;
+}
+
+.button-text {
+    font-size: 35px;
+    color: white;
+    -unity-font-style: bold;
+    margin-right: 8px;
+}
+
+.arrow {
+    font-size: 35px;
+    color: white;
+    -unity-font-style: bold;
 }

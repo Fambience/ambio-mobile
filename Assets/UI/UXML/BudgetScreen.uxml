@@ -1,21 +1,21 @@
-﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
-    <Style src="../USS/BudgeScreen.uss"/>
-    <ui:VisualElement class="container">
-
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/HousematesScreen.uss?fileID=7433441132597879392&amp;guid=a55ff556a8cb4e6ca3e7a4f7c8a899b9&amp;type=3#HousematesScreen" />
+    <ui:VisualElement class="container" style="justify-content: flex-start;">
         <ui:VisualElement class="top-bar">
-            <ui:Button name="backButton">←</ui:Button>
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
             <ui:VisualElement class="progress-bar">
                 <ui:VisualElement class="progress-fill" />
             </ui:VisualElement>
         </ui:VisualElement>
-
-        <ui:Label name="budgetTitle" class="title" text="What's your budget?" />
-
-        <ui:VisualElement name="budgetOptions" class="radio-group">
-            <ui:RadioButton text="Below $1000" />
-            <ui:RadioButton text="$1000 - $3000" />
-            <ui:RadioButton text="$3000 - $5000" />
-            <ui:RadioButton text="Above $5000" />
+        <ui:VisualElement name="VisualElement" style="top: 50px;">
+            <ui:Label name="title" text="What&apos;s your budget?" class="title" style="top: auto;" />
+            <ui:RadioButtonGroup value="-1" choices="3L,  3L - 5L,5L - 7L" enabled="true" focusable="true" class="radio-group" style="font-size: 35px; -unity-font-style: normal; align-self: auto; align-items: center; left: 150px; -unity-text-align: upper-left; padding-left: 0;" />
+            <ui:Button name="completeButton" class="primary-button" style="top: 100px;">
+                <ui:Label text="Complete" class="button-text" />
+                <ui:Label text="→" class="arrow" />
+            </ui:Button>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

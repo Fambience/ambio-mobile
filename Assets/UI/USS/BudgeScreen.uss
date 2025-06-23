@@ -1,152 +1,105 @@
 ﻿.container {
     flex-direction: column;
     padding: 24px;
-    background-color: #fefefe;
+    background-color: #F5F0ED;
     height: 100%;
     width: 100%;
-    color: #333;
-    font-size: 14px;
+    justify-content: space-between;
 }
 
 .top-bar {
     flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: 32px;
 }
 
 .back-button {
-    font-size: 20px;
+    width: 45px;
+    height: 45px;
     background-color: transparent;
     border-width: 0;
-    color: #333;
-    margin-right: 12px;
-    padding: 4px 8px;
+    font-size: 18px;
+    color: #333333;
+    padding: 0;
+    justify-content: center;
+    margin-top: 20%;
+    align-items: center;
+}
+
+.back-icon {
+    width: 45px;
+    height: 45px;
+    background-image: resource("back-icon");
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 
 .progress-bar {
-    width: 180px;
-    height: 8px;
-    background-color: #ddd;
-    border-radius: 4px;
+    flex-grow: 1;
+    height: 25px;
+    background-color: #D4B5A0;
+    border-radius: 25px;
+    margin-left: 50px;
+    margin-right: 95px;
     overflow: hidden;
-    align-self: center;
+    margin-top: 20%;
+    max-width: 1000px;
 }
 
 .progress-fill {
-    width: 60px;
+    width: 60%;
     height: 100%;
-    background-color: #8b4d2d;
+    background-color: #8B4C39;
     border-radius: 4px;
 }
 
 .title {
-    font-size: 22px;
-    font-weight: bold;
-    color: #111;
-    margin-bottom: 12px;
+    margin-top: 100px;
+    font-size: 45px;
+    -unity-font-style: bold;
+    color: #333333;
+    margin-bottom: 40px;
+    white-space: normal;
+    max-width: 800px;
+    margin-left: 100px;
 }
 
-.radio-group {
-    flex-direction: column;
-    row-gap: 10px;
-    padding-top: 10px;
+unity-radio-button Label {
+    margin-left: 120px; /* Ensures spacing after the dot */
 }
 
-/* ✅ Custom-styled RadioButton */
-.radio-group > .radio {
-    padding: 10px;
-    border-radius: 8px;
-    background-color: #f0f0f0;
-    font-size: 15px;
-    color: #222;
-    cursor:move-arrow;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.radio-group > .radio:hover {
-    background-color: #e0e0e0;
-}
-
-.radio-group > .radio.selected {
-    background-color: #8b4d2d;
+.primary-button {
+    max-width: 900px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: #8B4C39;
     color: white;
-    font-weight: bold;
-}
-.radio-group {
-    flex-direction: column;
-    row-gap: 12px;
-    padding-top: 12px;
-}
-
-.radio {
-    flex-direction: row;
-    align-items: center;
-    padding: 10px 14px;
-    background-color: transparent;
-    border-radius: 10px;
-    transition: background-color 0.2s ease;
-    cursor: pointer;
+    border-radius: 50px;
+    border-width: 0;
+    height: 100px;
+    margin-left: 2%;
+    margin-right: 2%;
 }
 
-.radio:hover {
-    background-color: #f0f0f0;
+.primary-button:hover {
+    background-color: #6B3629;
 }
 
-.radio::before {
-    content: '';
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    border: 2px solid #ccc;
-    margin-right: 12px;
-    background-color: white;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-    box-sizing: border-box;
+.primary-button:active {
+    background-color: #5A2A1F;
 }
 
-.radio.selected:enabled{
-    background-color: #8b4d2d;
-    border-color: #8b4d2d;
+.button-text {
+    font-size: 35px;
+    color: white;
+    -unity-font-style: bold;
+    margin-right: 8px;
 }
 
-.radio > Label {
-    font-size: 16px;
-    color: #111;
-    font-weight: bold;
+.arrow {
+    font-size: 35px;
+    color: white;
+    -unity-font-style: bold;
 }
-.radio {
-    flex-direction: row;
-    align-items: center;
-    padding: 10px 14px;
-    border-radius: 8px;
-    background-color: transparent;
-    transition: background-color 0.2s ease;
-    cursor: pointer;
-    gap: 10px;
-}
-
-.radio:hover {
-    background-color: #f2f2f2;
-}
-
-.radio-circle {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    border: 2px solid #ccc;
-    background-color: #fff;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.radio.selected .radio-circle {
-    background-color: #8b4d2d;
-    border-color: #8b4d2d;
-}
-
-.radio-label {
-    font-size: 16px;
-    color: #111;
-    font-weight: bold;
-}
-
