@@ -1,0 +1,24 @@
+.container {
+    flex-direction: column;
+    padding: 24px;
+    background-color: rgb(245, 240, 237);
+    height: 100%;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.party-popper {
+    width: 500px;
+    height: 500px;
+    background-image: resource('party-popper');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.title {
+    margin-top: 50px;
+    font-size: 50px;
+    color: rgb(51, 51, 51);
+    white-space: normal;
+    max-width: 800px;
+}

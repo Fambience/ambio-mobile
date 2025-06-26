@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/USS/HousematesScreen.uss?fileID=7433441132597879392&amp;guid=a55ff556a8cb4e6ca3e7a4f7c8a899b9&amp;type=3#HousematesScreen" />
+    <Style src="project://database/Assets/UI/USS/BudgeScreen.uss?fileID=7433441132597879392&amp;guid=98c09e83a73643d69804598909eb4c66&amp;type=3#BudgeScreen" />
     <ui:VisualElement class="container" style="justify-content: flex-start;">
         <ui:VisualElement class="top-bar">
             <ui:Button name="backButton" class="back-button">

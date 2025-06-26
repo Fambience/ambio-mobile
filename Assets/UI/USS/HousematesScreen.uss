@@ -1,7 +1,7 @@
-﻿.container {
+.container {
     flex-direction: column;
     padding: 24px;
-    background-color: #F5F0ED;
+    background-color: rgb(245, 240, 237);
     height: 100%;
     width: 100%;
     justify-content: space-between;
@@ -13,14 +13,13 @@
     margin-bottom: 32px;
 }
 
-
 .back-button {
     width: 45px;
     height: 45px;
     background-color: transparent;
     border-width: 0;
     font-size: 18px;
-    color: #333333;
+    color: rgb(51, 51, 51);
     padding: 0;
     justify-content: center;
     margin-top: 20%;
@@ -30,7 +29,7 @@
 .back-icon {
     width: 45px;
     height: 45px;
-    background-image: resource("back-icon");
+    background-image: resource('back-icon');
     background-repeat: no-repeat;
     background-size: contain;
 }
@@ -38,7 +37,7 @@
 .progress-bar {
     flex-grow: 1;
     height: 25px;
-    background-color: #D4B5A0;
+    background-color: rgb(212, 181, 160);
     border-radius: 25px;
     margin-left: 50px;
     margin-right: 95px;
@@ -48,9 +47,9 @@
 }
 
 .progress-fill {
-    width: 60%;
+    width: 100%;
     height: 100%;
-    background-color: #8B4C39;
+    background-color: rgb(139, 76, 57);
     border-radius: 4px;
 }
 
@@ -58,7 +57,7 @@
     margin-top: 50px;
     font-size: 45px;
     -unity-font-style: bold;
-    color: #333333;
+    color: rgb(51, 51, 51);
     margin-bottom: 40px;
     white-space: normal;
     max-width: 800px;
@@ -79,7 +78,6 @@
     height: 24px;
 }
 
-/* Custom Checkbox Styling */
 .custom-checkbox {
     width: 35px;
     height: 35px;
@@ -89,7 +87,6 @@
     margin-top: 4%;
 }
 
-/* Hide the default toggle styling */
 .custom-checkbox > .unity-toggle__input {
     width: 35px;
     height: 35px;
@@ -97,24 +94,23 @@
     padding: 0;
     background-color: transparent;
     border-width: 2px;
-    border-color: #8B4C39;
+    border-color: rgb(139, 76, 57);
     border-radius: 3px;
     margin-top: 4%;
 }
 
 .custom-checkbox > .unity-toggle__input:checked {
-    background-color: #8B4C39;
-    border-color: #8B4C39;
+    background-color: rgb(139, 76, 57);
+    border-color: rgb(139, 76, 57);
 }
 
-/* Hide the default checkmark and create custom one */
 .custom-checkbox .unity-toggle__checkmark {
     display: none;
 }
 
 .checkbox-label {
     font-size: 35px;
-    color: #333333;
+    color: rgb(51, 51, 51);
     margin-left: 16px;
     flex-grow: 1;
 }
@@ -125,7 +121,7 @@
     justify-content: center;
     align-items: center;
     padding: 16px 24px;
-    background-color: #8B4C39;
+    background-color: rgb(139, 76, 57);
     color: white;
     border-radius: 50px;
     border-width: 0;
@@ -136,11 +132,11 @@
 }
 
 .primary-button:hover {
-    background-color: #6B3629;
+    background-color: rgb(107, 54, 41);
 }
 
 .primary-button:active {
-    background-color: #5A2A1F;
+    background-color: rgb(90, 42, 31);
 }
 
 .button-text {
@@ -154,4 +150,7 @@
     font-size: 35px;
     color: white;
     -unity-font-style: bold;
+}
+
+.unity-button {
 }
