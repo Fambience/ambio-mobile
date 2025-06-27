@@ -14,29 +14,30 @@
             <ui:VisualElement name="styleGrid" class="style-grid">
                 <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
                     <ui:Button name="Button" class="button-1">
-                        <ui:Image class="image-1" />
+                        <ui:Image class="Scandinavian" />
                     </ui:Button>
                     <ui:Button name="Button" class="button-2">
-                        <ui:Image class="image-2" />
+                        <ui:Image class="Traditional" />
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
                     <ui:Button name="Button" class="button-1">
-                        <ui:Image class="image-3" />
+                        <ui:Image class="Art-Deco" />
                     </ui:Button>
                     <ui:Button name="Button" class="button-2">
-                        <ui:Image class="image-4" />
+                        <ui:Image class="Contemporary" />
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
                     <ui:Button name="Button" class="button-1">
-                        <ui:Image class="image-5" />
+                        <ui:Image class="Eclactic" />
                     </ui:Button>
                     <ui:Button name="Button" class="button-2">
-                        <ui:Image class="image-6" />
+                        <ui:Image class="Indian-Vernacular" />
                     </ui:Button>
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:Label name="warningLabel" class="warning-text" text="You can select maximum 3 design styles!" />
             <ui:Button name="completeButton" class="primary-button" style="top: 100px;">
                 <ui:Label text="Next" class="button-text" />
                 <ui:Label text="→" class="arrow" />

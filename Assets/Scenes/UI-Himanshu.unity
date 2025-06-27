@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 416240154}
   - component: {fileID: 416240153}
+  - component: {fileID: 416240155}
   m_Layer: 0
   m_Name: Onboarding-3
   m_TagString: Untagged
@@ -170,6 +171,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &416240155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 416240152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcfa2699bb1ce4707a5faebaea83449f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextScreen: {fileID: 1686236373}
+  previousScreen: {fileID: 999350411}
+  currentScreen: {fileID: 416240152}
 --- !u!1 &758697889
 GameObject:
   m_ObjectHideFlags: 0
@@ -461,7 +477,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiDocument: {fileID: 999350412}
   nextSceneName: NextScreen
-  nextScreenPrefab: {fileID: 1044070115}
+  nextScreenPrefab: {fileID: 416240152}
   budgetOptions:
   - 3L
   - 3L - 5L
@@ -476,6 +492,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1243716902}
   - component: {fileID: 1243716901}
+  - component: {fileID: 1243716903}
   m_Layer: 0
   m_Name: Onboarding-5
   m_TagString: Untagged
@@ -517,6 +534,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1243716903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1243716900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9f011df7fe4c40bca15ddc126dfa253, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextScreen: {fileID: 1044070115}
+  previousScreen: {fileID: 1686236373}
+  currentScreen: {fileID: 1243716900}
 --- !u!1 &1617225798
 GameObject:
   m_ObjectHideFlags: 0
@@ -533,7 +565,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1617225799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -578,6 +610,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1686236375}
   - component: {fileID: 1686236374}
+  - component: {fileID: 1686236376}
   m_Layer: 0
   m_Name: Onboarding-4
   m_TagString: Untagged
@@ -619,6 +652,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1686236376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1686236373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee4485198aa1a4412b9fb002f6a00a90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextScreen: {fileID: 1243716900}
+  previousScreen: {fileID: 416240152}
+  currentScreen: {fileID: 1686236373}
 --- !u!1 &1770568091
 GameObject:
   m_ObjectHideFlags: 0

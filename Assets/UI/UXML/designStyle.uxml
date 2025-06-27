@@ -9,34 +9,35 @@
                 <ui:VisualElement class="progress-fill" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="VisualElement" style="top: 0px;">
+        <ui:VisualElement name="VisualElement" style="top: 0;">
             <ui:Label name="title" text="Which design style inspire you?" class="title" />
             <ui:VisualElement name="styleGrid" class="style-grid">
                 <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
-                    <ui:Button name="Button" class="button-1" >
-                        <ui:Image class="image-1" />
+                    <ui:Button name="Button" class="button-1">
+                        <ui:Image class="Art-Deco" />
                     </ui:Button>
-                    <ui:Button name="Button" class="button-2" >
-                        <ui:Image class="image-2" />
-                    </ui:Button>
-                </ui:VisualElement>
-                <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
-                    <ui:Button name="Button" class="button-1" >
-                        <ui:Image class="image-3" />
-                    </ui:Button>
-                    <ui:Button name="Button" class="button-2" >
-                        <ui:Image class="image-4" />
+                    <ui:Button name="Button" class="button-2">
+                        <ui:Image class="Bohemian" />
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
-                    <ui:Button name="Button" class="button-1" >
-                        <ui:Image class="image-5" />
+                    <ui:Button name="Button" class="button-1">
+                        <ui:Image class="Coastal" />
                     </ui:Button>
-                    <ui:Button name="Button" class="button-2" >
-                        <ui:Image class="image-6" />
+                    <ui:Button name="Button" class="button-2">
+                        <ui:Image class="Contemporary" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
+                    <ui:Button name="Button" class="button-1">
+                        <ui:Image class="Eclectic" />
+                    </ui:Button>
+                    <ui:Button name="Button" class="button-2">
+                        <ui:Image class="Indian-Vernacular" />
                     </ui:Button>
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:Label name="warningLabel" class="warning-text" text="You can select maximum 3 design styles!" />
             <ui:Button name="completeButton" class="primary-button" style="top: 100px;">
                 <ui:Label text="Next" class="button-text" />
                 <ui:Label text="→" class="arrow" />

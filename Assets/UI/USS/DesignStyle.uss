@@ -71,7 +71,7 @@
 
 .style-grid1 {
     margin-top: 80px;
- }
+}
 
 .button-1 {
     width: 250px;
@@ -87,43 +87,42 @@
     padding: 0;
 }
 
-.image-1 {
+/* Updated image classes with proper names */
+.Art-Deco {
     width: 100%;
     height: 100%;
     background-image: resource("Art-Deco");
 }
 
-.image-2 {
+.Bohemian {
     width: 100%;
     height: 100%;
     background-image: resource("Bohemian");
 }
 
-.image-3 {
+.Coastal {
     width: 100%;
     height: 100%;
     background-image: resource("Coastal");
 }
 
-.image-4 {
+.Contemporary {
     width: 100%;
     height: 100%;
     background-image: resource("Contemporary");
 }
 
-
-.image-5 {
+.Eclectic {
     width: 100%;
     height: 100%;
     background-image: resource("Eclactic");
 }
 
-.image-6 {
+.Indian-Vernacular {
     width: 100%;
     height: 100%;
     background-image: resource("Indian-Vernacular");
 }
-
 
 .primary-button {
     max-width: 900px;
@@ -159,4 +158,22 @@
     font-size: 35px;
     color: white;
     -unity-font-style: bold;
+}
+
+.warning-text {
+    font-size: 35px;
+    -unity-text-align: middle-center;
+    margin-top: 4px;
+    color: rgb(255, 0, 0);
+    justify-content: flex-end;
+    align-content: flex-end;
+    padding-top: 40px;
+    height: 80px; /* 👈 Reserve space */
+    visibility: hidden; /* 👈 Instead of display: none */
+    opacity: 0;          /* 👈 Smooth transition if needed */
+    transition: opacity 0.3s ease;
+}
+.warning-text.show {
+    visibility: visible;
+    opacity: 1;
 }
