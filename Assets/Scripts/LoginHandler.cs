@@ -208,6 +208,9 @@ public class LoginHandler : MonoBehaviour
                 if (!string.IsNullOrEmpty(token))
                     userProfileManager.InitializeProfile(token);
                 break;
+            
+            case "Basic Details":
+                break;
 
             default:
                 Debug.LogError("Unknown onboarding state.");

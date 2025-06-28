@@ -197,6 +197,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21c56f47d675ec441b9873b18ac9d074, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uiDocument: {fileID: 1850489381}
+  register: {fileID: 0}
+  userProfileManager: {fileID: 0}
+  registerUXMLAsset: {fileID: 9197481963319205126, guid: 7f35ecdb1095729448b12ec13b17cfd9, type: 3}
 --- !u!1 &2010436888
 GameObject:
   m_ObjectHideFlags: 0
