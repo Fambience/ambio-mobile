@@ -37,12 +37,19 @@
     font-size: 60px;
     color: #333333;
     -unity-font-style: bold;
-    unity-text-align: middle-center; /* ✅ Unity-specific horizontal+vertical centering */
+    -unity-text-align: middle-center; /* ✅ Unity-specific horizontal+vertical centering */
     text-align: center;              /* Optional but safe */
     white-space: normal;
     max-width: 1000px;
     width: 100%;
 }
+.warning-container {
+    flex-direction: column;
+    margin-bottom: 10px;
+    align-items: center;
+    font-size: 18;
+}
+
 
 /* Form Section */
 .form-section {

@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/Scripts/UI/USS/RegisterView.uss?fileID=7433441132597879392&amp;guid=9a3f176c414bd8a49a3d63cfb699f89b&amp;type=3#RegisterView" />
     <ui:VisualElement class="signup-container">
         <ui:VisualElement class="header-section" style="-unity-text-align: upper-center;">
-            <ui:Button name="backButton" class="back-button">
+            <ui:Button name="BackToLoginLabel" class="back-button">
                 <ui:Image class="back-icon" />
             </ui:Button>
             <ui:Label text="Ambio" class="app-title" style="-unity-text-align: upper-left;" />

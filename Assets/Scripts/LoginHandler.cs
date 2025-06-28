@@ -1,0 +1,273 @@
+using System.Collections;
+using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UIElements;
+
+public class LoginHandler : MonoBehaviour
+{
+    [Header("UI Toolkit")]
+    public UIDocument uiDocument;
+
+    [Header("External References")]
+    public Register register;
+    // public HomeFeedManager feedManager;
+    public UserProfileManager userProfileManager;
+    public VisualTreeAsset registerUXMLAsset;
+
+    private VisualElement loginScreen;
+    private VisualElement registerScreen;
+
+    [Header("Screens")]
+    public VisualElement otpScreen;
+    public VisualElement onboardingScreen;
+    public VisualElement homeScreen;
+    public VisualElement loaderScreen;
+    public Label loaderText;
+
+    private TextField emailField;
+    private TextField passwordField;
+    private Button loginButton;
+
+    private Label warningEmailText;
+    private Label warningPasswordText;
+    private Label warningLoginText;
+
+    private string userEmail;
+    private string baseURL = baseScript.baseURL;
+    private string loginEndPoint = "/api/v1/auth/login";
+
+    private void Awake()
+    {
+        var root = uiDocument.rootVisualElement;
+
+        // Bind UXML fields
+        loginScreen = root.Q<VisualElement>("LoginScreen");
+        emailField = root.Q<TextField>("emailField");
+        passwordField = root.Q<TextField>("passwordField");
+        loginButton = root.Q<Button>("signInButton");
+
+        // Create warning labels
+        warningEmailText = new Label { style = { color = Color.red, unityFontStyleAndWeight = FontStyle.Bold } };
+        warningPasswordText = new Label { style = { color = Color.red, unityFontStyleAndWeight = FontStyle.Bold } };
+        warningLoginText = new Label { style = { color = Color.red, unityFontStyleAndWeight = FontStyle.Bold } };
+
+        // Insert warnings into designated container
+        var warningContainer = root.Q<VisualElement>("LoginWarningContainer");
+        warningContainer.Add(warningEmailText);
+        warningContainer.Add(warningPasswordText);
+        warningContainer.Add(warningLoginText);
+
+        // Listeners
+        emailField.RegisterValueChangedCallback(evt => ValidateEmail(evt.newValue));
+        passwordField.RegisterValueChangedCallback(evt => ValidatePassword(evt.newValue));
+        loginButton.clicked += LoginUser;
+
+        // Sign up navigation
+        Label signUpLabel = root.Q<Label>("SignUpLabel");
+        signUpLabel.RegisterCallback<ClickEvent>(evt => ShowRegisterScreen());
+
+        PlayerPrefs.DeleteAll();
+        // AutoLogin(); // optional
+    }
+
+    private void ValidateEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            warningEmailText.text = "Email is required.";
+        else if (!emailValidator.isValidEmail(email))
+            warningEmailText.text = "Invalid email format.";
+        else
+            warningEmailText.text = string.Empty;
+    }
+
+    private void ValidatePassword(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
+            warningPasswordText.text = "Password is required.";
+        else if (!PasswordValidator.IsValidPassword(password, out string error))
+            warningPasswordText.text = error;
+        else
+            warningPasswordText.text = string.Empty;
+    }
+
+    private void LoginUser()
+    {
+        string email = emailField.value?.Trim();
+        string password = passwordField.value?.Trim();
+
+        bool hasEmpty = false;
+
+        if (string.IsNullOrEmpty(email))
+        {
+            warningEmailText.text = "Email is required.";
+            hasEmpty = true;
+        }
+
+        if (string.IsNullOrEmpty(password))
+        {
+            warningPasswordText.text = "Password is required.";
+            hasEmpty = true;
+        }
+
+        if (hasEmpty) return;
+
+        if (!string.IsNullOrEmpty(warningEmailText.text) || !string.IsNullOrEmpty(warningPasswordText.text))
+            return;
+
+        StartCoroutine(LoginUserCoroutine(email, password));
+    }
+
+    private IEnumerator LoginUserCoroutine(string email, string password)
+    {
+        ShowLoader("Logging in...");
+        string jsonData = JsonUtility.ToJson(new LoginData(email, password));
+
+        using (UnityWebRequest request = new UnityWebRequest(baseURL + loginEndPoint, "POST"))
+        {
+            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonData));
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+            HideLoader();
+
+            if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError($"Login Error: {request.error}");
+                messege error = JsonUtility.FromJson<messege>(request.downloadHandler.text);
+                warningLoginText.text = error?.message ?? "Login failed. Please try again.";
+                passwordField.value = "";
+                yield break;
+            }
+
+            warningLoginText.text = "";
+            passwordField.value = "";
+
+            var response = JsonUtility.FromJson<LoginResponse>(request.downloadHandler.text);
+            string token = response.token;
+
+            AuthTokenManager.SetToken(token);
+            userEmail = email;
+
+            PlayerPrefs.SetString("email", email);
+            PlayerPrefs.SetString("password", password);
+            PlayerPrefs.SetString("role", response.data.role);
+            PlayerPrefs.Save();
+
+            HandleLoginStage(response.data.onboardingState, response.data.role, token);
+        }
+    }
+
+    private void ShowRegisterScreen()
+    {
+        if (registerScreen == null)
+        {
+            registerScreen = registerUXMLAsset.CloneTree();
+            registerScreen.name = "RegisterScreen";
+            uiDocument.rootVisualElement.Add(registerScreen);
+
+            // Wait until the registerScreen is fully initialized before querying
+            registerScreen.RegisterCallback<GeometryChangedEvent>(evt =>
+            {
+                Button backToLogin = registerScreen.Q<Button>("BackToLoginLabel");
+                if (backToLogin != null)
+                {
+                    backToLogin.RegisterCallback<ClickEvent>(clickEvt =>
+                    {
+                        registerScreen.style.display = DisplayStyle.None;
+                        loginScreen.style.display = DisplayStyle.Flex;
+                    });
+                }
+                else
+                {
+                    Debug.LogWarning("BackToLoginLabel not found inside RegisterView.");
+                }
+            });
+        }
+
+        loginScreen.style.display = DisplayStyle.None;
+        registerScreen.style.display = DisplayStyle.Flex;
+    }
+
+    private void HandleLoginStage(string state, string role, string token)
+    {
+        switch (state)
+        {
+            case "VERIFY_EMAIL":
+                ShowOnly(otpScreen);
+                register.sendOTPFunc(userEmail);
+                break;
+
+            case "ONBOARD_DETAILS":
+                ShowOnly(onboardingScreen);
+                break;
+
+            case "ONBOARDING_COMPLETED":
+                ShowOnly(homeScreen);
+                // feedManager?.LoadHomeFeed();
+                if (!string.IsNullOrEmpty(token))
+                    userProfileManager.InitializeProfile(token);
+                break;
+
+            default:
+                Debug.LogError("Unknown onboarding state.");
+                break;
+        }
+    }
+
+    private void ShowOnly(VisualElement target)
+    {
+        otpScreen.style.display = DisplayStyle.None;
+        onboardingScreen.style.display = DisplayStyle.None;
+        homeScreen.style.display = DisplayStyle.None;
+        target.style.display = DisplayStyle.Flex;
+    }
+
+    private void ShowLoader(string message)
+    {
+        if (loaderScreen != null)
+        {
+            loaderText.text = message;
+            loaderScreen.style.display = DisplayStyle.Flex;
+        }
+    }
+
+    private void HideLoader()
+    {
+        if (loaderScreen != null)
+        {
+            loaderText.text = "";
+            loaderScreen.style.display = DisplayStyle.None;
+        }
+    }
+
+    [System.Serializable]
+    public class LoginData
+    {
+        public string email;
+        public string password;
+        public LoginData(string e, string p) { email = e; password = p; }
+    }
+
+    [System.Serializable]
+    public class LoginResponse
+    {
+        public bool success;
+        public string message;
+        public string token;
+        public Data data;
+    }
+
+    [System.Serializable]
+    public class Data
+    {
+        public string onboardingState;
+        public string role;
+    }
+
+    [System.Serializable]
+    public class messege
+    {
+        public string message;
+    }
+}
