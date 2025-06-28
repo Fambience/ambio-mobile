@@ -10,7 +10,6 @@ public class LoginHandler : MonoBehaviour
 
     [Header("External References")]
     public Register register;
-    // public HomeFeedManager feedManager;
     public UserProfileManager userProfileManager;
     public VisualTreeAsset registerUXMLAsset;
 
@@ -51,23 +50,19 @@ public class LoginHandler : MonoBehaviour
         warningPasswordText = new Label { style = { color = Color.red, unityFontStyleAndWeight = FontStyle.Bold } };
         warningLoginText = new Label { style = { color = Color.red, unityFontStyleAndWeight = FontStyle.Bold } };
 
-        // Insert warnings into designated container
         var warningContainer = root.Q<VisualElement>("LoginWarningContainer");
         warningContainer.Add(warningEmailText);
         warningContainer.Add(warningPasswordText);
         warningContainer.Add(warningLoginText);
 
-        // Listeners
         emailField.RegisterValueChangedCallback(evt => ValidateEmail(evt.newValue));
         passwordField.RegisterValueChangedCallback(evt => ValidatePassword(evt.newValue));
         loginButton.clicked += LoginUser;
 
-        // Sign up navigation
         Label signUpLabel = root.Q<Label>("SignUpLabel");
         signUpLabel.RegisterCallback<ClickEvent>(evt => ShowRegisterScreen());
 
         PlayerPrefs.DeleteAll();
-        // AutoLogin(); // optional
     }
 
     private void ValidateEmail(string email)
@@ -164,9 +159,12 @@ public class LoginHandler : MonoBehaviour
         {
             registerScreen = registerUXMLAsset.CloneTree();
             registerScreen.name = "RegisterScreen";
+            registerScreen.style.flexGrow = 1;
+            registerScreen.style.flexDirection = FlexDirection.Column;
+            registerScreen.MarkDirtyRepaint();
+
             uiDocument.rootVisualElement.Add(registerScreen);
 
-            // Wait until the registerScreen is fully initialized before querying
             registerScreen.RegisterCallback<GeometryChangedEvent>(evt =>
             {
                 Button backToLogin = registerScreen.Q<Button>("BackToLoginLabel");
@@ -204,12 +202,8 @@ public class LoginHandler : MonoBehaviour
 
             case "ONBOARDING_COMPLETED":
                 ShowOnly(homeScreen);
-                // feedManager?.LoadHomeFeed();
                 if (!string.IsNullOrEmpty(token))
                     userProfileManager.InitializeProfile(token);
-                break;
-            
-            case "Basic Details":
                 break;
 
             default:

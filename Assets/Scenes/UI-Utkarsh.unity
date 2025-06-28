@@ -150,7 +150,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2d5e7603ef83b84f8fc2acee2d00c7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loginDocument: {fileID: 1850489381}
 --- !u!114 &1850489381
 MonoBehaviour:
   m_ObjectHideFlags: 0
