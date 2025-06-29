@@ -95,13 +95,14 @@
     background-color: transparent;
     border-width: 2px;
     border-color: rgb(139, 76, 57);
-    border-radius: 3px;
+    border-radius: 50%; /* 👈 make it circular */
     margin-top: 4%;
 }
 
 .custom-checkbox > .unity-toggle__input:checked {
     background-color: rgb(139, 76, 57);
     border-color: rgb(139, 76, 57);
+    border-radius: 50%; /* 👈 ensure it's round when checked too */
 }
 
 .custom-checkbox .unity-toggle__checkmark {

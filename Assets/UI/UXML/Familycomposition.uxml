@@ -29,7 +29,7 @@
                 <ui:Label text="with roommates" class="checkbox-label" />
             </ui:VisualElement>
             <ui:VisualElement class="checkbox-item">
-                <ui:Toggle name="petsToggle" value="true" class="custom-checkbox" />
+                <ui:Toggle name="petsToggle" class="custom-checkbox" />
                 <ui:Label text="with pets" class="checkbox-label" />
             </ui:VisualElement>
         </ui:VisualElement>
