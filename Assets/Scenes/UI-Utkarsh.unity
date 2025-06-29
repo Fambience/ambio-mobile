@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 484351385}
   - component: {fileID: 484351384}
+  - component: {fileID: 484351386}
   m_Layer: 0
   m_Name: registerScreen
   m_TagString: Untagged
@@ -170,6 +171,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &484351386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484351383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 729887b7dc8e7fa468439a1e266cc61c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiDocument: {fileID: 484351384}
+  userProfileManager: {fileID: 0}
 --- !u!1 &854714330
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,7 +246,6 @@ GameObject:
   - component: {fileID: 1850489381}
   - component: {fileID: 1850489380}
   - component: {fileID: 1850489383}
-  - component: {fileID: 1850489384}
   m_Layer: 0
   m_Name: loginScreen
   m_TagString: Untagged
@@ -301,20 +315,6 @@ MonoBehaviour:
   register: {fileID: 0}
   userProfileManager: {fileID: 0}
   registerUXMLAsset: {fileID: 9197481963319205126, guid: 7f35ecdb1095729448b12ec13b17cfd9, type: 3}
---- !u!114 &1850489384
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1850489379}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 729887b7dc8e7fa468439a1e266cc61c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  uiDocument: {fileID: 0}
-  userProfileManager: {fileID: 0}
 --- !u!1 &2010436888
 GameObject:
   m_ObjectHideFlags: 0

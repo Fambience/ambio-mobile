@@ -8,10 +8,6 @@ public class Register : MonoBehaviour
     [Header("UI Toolkit")]
     public UIDocument uiDocument;
     public UserProfileManager userProfileManager;
-    public VisualElement verifyOtpScreen;
-    public VisualElement selectionScreen;
-    public VisualElement loaderScreen;
-    public Label loaderText;
 
     private TextField emailField;
     private TextField passwordField;
@@ -41,23 +37,26 @@ public class Register : MonoBehaviour
         confirmPasswordField = root.Q<TextField>("confirmPasswordField");
         continueButton = root.Q<Button>("continueButton");
 
-        // Create and add warning labels manually
         warningEmail = CreateWarningLabel();
         warningPassword = CreateWarningLabel();
         warningConfirmPassword = CreateWarningLabel();
         warningRegister = CreateWarningLabel();
 
-        continueButton.clicked += RegisterUser;
-        var backToLoginButton = root.Q<Button>("BackToLoginLabel");
-        backToLoginButton?.RegisterCallback<ClickEvent>(evt =>
-        {
-            UIManager.Instance.OpenScreen(UIScreenType.Login);
-            Debug.Log("Back to Login Called");
-        });
-
         emailField.RegisterValueChangedCallback(evt => ValidateEmail(evt.newValue));
         passwordField.RegisterValueChangedCallback(evt => ValidatePassword(evt.newValue));
         confirmPasswordField.RegisterValueChangedCallback(evt => ValidateConfirmPassword(evt.newValue));
+
+        continueButton.clicked += RegisterUser;
+
+        backToLoginButton = root.Q<Button>("BackToLoginLabel");
+        if (backToLoginButton != null)
+        {
+            backToLoginButton.RegisterCallback<ClickEvent>(evt =>
+            {
+                Debug.Log("Back to Login Called");
+                UIManager.Instance.OpenScreen(UIScreenType.Login);
+            });
+        }
     }
 
     private Label CreateWarningLabel()
@@ -76,24 +75,26 @@ public class Register : MonoBehaviour
     private void ValidateEmail(string email)
     {
         warningEmail.text = emailValidator.isValidEmail(email) ? "" : "Invalid email format.";
-    }
-
-    private void ShowLoginScreen()
-    {
-        UIManager.Instance.OpenScreen(UIScreenType.Login);
+        Debug.Log($"Email validation: {warningEmail.text}");
     }
 
     private void ValidatePassword(string password)
     {
         if (!PasswordValidator.IsValidPassword(password, out string error))
+        {
             warningPassword.text = error;
+            Debug.LogError(error);
+        }
         else
+        {
             warningPassword.text = "";
+        }
     }
 
     private void ValidateConfirmPassword(string confirm)
     {
         warningConfirmPassword.text = confirm != passwordField.value ? "Passwords do not match." : "";
+        Debug.Log($"Confirm password validation: {warningConfirmPassword.text}");
     }
 
     private void RegisterUser()
@@ -106,26 +107,32 @@ public class Register : MonoBehaviour
         ValidatePassword(password);
         ValidateConfirmPassword(confirmPassword);
 
-        if (!string.IsNullOrEmpty(warningEmail.text) || !string.IsNullOrEmpty(warningPassword.text) || !string.IsNullOrEmpty(warningConfirmPassword.text))
+        if (!string.IsNullOrEmpty(warningEmail.text) ||
+            !string.IsNullOrEmpty(warningPassword.text) ||
+            !string.IsNullOrEmpty(warningConfirmPassword.text))
+        {
+            Debug.LogWarning("Validation failed. Aborting register.");
             return;
+        }
 
+        Debug.Log("Sending registration request...");
         StartCoroutine(RegisterUserCoroutine(email, password));
     }
 
     private IEnumerator RegisterUserCoroutine(string email, string password)
     {
-        ShowLoader("Registering your account...");
+        // ShowLoader("Registering your account...");
         string jsonData = JsonUtility.ToJson(new LoginData(email, password));
 
         using (UnityWebRequest request = new UnityWebRequest(baseURL + registerEndPoint, "POST"))
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonData));
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
 
             yield return request.SendWebRequest();
-            HideLoader();
+
+            // HideLoader();
 
             if (request.result != UnityWebRequest.Result.Success)
             {
@@ -137,12 +144,12 @@ public class Register : MonoBehaviour
             {
                 warningRegister.text = "";
                 RegisterResponse response = JsonUtility.FromJson<RegisterResponse>(request.downloadHandler.text);
+                Debug.Log("Registration successful. Token: " + response.token);
                 AuthTokenManager.SetToken(response.token);
                 userProfileManager.InitializeProfile(response.token);
-                sendOTPFunc(email);
 
-                uiDocument.rootVisualElement.Q<VisualElement>("RegisterScreen").style.display = DisplayStyle.None;
-                verifyOtpScreen.style.display = DisplayStyle.Flex;
+                sendOTPFunc(email);
+                UIManager.Instance.OpenScreen(UIScreenType.Login);
             }
         }
     }
@@ -160,11 +167,9 @@ public class Register : MonoBehaviour
 
         using (UnityWebRequest request = new UnityWebRequest(baseURL + sendOtpEndPoint, "POST"))
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonData));
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
-
             if (!string.IsNullOrEmpty(token))
                 request.SetRequestHeader("Authorization", token);
 
@@ -180,12 +185,15 @@ public class Register : MonoBehaviour
     public void VerifyOTP(string otp)
     {
         if (!string.IsNullOrEmpty(otp))
+        {
+            Debug.Log("Verifying OTP: " + otp);
             StartCoroutine(VerifyOtpCoroutine(otp));
+        }
     }
 
     private IEnumerator VerifyOtpCoroutine(string otp)
     {
-        ShowLoader("Verifying OTP...");
+        // ShowLoader("Verifying OTP...");
         string jsonData = JsonUtility.ToJson(new OTPData(otp));
         string token = AuthTokenManager.GetToken();
 
@@ -197,7 +205,8 @@ public class Register : MonoBehaviour
             request.SetRequestHeader("Authorization", token);
 
             yield return request.SendWebRequest();
-            HideLoader();
+
+            // HideLoader();
 
             if (request.result != UnityWebRequest.Result.Success)
             {
@@ -206,38 +215,14 @@ public class Register : MonoBehaviour
             else
             {
                 Debug.Log("OTP Verified.");
-                verifyOtpScreen.style.display = DisplayStyle.None;
-                selectionScreen.style.display = DisplayStyle.Flex;
+                UIManager.Instance.OpenScreen(UIScreenType.Login);
             }
         }
     }
 
-    private void ShowLoader(string msg)
-    {
-        if (loaderScreen != null)
-        {
-            loaderText.text = msg;
-            loaderScreen.style.display = DisplayStyle.Flex;
-        }
-    }
-
-    private void HideLoader()
-    {
-        if (loaderScreen != null)
-        {
-            loaderText.text = "";
-            loaderScreen.style.display = DisplayStyle.None;
-        }
-    }
-
-    [System.Serializable]
-    public class LoginData { public string email, password; public LoginData(string e, string p) { email = e; password = p; } }
-    [System.Serializable]
-    public class OTPData { public string otp; public OTPData(string o) { otp = o; } }
-    [System.Serializable]
-    public class EmailData { public string email; public EmailData(string e) { email = e; } }
-    [System.Serializable]
-    public class RegisterResponse { public string token; public bool success; public string message; }
-    [System.Serializable]
-    public class messege { public string message; }
+    [System.Serializable] public class LoginData { public string email, password; public LoginData(string e, string p) { email = e; password = p; } }
+    [System.Serializable] public class OTPData { public string otp; public OTPData(string o) { otp = o; } }
+    [System.Serializable] public class EmailData { public string email; public EmailData(string e) { email = e; } }
+    [System.Serializable] public class RegisterResponse { public string token; public bool success; public string message; }
+    [System.Serializable] public class messege { public string message; }
 }
