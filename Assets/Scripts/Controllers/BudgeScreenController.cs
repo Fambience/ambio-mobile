@@ -18,7 +18,7 @@ public class BudgeScreenController
             backButton.clicked += () =>
             {
                 Debug.Log("[BudgetScreen] Back button clicked");
-                manager.ShowCompleteProfile();
+                //anager.ShowCompleteProfile();
             };
         }
 
@@ -52,7 +52,7 @@ public class BudgeScreenController
                         }
 
                         Debug.Log("[BudgetScreen] Navigating to FamilyScreen...");
-                        manager.ShowFamilyScreen();
+                        //manager.ShowFamilyScreen();
                     }
                 });
 

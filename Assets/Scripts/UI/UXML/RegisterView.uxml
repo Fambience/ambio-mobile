@@ -1,0 +1,35 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/RegisterView.uss?fileID=7433441132597879392&amp;guid=9a3f176c414bd8a49a3d63cfb699f89b&amp;type=3#RegisterView" />
+    <ui:VisualElement class="signup-container">
+        <ui:VisualElement class="header-section" style="-unity-text-align: upper-center;">
+            <ui:Button name="BackToLoginLabel" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+            <ui:Label text="Ambio" class="app-title" style="-unity-text-align: upper-left;" />
+        </ui:VisualElement>
+        <ui:VisualElement class="form-section" style="-unity-text-align: upper-left; justify-content: flex-start; align-items: auto; align-self: auto; align-content: flex-start;">
+            <ui:VisualElement class="input-group">
+                <ui:Label text="Enter Email" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon email-icon" />
+                    <ui:TextField name="emailField" placeholder-text="Email" class="input-field" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="input-group">
+                <ui:Label text="Enter Password" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon password-icon" />
+                    <ui:TextField name="passwordField" is-password="true" placeholder-text="Password" class="input-field" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="input-group">
+                <ui:Label text="Confirm Password" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon password-icon" />
+                    <ui:TextField name="confirmPasswordField" is-password="true" placeholder-text="Confirm Password" class="input-field" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Button name="continueButton" text="Continue" class="continue-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

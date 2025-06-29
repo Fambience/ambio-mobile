@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/USS/LoginView.uss?fileID=7433441132597879392&amp;guid=dd85c5becfad17648b85c3baf1398a95&amp;type=3#LoginView" />
-    <ui:VisualElement class="login-container">
+    <ui:VisualElement name="LoginScreen" class="login-container">
         <ui:VisualElement class="logo-section">
             <ui:Image name="logoImage" class="ambio-logo" style="background-image: url(&quot;project://database/Assets/Art/UI/logo.png?fileID=21300000&amp;guid=6fe66b90e693d7e479eae7bc6a09efcb&amp;type=3#logo&quot;);" />
             <ui:Label text="Creating Creativity,&#10;Crafting Spaces!" class="subtitle" style="flex-direction: row; -unity-text-align: upper-center;" />
@@ -21,10 +21,12 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:Label text="Forgot Password?" class="forgot-password" />
+            <ui:VisualElement name="LoginWarningContainer" class="warning-container" />
+            
             <ui:Button name="signInButton" text="Sign In" class="sign-in-button" />
             <ui:VisualElement class="signup-section">
                 <ui:Label text="Don&apos;t have an account? " class="signup-text" />
-                <ui:Label text="Sign Up" class="signup-link" />
+                <ui:Label name="SignUpLabel" text="Sign Up" class="signup-link" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
