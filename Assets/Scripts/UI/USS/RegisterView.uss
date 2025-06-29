@@ -162,3 +162,14 @@
     background-color: rgb(204, 204, 204);
     color: rgb(102, 102, 102);
 }
+.warning-label {
+    color: red;
+    font-size: 14px;
+    margin-top: 6px;
+    margin-left: 4px;
+    unity-font-style: bold;
+}
+
+.center-text {
+    -unity-text-align: middle-center;
+}

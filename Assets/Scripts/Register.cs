@@ -36,11 +36,13 @@ public class Register : MonoBehaviour
         passwordField = root.Q<TextField>("passwordField");
         confirmPasswordField = root.Q<TextField>("confirmPasswordField");
         continueButton = root.Q<Button>("continueButton");
+        backToLoginButton = root.Q<Button>("BackToLoginLabel");
 
-        warningEmail = CreateWarningLabel();
-        warningPassword = CreateWarningLabel();
-        warningConfirmPassword = CreateWarningLabel();
-        warningRegister = CreateWarningLabel();
+        // Bind pre-defined warning labels
+        warningEmail = root.Q<Label>("WarningEmail");
+        warningPassword = root.Q<Label>("WarningPassword");
+        warningConfirmPassword = root.Q<Label>("WarningConfirmPassword");
+        warningRegister = root.Q<Label>("WarningRegister");
 
         emailField.RegisterValueChangedCallback(evt => ValidateEmail(evt.newValue));
         passwordField.RegisterValueChangedCallback(evt => ValidatePassword(evt.newValue));
@@ -48,34 +50,24 @@ public class Register : MonoBehaviour
 
         continueButton.clicked += RegisterUser;
 
-        backToLoginButton = root.Q<Button>("BackToLoginLabel");
-        if (backToLoginButton != null)
+        backToLoginButton?.RegisterCallback<ClickEvent>(evt =>
         {
-            backToLoginButton.RegisterCallback<ClickEvent>(evt =>
-            {
-                Debug.Log("Back to Login Called");
-                UIManager.Instance.OpenScreen(UIScreenType.Login);
-            });
-        }
-    }
-
-    private Label CreateWarningLabel()
-    {
-        return new Label
-        {
-            style =
-            {
-                color = Color.red,
-                unityFontStyleAndWeight = FontStyle.Bold,
-                marginTop = 2
-            }
-        };
+            Debug.Log("Back to Login Called");
+            UIManager.Instance.OpenScreen(UIScreenType.Login);
+        });
     }
 
     private void ValidateEmail(string email)
     {
-        warningEmail.text = emailValidator.isValidEmail(email) ? "" : "Invalid email format.";
-        Debug.Log($"Email validation: {warningEmail.text}");
+        if (!emailValidator.isValidEmail(email))
+        {
+            warningEmail.text = "Invalid email format.";
+            Debug.LogWarning(warningEmail.text);
+        }
+        else
+        {
+            warningEmail.text = "";
+        }
     }
 
     private void ValidatePassword(string password)
@@ -83,7 +75,7 @@ public class Register : MonoBehaviour
         if (!PasswordValidator.IsValidPassword(password, out string error))
         {
             warningPassword.text = error;
-            Debug.LogError(error);
+            Debug.LogWarning(error);
         }
         else
         {
@@ -93,8 +85,15 @@ public class Register : MonoBehaviour
 
     private void ValidateConfirmPassword(string confirm)
     {
-        warningConfirmPassword.text = confirm != passwordField.value ? "Passwords do not match." : "";
-        Debug.Log($"Confirm password validation: {warningConfirmPassword.text}");
+        if (confirm != passwordField.value)
+        {
+            warningConfirmPassword.text = "Passwords do not match.";
+            Debug.LogWarning(warningConfirmPassword.text);
+        }
+        else
+        {
+            warningConfirmPassword.text = "";
+        }
     }
 
     private void RegisterUser()
@@ -111,7 +110,7 @@ public class Register : MonoBehaviour
             !string.IsNullOrEmpty(warningPassword.text) ||
             !string.IsNullOrEmpty(warningConfirmPassword.text))
         {
-            Debug.LogWarning("Validation failed. Aborting register.");
+            Debug.LogWarning("Validation failed. Registration aborted.");
             return;
         }
 
@@ -143,13 +142,14 @@ public class Register : MonoBehaviour
             else
             {
                 warningRegister.text = "";
-                RegisterResponse response = JsonUtility.FromJson<RegisterResponse>(request.downloadHandler.text);
+                var response = JsonUtility.FromJson<RegisterResponse>(request.downloadHandler.text);
                 Debug.Log("Registration successful. Token: " + response.token);
                 AuthTokenManager.SetToken(response.token);
                 userProfileManager.InitializeProfile(response.token);
 
                 sendOTPFunc(email);
-                UIManager.Instance.OpenScreen(UIScreenType.Login);
+
+                //UIManager.Instance.OpenScreen(UIScreenType.OTP); // or whatever screen you use for OTP
             }
         }
     }
@@ -170,6 +170,7 @@ public class Register : MonoBehaviour
             request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonData));
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
+
             if (!string.IsNullOrEmpty(token))
                 request.SetRequestHeader("Authorization", token);
 
@@ -215,7 +216,7 @@ public class Register : MonoBehaviour
             else
             {
                 Debug.Log("OTP Verified.");
-                UIManager.Instance.OpenScreen(UIScreenType.Login);
+                //UIManager.Instance.OpenScreen(UIScreenType.Onboarding); // or next stage
             }
         }
     }
