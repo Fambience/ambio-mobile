@@ -155,37 +155,7 @@ public class LoginHandler : MonoBehaviour
 
     private void ShowRegisterScreen()
     {
-        if (registerScreen == null)
-        {
-            // registerScreen = registerUXMLAsset.CloneTree();
-            // registerScreen.name = "RegisterScreen";
-            // registerScreen.style.flexGrow = 1;
-            // registerScreen.style.flexDirection = FlexDirection.Column;
-            // registerScreen.MarkDirtyRepaint();
-            //
-            // uiDocument.rootVisualElement.Add(registerScreen);
-            //
-            // registerScreen.RegisterCallback<GeometryChangedEvent>(evt =>
-            // {
-            //     Button backToLogin = registerScreen.Q<Button>("BackToLoginLabel");
-            //     if (backToLogin != null)
-            //     {
-            //         backToLogin.RegisterCallback<ClickEvent>(clickEvt =>
-            //         {
-            //             registerScreen.style.display = DisplayStyle.None;
-            //             loginScreen.style.display = DisplayStyle.Flex;
-            //         });
-            //     }
-            //     else
-            //     {
-            //         Debug.LogWarning("BackToLoginLabel not found inside RegisterView.");
-            //     }
-            // });
             UIManager.Instance.OpenScreen(UIScreenType.Register);
-        }
-
-        loginScreen.style.display = DisplayStyle.None;
-        registerScreen.style.display = DisplayStyle.Flex;
     }
 
     private void HandleLoginStage(string state, string role, string token)

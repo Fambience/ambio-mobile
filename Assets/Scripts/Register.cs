@@ -40,7 +40,6 @@ public class Register : MonoBehaviour
         passwordField = root.Q<TextField>("passwordField");
         confirmPasswordField = root.Q<TextField>("confirmPasswordField");
         continueButton = root.Q<Button>("continueButton");
-        backToLoginButton = root.Q<Button>("BackToLoginLabel");
 
         // Create and add warning labels manually
         warningEmail = CreateWarningLabel();
@@ -49,11 +48,12 @@ public class Register : MonoBehaviour
         warningRegister = CreateWarningLabel();
 
         continueButton.clicked += RegisterUser;
-        backToLoginButton.clicked += () =>
+        var backToLoginButton = root.Q<Button>("BackToLoginLabel");
+        backToLoginButton?.RegisterCallback<ClickEvent>(evt =>
         {
-            root.Q<VisualElement>("RegisterScreen").style.display = DisplayStyle.None;
-            root.Q<VisualElement>("LoginScreen").style.display = DisplayStyle.Flex;
-        };
+            UIManager.Instance.OpenScreen(UIScreenType.Login);
+            Debug.Log("Back to Login Called");
+        });
 
         emailField.RegisterValueChangedCallback(evt => ValidateEmail(evt.newValue));
         passwordField.RegisterValueChangedCallback(evt => ValidatePassword(evt.newValue));
@@ -76,6 +76,11 @@ public class Register : MonoBehaviour
     private void ValidateEmail(string email)
     {
         warningEmail.text = emailValidator.isValidEmail(email) ? "" : "Invalid email format.";
+    }
+
+    private void ShowLoginScreen()
+    {
+        UIManager.Instance.OpenScreen(UIScreenType.Login);
     }
 
     private void ValidatePassword(string password)
