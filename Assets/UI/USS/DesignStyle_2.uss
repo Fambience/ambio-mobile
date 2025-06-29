@@ -47,7 +47,7 @@
 }
 
 .progress-fill {
-    width: 83%;
+    width: 87%;
     height: 100%;
     background-color: #8B4C39;
     border-radius: 4px;
@@ -78,6 +78,14 @@
     height: 250px;
     border-radius: 25px;
     padding: 0;
+    background-color: transparent;
+    border-width: 0;
+}
+
+.label {
+    font-size: 35px;
+    -unity-font-style: bold;
+    white-space: normal;
 }
 
 .button-2 {
@@ -85,45 +93,33 @@
     height: 250px;
     border-radius: 25px;
     padding: 0;
+    background-color: transparent;
+    border-width: 0;
 }
 
-.Scandinavian {
+.Warm {
     width: 100%;
     height: 100%;
-    background-image: resource("Scandinavian");
+    background-image: resource("Warm");
 }
 
-.Traditional {
+.Calm {
     width: 100%;
     height: 100%;
-    background-image: resource("Traditional");
+    background-image: resource("Calm");
 }
 
-.Art-Deco {
+.Neutral {
     width: 100%;
     height: 100%;
-    background-image: resource("Art-Deco");
+    background-image: resource("Neutral");
 }
 
-.Contemporary {
+.Bold {
     width: 100%;
     height: 100%;
-    background-image: resource("Contemporary");
+    background-image: resource("strong");
 }
-
-
-.Eclactic {
-    width: 100%;
-    height: 100%;
-    background-image: resource("Eclactic");
-}
-
-.Indian-Vernacular {
-    width: 100%;
-    height: 100%;
-    background-image: resource("Indian-Vernacular");
-}
-
 
 .primary-button {
     max-width: 900px;

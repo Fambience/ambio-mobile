@@ -1,0 +1,34 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/BasicDetails.uss?fileID=7433441132597879392&amp;guid=e490d2f817a694f078a9357e6bcabaf7&amp;type=3#BasicDetails" />
+    <ui:VisualElement class="container" style="justify-content: flex-start;">
+        <ui:VisualElement class="top-bar">
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+            <ui:VisualElement class="progress-bar">
+                <ui:VisualElement class="progress-fill" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label name="title" text="Complete Your Profile!" class="title" />
+        <ui:VisualElement class="form-section">
+            <ui:VisualElement class="input-group">
+                <ui:Label text="First Name" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon email-icon" />
+                    <ui:TextField name="firstName" placeholder-text="First Name" class="input-field" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="input-group">
+                <ui:Label text="Last Name" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon password-icon" />
+                    <ui:TextField name="lastName" placeholder-text="Last Name" class="input-field" style="align-self: center; background-color: rgba(255, 255, 255, 0); -unity-background-image-tint-color: rgba(255, 255, 255, 0); -unity-slice-scale: 1px; border-left-color: rgba(255, 255, 255, 0); border-right-color: rgba(255, 255, 255, 0); border-top-color: rgba(255, 255, 255, 0); border-bottom-color: rgba(255, 255, 255, 0);" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="completeButton" class="primary-button">
+            <ui:Label text="Next" class="button-text" />
+            <ui:Label text="→" class="arrow" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

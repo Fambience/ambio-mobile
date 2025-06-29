@@ -10,30 +10,26 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="VisualElement" style="top: 0;">
-            <ui:Label name="title" text="Which design style inspire you?" class="title" />
+            <ui:Label name="title" text="Which color schemes do you love?" class="title" />
             <ui:VisualElement name="styleGrid" class="style-grid">
                 <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
                     <ui:Button name="Button" class="button-1">
-                        <ui:Image class="Scandinavian" />
+                        <ui:Image class="Warm" />
+                        <ui:Label name="label" text="Warm" class="label" />
                     </ui:Button>
                     <ui:Button name="Button" class="button-2">
-                        <ui:Image class="Traditional" />
+                        <ui:Image class="Calm" />
+                        <ui:Label name="label" text="Calm" class="label" />
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
                     <ui:Button name="Button" class="button-1">
-                        <ui:Image class="Art-Deco" />
+                        <ui:Image class="Neutral" />
+                        <ui:Label name="label" text="Neutral" class="label" />
                     </ui:Button>
                     <ui:Button name="Button" class="button-2">
-                        <ui:Image class="Contemporary" />
-                    </ui:Button>
-                </ui:VisualElement>
-                <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
-                    <ui:Button name="Button" class="button-1">
-                        <ui:Image class="Eclactic" />
-                    </ui:Button>
-                    <ui:Button name="Button" class="button-2">
-                        <ui:Image class="Indian-Vernacular" />
+                        <ui:Image class="Bold" />
+                        <ui:Label name="label" text="Bold" class="label" />
                     </ui:Button>
                 </ui:VisualElement>
             </ui:VisualElement>

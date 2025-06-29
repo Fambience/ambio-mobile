@@ -9,9 +9,12 @@
             <ui:VisualElement class="progress-bar">
                 <ui:VisualElement class="progress-fill" />
             </ui:VisualElement>
+            
+            <ui:Button name="skipButton" class="skip-button">
+                <ui:Image class="skip-icon" />
+            </ui:Button>
         </ui:VisualElement>
-        <ui:Label name="title" text="Complete Your Profile!" class="title" />
-        <ui:Label name="subtitle" text="Where is your home located?" class="subtitle" />
+        <ui:Label name="title" text="Where is your home located?" class="title" />
         <ui:VisualElement name="locationDropdown" class="location-dropdown" style="justify-content: flex-start;">
             <ui:VisualElement name="dropdownTrigger" class="dropdown-trigger">
                 <ui:Label name="selectedText" text="Select your location" class="selected-text" style="justify-content: flex-start; align-content: flex-start;" />
@@ -24,6 +27,9 @@
                 <ui:ScrollView name="optionsList" class="options-list" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Button name="continueButton" text="Continue" class="continue-button" style="display: none;" />
+        <ui:Button name="completeButton" class="primary-button">
+            <ui:Label text="Next" class="button-text" />
+            <ui:Label text="→" class="arrow" />
+        </ui:Button>
     </ui:VisualElement>
 </ui:UXML>
