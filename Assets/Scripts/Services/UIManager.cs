@@ -1,49 +1,53 @@
 ﻿using UnityEngine;
-using UnityEngine.UIElements;
+using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour
 {
-    private UIDocument uiDocument;
+    public static UIManager Instance { get; private set; }
 
-    [Header("Screens")]
-    public VisualTreeAsset completeProfileScreen;
-    public VisualTreeAsset budgetScreen;
-    public VisualTreeAsset familyScreen;
-   
-    private string userName = "Vansh";
-    private readonly string[] locations = { "New York", "Los Angeles", "Chicago", "Houston", "San Francisco" };
-
-    private void Awake()
+    [System.Serializable]
+    public class ScreenEntry
     {
-        uiDocument = GetComponent<UIDocument>();
+        public UIScreenType screenType;
+        public GameObject screenObject;
     }
 
-    private void Start()
+    [Header("Screen Registry")]
+    public List<ScreenEntry> screenEntries;
+
+    private Dictionary<UIScreenType, GameObject> screenMap = new();
+
+    void Awake()
     {
-        ShowCompleteProfile();
+        if (Instance != null && Instance != this) Destroy(gameObject);
+        else Instance = this;
+
+        foreach (var entry in screenEntries)
+        {
+            if (!screenMap.ContainsKey(entry.screenType))
+            {
+                screenMap.Add(entry.screenType, entry.screenObject);
+            }
+        }
     }
 
-    public void ShowCompleteProfile()
+    public void OpenScreen(UIScreenType screenToOpen)
     {
-        uiDocument.visualTreeAsset = completeProfileScreen;
-        var root = uiDocument.rootVisualElement;
-
-        var screen = new CompleteProfileController();
-        screen.Initialize(root, this);
+        foreach (var kvp in screenMap)
+        {
+            kvp.Value.SetActive(kvp.Key == screenToOpen);
+        }
     }
 
-    public void ShowBudgetScreen()
+    public void TransitionScreens(UIScreenType current, UIScreenType next)
     {
-        uiDocument.visualTreeAsset = budgetScreen;
-        var root = uiDocument.rootVisualElement;
-
-        var screen = new BudgeScreenController();
-        screen.Initialize(root, this);
+        if (screenMap.ContainsKey(current)) screenMap[current].SetActive(false);
+        if (screenMap.ContainsKey(next)) screenMap[next].SetActive(true);
     }
 
-    public void ShowFamilyScreen()
+    public GameObject GetScreen(UIScreenType type)
     {
-        uiDocument.visualTreeAsset = familyScreen;
-        var root = uiDocument.rootVisualElement;
+        screenMap.TryGetValue(type, out var screen);
+        return screen;
     }
 }

@@ -62,7 +62,7 @@ public class CompleteProfileController
             dropdown.RegisterValueChangedCallback(evt =>
             {
                 Debug.Log("Location selected: " + evt.newValue);
-                manager.ShowBudgetScreen();
+                //manager.ShowBudgetScreen();
             });
 
             dropdownWrapper.Add(dropdown);
