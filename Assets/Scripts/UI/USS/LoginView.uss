@@ -89,20 +89,20 @@
 
 /* Icons */
 .input-icon {
-    width: 40px;
-    height: 40px;
-    margin-left: 14px;
+    width: 50px;
+    height: 50px;
+    margin-left: 25px;
     margin-right: 10px;
     background-size: contain;
     background-repeat: no-repeat;
 }
 
 .email-icon {
-    background-image: resource("mail-icon"); /* Replace with your email icon resource */
+    background-image: resource("email"); /* Replace with your email icon resource */
 }
 
 .password-icon {
-    background-image: resource("lock-icon"); /* Replace with your lock icon resource */
+    background-image: resource("lock"); /* Replace with your lock icon resource */
 }
 
 /* Input Field */

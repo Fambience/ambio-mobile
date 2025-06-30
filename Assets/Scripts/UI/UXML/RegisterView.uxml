@@ -1,18 +1,14 @@
-<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:ui="UnityEngine.UIElements"
-         xmlns:uie="UnityEditor.UIElements"
-         editor-extension-mode="False">
-
-    <Style src="project://database/Assets/Scripts/UI/USS/RegisterView.uss" />
-
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/RegisterView.uss?fileID=7433441132597879392&amp;guid=9a3f176c414bd8a49a3d63cfb699f89b&amp;type=3#RegisterView" />
     <ui:VisualElement class="signup-container">
-        <ui:VisualElement class="header-section">
+        <ui:VisualElement class="header-section" style="-unity-text-align: upper-center;">
             <ui:Button name="BackToLoginLabel" class="back-button">
                 <ui:Image class="back-icon" />
             </ui:Button>
-            <ui:Label text="Ambio" class="app-title" />
         </ui:VisualElement>
-
+        <ui:VisualElement name="VisualElement" class="logo-section" style="margin-top: 0%">
+            <ui:Image name="logoImage" class="ambio-logo" style="background-image: url(&quot;project://database/Assets/Art/UI/logo.png?fileID=2800000&amp;guid=481d0ae85e5b2e642a56e78842fa577b&amp;type=3#logo&quot;);" />
+        </ui:VisualElement>
         <ui:VisualElement class="form-section">
             <ui:VisualElement class="input-group">
                 <ui:Label text="Enter Email" class="input-label" />
@@ -20,29 +16,21 @@
                     <ui:Image class="input-icon email-icon" />
                     <ui:TextField name="emailField" placeholder-text="Email" class="input-field" />
                 </ui:VisualElement>
-                <ui:Label name="warningEmail" class="warning-label" />
             </ui:VisualElement>
-
             <ui:VisualElement class="input-group">
                 <ui:Label text="Enter Password" class="input-label" />
                 <ui:VisualElement class="input-wrapper">
                     <ui:Image class="input-icon password-icon" />
                     <ui:TextField name="passwordField" is-password="true" placeholder-text="Password" class="input-field" />
                 </ui:VisualElement>
-                <ui:Label name="warningPassword" class="warning-label" />
             </ui:VisualElement>
-
             <ui:VisualElement class="input-group">
                 <ui:Label text="Confirm Password" class="input-label" />
                 <ui:VisualElement class="input-wrapper">
                     <ui:Image class="input-icon password-icon" />
                     <ui:TextField name="confirmPasswordField" is-password="true" placeholder-text="Confirm Password" class="input-field" />
                 </ui:VisualElement>
-                <ui:Label name="warningConfirmPassword" class="warning-label" />
             </ui:VisualElement>
-
-            <ui:Label name="warningRegister" class="warning-label center-text" />
-
             <ui:Button name="continueButton" text="Continue" class="continue-button" />
         </ui:VisualElement>
     </ui:VisualElement>
