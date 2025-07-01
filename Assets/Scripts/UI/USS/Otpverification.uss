@@ -1,0 +1,160 @@
+:root {
+}
+
+.signup-container {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 60px 32px 40px 32px;
+    background-color: #F5F0ED;
+    width: 100%;
+    min-height: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+/* Logo Section */
+.logo-section {
+    flex-direction: column;
+    align-items: center;
+}
+
+.ambio-logo {
+    width: 400px;
+    height: 300px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-bottom: 30px;
+}
+
+.header-section {
+    justify-content: initial;
+    width: 100%;
+    margin-top: 10%;
+}
+
+.back-button {
+    width: 180px;
+    height: 180px;
+    background-color: transparent;
+    border-width: 0;
+    font-size: 18px;
+    color: #333333;
+    padding: 0;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.back-icon {
+    width: 150px;
+    height: 150px;
+    background-image: resource("back-icon");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.email-verify-icon {
+    width: 150px;
+    height: 150px;
+    background-image: resource("email-Icon");
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-left: 50px;
+    margin-top: 80px;
+}
+
+.title {
+    margin-top: 50px;
+    font-size: 80px;
+    -unity-font-style: bold;
+    color: #333333;
+    white-space: normal;
+    max-width: 800px;
+    margin-left: 50px;
+}
+
+.subtitle {
+    font-size: 40px;
+    -unity-font-style: normal;
+    color: #333333;
+    margin-bottom: 40px;
+    white-space: normal;
+    max-width: 800px;
+    margin-left: 50px;
+}
+
+/*Otp container*/
+.otp-container {
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-top: 40px;
+    width: 100%;
+}
+
+.otp-input-group {
+    flex-direction: row;
+    justify-content: center;
+}
+
+.otp-box {
+    width: 100px;
+    height: 100px;
+    font-size: 50px;
+    border-width: 5px;
+    border-color: #9D8277;
+    background-color: transparent;
+    color: transparent;
+    border-radius: 50px;
+}
+
+.otp-box-margin {
+    margin-right: 30px;
+    background-color: transparent;
+    color: black;
+}
+
+/* Sign In Button */
+.verify-button {
+    background-color: #8B4C39;
+    color: #FFFFFF;
+    width: 800px;
+    height: 100px;
+    border-radius: 50px;
+    border-width: 0;
+    font-size: 35px;
+    -unity-font-style: bold;
+    margin-bottom: 20px;
+    margin-top: 100px;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+.verify-button:hover {
+    background-color: #6B3629;
+}
+
+.verify-button:active {
+    background-color: #5A2A1F;
+}
+
+.unity-text-element--inner-input-field-component {
+    padding-left: 25%;
+}
+
+.warning-text {
+    font-size: 35px;
+    -unity-text-align: middle-center;
+    color: rgb(255, 0, 0);
+    margin-left: 80px;
+    justify-content: flex-end;
+    align-content: flex-end;
+    height: 80px; /* 👈 Reserve space */
+    visibility: hidden; /* 👈 Instead of display: none */
+    opacity: 0;          /* 👈 Smooth transition if needed */
+    transition: opacity 0.3s ease;
+}
+.warning-text.show {
+    visibility: visible;
+    opacity: 1;
+}

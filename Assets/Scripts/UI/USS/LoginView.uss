@@ -50,7 +50,6 @@
     font-size: 18;
 }
 
-
 /* Form Section */
 .form-section {
     width: 100%;

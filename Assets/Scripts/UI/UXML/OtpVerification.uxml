@@ -1,0 +1,25 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/Otpverification.uss?fileID=7433441132597879392&amp;guid=c4a447a57e869481b91c580c7fa21593&amp;type=3#Otpverification" />
+    <ui:VisualElement class="signup-container">
+        <ui:VisualElement class="header-section" style="-unity-text-align: upper-center;">
+            <ui:Button name="BackToLoginLabel" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:Image class="email-verify-icon" style="align-items: flex-start; align-self: flex-start;" />
+        <ui:Label name="title" text="OTP Verification" class="title" style="align-items: flex-start; align-self: flex-start;" />
+        <ui:Label name="subtitle" text="Check your email to see the verification code" class="subtitle" style="align-items: flex-start; align-self: flex-start;" />
+        <ui:VisualElement class="otp-container">
+            <ui:VisualElement class="otp-input-group">
+                <ui:TextField name="otp-0" max-length="1" class="otp-box otp-box-margin" />
+                <ui:TextField name="otp-1" max-length="1" class="otp-box otp-box-margin" style="-unity-text-align: middle-center;" />
+                <ui:TextField name="otp-2" max-length="1" class="otp-box otp-box-margin" style="-unity-text-align: middle-center;" />
+                <ui:TextField name="otp-3" max-length="1" class="otp-box otp-box-margin" style="-unity-text-align: middle-center;" />
+                <ui:TextField name="otp-4" max-length="1" class="otp-box otp-box-margin" style="-unity-text-align: middle-center;" />
+                <ui:TextField name="otp-5" max-length="1" class="otp-box" style="-unity-text-align: middle-center;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label name="warningLabelRole" text="username should be unique" class="warning-text" style="align-self: flex-start; align-content: flex-end;" />
+        <ui:Button name="verfiyOTP" text="Verify" class="verify-button" />
+    </ui:VisualElement>
+</ui:UXML>

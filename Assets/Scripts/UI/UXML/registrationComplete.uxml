@@ -1,0 +1,8 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/registrationComplete.uss?fileID=7433441132597879392&amp;guid=7b4b3ba416e3c43e4a7a8338dd7bb0f6&amp;type=3#registrationComplete" />
+    <ui:VisualElement class="signup-container">
+        <ui:Image class="complete-icon" />
+        <ui:Label name="title" text="Your Account is Successfully Created" class="title" style="align-items: flex-start; align-self: flex-start;" />
+        <ui:Label name="subtitle" text="Let’s start your onboarding journey" class="subtitle" style="align-items: flex-start; align-self: flex-start;" />
+    </ui:VisualElement>
+</ui:UXML>

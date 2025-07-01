@@ -1,0 +1,47 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/BasicDetails.uss?fileID=7433441132597879392&amp;guid=1d51b6beb8e444304bb8d2e631999273&amp;type=3#BasicDetails" />
+    <ui:VisualElement class="signup-container">
+        <ui:VisualElement class="header-section" style="-unity-text-align: upper-center;">
+            <ui:Button name="BackToLoginLabel" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:Label name="title" text="Step-In with Your Unique ID" class="title" style="align-items: flex-start; align-self: flex-start;" />
+        <ui:Label name="subtitle" text="complete your basic details for your account" class="subtitle" style="align-items: flex-start; align-self: flex-start;" />
+        <ui:VisualElement class="form-section">
+            <ui:VisualElement class="input-group">
+                <ui:Label text="UserName" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon user-icon" />
+                    <ui:TextField name="userName" placeholder-text="username" class="input-field" />
+                </ui:VisualElement>
+                <ui:Label name="warningLabelUserName" text="username should be unique" class="warning-text-1" style="align-self: flex-start;" />
+            </ui:VisualElement>
+            <ui:VisualElement class="form-row">
+                <ui:VisualElement class="age-input-group">
+                    <ui:Label text="Age" class="age-input-label" />
+                    <ui:VisualElement class="input-wrapper">
+                        <ui:TextField name="age" placeholder-text="25" class="input-field age-input-field" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="genderDropdown" class="location-dropdown" style="justify-content: flex-start;">
+                    <ui:Label text="Gender" class="age-input-label" />
+                    <ui:VisualElement name="dropdownTrigger" class="dropdown-trigger">
+                        <ui:Label name="selectedText" text="Select your Gender" class="selected-text" style="justify-content: flex-start; align-content: flex-start;" />
+                        <ui:Label name="dropdownArrow" text="▼" class="dropdown-arrow" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="dropdownContent" class="dropdown-content" style="display: none;">
+                        <ui:ScrollView name="optionsList" class="options-list" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="warningLabelAgeGender" text="username should be unique" class="warning-text-2" style="align-self: flex-start;" />
+            <ui:VisualElement name="roleRadioButton" style="top: 25px;">
+                <ui:Label text="We welcome you as a" class="age-input-label" />
+                <ui:RadioButtonGroup value="-1" choices="User, Creator" enabled="true" focusable="true" class="radio-group" />
+                <ui:Label name="warningLabelRole" text="username should be unique" class="warning-text-3" style="align-self: flex-start;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="signIn" text="Sign in" class="signin-button" />
+    </ui:VisualElement>
+</ui:UXML>
