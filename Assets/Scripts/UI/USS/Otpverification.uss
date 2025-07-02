@@ -137,7 +137,7 @@
     background-color: #5A2A1F;
 }
 
-.unity-text-element--inner-input-field-component {
+.otp-box-margin .unity-text-element--inner-input-field-component {
     padding-left: 25%;
 }
 

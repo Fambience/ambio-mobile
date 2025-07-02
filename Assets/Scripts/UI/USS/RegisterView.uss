@@ -76,7 +76,6 @@
 
 .input-group {
     width: 100%;
-    margin-bottom: 60px;
 }
 
 .input-label {
@@ -158,7 +157,7 @@
     font-size: 35px;
     -unity-font-style: bold;
     margin-bottom: 20px;
-    margin-top: 200px;
+    margin-top: 0px;
 }
 
 .continue-button:hover {
@@ -167,4 +166,21 @@
 
 .continue-button:active {
     background-color: #5A2A1F;
+}
+
+.warning-text {
+    font-size: 35px;
+    -unity-text-align: middle-center;
+    color: rgb(255, 0, 0);
+    margin-left: 80px;
+    justify-content: flex-end;
+    align-content: flex-end;
+    height: 80px; /* 👈 Reserve space */
+    /*visibility: hidden; !* 👈 Instead of display: none *!*/
+    /*opacity: 0;          !* 👈 Smooth transition if needed *!*/
+    transition: opacity 0.3s ease;
+}
+.warning-text.show {
+    visibility: visible;
+    opacity: 1;
 }

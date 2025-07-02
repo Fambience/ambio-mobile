@@ -16,7 +16,7 @@
                 <ui:TextField name="otp-2" max-length="1" class="otp-box otp-box-margin" style="-unity-text-align: middle-center;" />
                 <ui:TextField name="otp-3" max-length="1" class="otp-box otp-box-margin" style="-unity-text-align: middle-center;" />
                 <ui:TextField name="otp-4" max-length="1" class="otp-box otp-box-margin" style="-unity-text-align: middle-center;" />
-                <ui:TextField name="otp-5" max-length="1" class="otp-box" style="-unity-text-align: middle-center;" />
+                <ui:TextField name="otp-5" max-length="1" class="otp-box otp-box-margin" style="-unity-text-align: middle-center;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Label name="warningLabelRole" text="username should be unique" class="warning-text" style="align-self: flex-start; align-content: flex-end;" />
