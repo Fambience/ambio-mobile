@@ -180,7 +180,7 @@ public class LoginHandler : MonoBehaviour
                     userProfileManager.InitializeProfile(token);
                 break;
             
-            case "Basic Details":
+            case "Basic_Details":
                 break;
 
             default:
