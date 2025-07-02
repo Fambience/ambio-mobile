@@ -107,6 +107,9 @@
     color: transparent;
     border-radius: 50px;
 }
+.otp-box-error {
+    border-color: rgb(200, 50, 50);
+}
 
 .otp-box-margin {
     margin-right: 30px;

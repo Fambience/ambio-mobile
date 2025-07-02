@@ -34,6 +34,7 @@ public class LoginHandler : MonoBehaviour
     private string userEmail;
     private string baseURL = baseScript.baseURL;
     private string loginEndPoint = "/api/v1/auth/login";
+    private string sendOtpEndPoint = "/api/v1/user/trigger-otp";
 
     private void Awake()
     {
@@ -114,7 +115,8 @@ public class LoginHandler : MonoBehaviour
 
     private IEnumerator LoginUserCoroutine(string email, string password)
     {
-        ShowLoader("Logging in...");
+        Debug.Log("LoginUserCoroutine Called");
+        //ShowLoader("Logging in...");
         string jsonData = JsonUtility.ToJson(new LoginData(email, password));
 
         using (UnityWebRequest request = new UnityWebRequest(baseURL + loginEndPoint, "POST"))
@@ -163,16 +165,17 @@ public class LoginHandler : MonoBehaviour
         switch (state)
         {
             case "VERIFY_EMAIL":
-                ShowOnly(otpScreen);
-                register.sendOTPFunc(userEmail);
+                //UIManager.Instance.OpenScreen(UIScreenType.OTP);
+                //ShowLoader("Sending OTP on");
+                sendOTPFunc(userEmail);
                 break;
 
             case "ONBOARD_DETAILS":
-                ShowOnly(onboardingScreen);
+                //UIManager.Instance.OpenScreen(UIScreenType.OTP);
                 break;
 
             case "ONBOARDING_COMPLETED":
-                ShowOnly(homeScreen);
+                //ShowOnly(homeScreen);
                 if (!string.IsNullOrEmpty(token))
                     userProfileManager.InitializeProfile(token);
                 break;
@@ -185,13 +188,67 @@ public class LoginHandler : MonoBehaviour
                 break;
         }
     }
-
-    private void ShowOnly(VisualElement target)
+    
+    public void sendOTPFunc(string email)
     {
-        otpScreen.style.display = DisplayStyle.None;
-        onboardingScreen.style.display = DisplayStyle.None;
-        homeScreen.style.display = DisplayStyle.None;
-        target.style.display = DisplayStyle.Flex;
+        Debug.Log("Sending OTP for: " + email);
+        StartCoroutine(SendOtpCoroutine(email));
+    }
+
+    private IEnumerator SendOtpCoroutine(string email)
+    {
+        // TODO: Show loading screen
+        Debug.Log("Sending OTP request...");
+
+        string jsonData = JsonUtility.ToJson(new EmailData(email));
+        string token = AuthTokenManager.GetToken();
+
+        using (UnityWebRequest request = new UnityWebRequest(baseURL + sendOtpEndPoint, "POST"))
+        {
+            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonData));
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            if (!string.IsNullOrEmpty(token))
+                request.SetRequestHeader("Authorization", token);
+
+            yield return request.SendWebRequest();
+
+            // TODO: Hide loading screen
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("OTP send failed (network issue): " + request.error);
+                warningLoginText.text = "Failed to send OTP. Please try again.";
+                UIManager.Instance.OpenScreen(UIScreenType.Register);
+            }
+            else
+            {
+                string responseText = request.downloadHandler.text;
+                Debug.Log("OTP Response: " + responseText);
+
+                OTPResponse otpResponse = JsonUtility.FromJson<OTPResponse>(responseText);
+
+                if (otpResponse != null && otpResponse.success)
+                {
+                    Debug.Log("OTP sent successfully. Opening OTP screen...");
+                    UIManager.Instance.OpenScreen(UIScreenType.OTP);
+                }
+                else
+                {
+                    string errorMsg = otpResponse?.message ?? "Failed to send OTP.";
+                    Debug.LogWarning("OTP response failure: " + errorMsg);
+                    warningLoginText.text = errorMsg;
+                    UIManager.Instance.OpenScreen(UIScreenType.Register);
+                }
+            }
+        }
+    }
+    
+    public class OTPResponse
+    {
+        public bool success;
+        public string message;
     }
 
     private void ShowLoader(string message)
@@ -219,7 +276,9 @@ public class LoginHandler : MonoBehaviour
         public string password;
         public LoginData(string e, string p) { email = e; password = p; }
     }
-
+    
+    [System.Serializable] public class EmailData { public string email; public EmailData(string e) { email = e; } }
+    
     [System.Serializable]
     public class LoginResponse
     {

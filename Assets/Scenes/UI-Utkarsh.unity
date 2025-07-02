@@ -235,7 +235,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiDocument: {fileID: 484351384}
-  userProfileManager: {fileID: 0}
 --- !u!1 &854714330
 GameObject:
   m_ObjectHideFlags: 0
@@ -270,6 +269,10 @@ MonoBehaviour:
     screenObject: {fileID: 1850489379}
   - screenType: 1
     screenObject: {fileID: 484351383}
+  - screenType: 3
+    screenObject: {fileID: 1816956111}
+  - screenType: 4
+    screenObject: {fileID: 1788447527}
 --- !u!4 &854714332
 Transform:
   m_ObjectHideFlags: 0
@@ -349,6 +352,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b773963b878774616ade05c2befc2749, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uiDocument: {fileID: 0}
+  typingDelay: 1
+  baseURL: http://localhost:3000
 --- !u!1 &1816956111
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,13 +365,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1816956113}
   - component: {fileID: 1816956112}
+  - component: {fileID: 1816956114}
   m_Layer: 0
   m_Name: OtpScreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1816956112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -400,6 +407,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1816956114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1816956111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea3ca954512f27445bd9f76deb7e8c73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiDocument: {fileID: 1816956112}
+  verifyOtpEndPoint: /api/v1/user/verify-otp
 --- !u!1 &1850489379
 GameObject:
   m_ObjectHideFlags: 0
@@ -418,7 +439,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1850489380
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -478,7 +499,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiDocument: {fileID: 1850489381}
-  register: {fileID: 0}
+  register: {fileID: 484351386}
   userProfileManager: {fileID: 0}
   registerUXMLAsset: {fileID: 9197481963319205126, guid: 7f35ecdb1095729448b12ec13b17cfd9, type: 3}
 --- !u!1 &2010436888

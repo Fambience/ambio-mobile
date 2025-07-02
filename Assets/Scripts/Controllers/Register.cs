@@ -7,7 +7,7 @@ public class Register : MonoBehaviour
 {
     [Header("UI Toolkit")]
     public UIDocument uiDocument;
-    public UserProfileManager userProfileManager;
+    //public UserProfileManager userProfileManager;
 
     private TextField emailField;
     private TextField passwordField;
@@ -145,11 +145,9 @@ public class Register : MonoBehaviour
                 var response = JsonUtility.FromJson<RegisterResponse>(request.downloadHandler.text);
                 Debug.Log("Registration successful. Token: " + response.token);
                 AuthTokenManager.SetToken(response.token);
-                userProfileManager.InitializeProfile(response.token);
-
+                //userProfileManager.InitializeProfile(response.token);
                 sendOTPFunc(email);
-
-                //UIManager.Instance.OpenScreen(UIScreenType.OTP); // or whatever screen you use for OTP
+                //UIManager.Instance.OpenScreen(UIScreenType.OTP); 
             }
         }
     }
@@ -162,6 +160,9 @@ public class Register : MonoBehaviour
 
     private IEnumerator SendOtpCoroutine(string email)
     {
+        // TODO: Show loading screen
+        Debug.Log("Sending OTP request...");
+
         string jsonData = JsonUtility.ToJson(new EmailData(email));
         string token = AuthTokenManager.GetToken();
 
@@ -176,52 +177,48 @@ public class Register : MonoBehaviour
 
             yield return request.SendWebRequest();
 
-            if (request.result != UnityWebRequest.Result.Success)
-                Debug.LogError("OTP send failed: " + request.error);
-            else
-                Debug.Log("OTP sent successfully.");
-        }
-    }
-
-    public void VerifyOTP(string otp)
-    {
-        if (!string.IsNullOrEmpty(otp))
-        {
-            Debug.Log("Verifying OTP: " + otp);
-            StartCoroutine(VerifyOtpCoroutine(otp));
-        }
-    }
-
-    private IEnumerator VerifyOtpCoroutine(string otp)
-    {
-        // ShowLoader("Verifying OTP...");
-        string jsonData = JsonUtility.ToJson(new OTPData(otp));
-        string token = AuthTokenManager.GetToken();
-
-        using (UnityWebRequest request = new UnityWebRequest(baseURL + verifyOtpEndPoint, "POST"))
-        {
-            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonData));
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("Authorization", token);
-
-            yield return request.SendWebRequest();
-
-            // HideLoader();
+            // TODO: Hide loading screen
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("OTP Verification failed: " + request.error);
+                Debug.LogError("OTP send failed (network issue): " + request.error);
+                warningRegister.text = "Failed to send OTP. Please try again.";
+                UIManager.Instance.OpenScreen(UIScreenType.Register);
             }
             else
             {
-                Debug.Log("OTP Verified.");
-                //UIManager.Instance.OpenScreen(UIScreenType.Onboarding); // or next stage
+                string responseText = request.downloadHandler.text;
+                Debug.Log("OTP Response: " + responseText);
+
+                OTPResponse otpResponse = JsonUtility.FromJson<OTPResponse>(responseText);
+
+                if (otpResponse != null && otpResponse.success)
+                {
+                    Debug.Log("OTP sent successfully. Opening OTP screen...");
+                    UIManager.Instance.OpenScreen(UIScreenType.OTP);
+                }
+                else
+                {
+                    string errorMsg = otpResponse?.message ?? "Failed to send OTP.";
+                    Debug.LogWarning("OTP response failure: " + errorMsg);
+                    warningRegister.text = errorMsg;
+                    UIManager.Instance.OpenScreen(UIScreenType.Register);
+                }
             }
         }
     }
+
+
 
     [System.Serializable] public class LoginData { public string email, password; public LoginData(string e, string p) { email = e; password = p; } }
+    
+    [System.Serializable]
+    public class OTPResponse
+    {
+        public bool success;
+        public string message;
+    }
+
     [System.Serializable] public class OTPData { public string otp; public OTPData(string o) { otp = o; } }
     [System.Serializable] public class EmailData { public string email; public EmailData(string e) { email = e; } }
     [System.Serializable] public class RegisterResponse { public string token; public bool success; public string message; }
