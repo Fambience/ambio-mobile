@@ -114,7 +114,6 @@
     color: black;
 }
 
-/* Sign In Button */
 .verify-button {
     background-color: #8B4C39;
     color: #FFFFFF;
