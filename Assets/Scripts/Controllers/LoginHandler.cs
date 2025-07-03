@@ -171,6 +171,7 @@ public class LoginHandler : MonoBehaviour
                 break;
 
             case "ONBOARD_DETAILS":
+                Debug.Log("Onboard Details");
                 //UIManager.Instance.OpenScreen(UIScreenType.OTP);
                 break;
 
@@ -180,7 +181,8 @@ public class LoginHandler : MonoBehaviour
                     userProfileManager.InitializeProfile(token);
                 break;
             
-            case "Basic_Details":
+            case "BASIC_DETAILS":
+                UIManager.Instance.OpenScreen(UIScreenType.BasicDetails);
                 break;
 
             default:

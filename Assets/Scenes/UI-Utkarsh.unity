@@ -505,9 +505,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b773963b878774616ade05c2befc2749, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiDocument: {fileID: 0}
-  typingDelay: 1
-  baseURL: http://localhost:3000
+  uiDocument: {fileID: 1788447528}
 --- !u!1 &1816956111
 GameObject:
   m_ObjectHideFlags: 0
