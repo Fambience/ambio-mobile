@@ -7,4 +7,13 @@ public enum UIScreenType
     Home,
     OTP,
     BasicDetails,
+    UserDetails,
+    CreativeStyles,
+    ModernStyles,
+    Budget,
+    Family,
+    Location,
+    OnboardingComplete,
+    ColorTone,
+    
 }

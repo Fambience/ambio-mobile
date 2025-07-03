@@ -15,10 +15,8 @@ public class DesignStyleSelector3 : MonoBehaviour
     private Label warningLabel;
 
     private Dictionary<Button, bool> buttonSelectionState = new Dictionary<Button, bool>();
-    private List<Button> selectedButtons = new List<Button>();
+    private Button selectedButton = null; // Changed from List to single Button
     private Dictionary<Button, string> buttonStyleNames = new Dictionary<Button, string>();
-
-    private const int MAX_SELECTIONS = 3;
 
     void Start()
     {
@@ -59,7 +57,8 @@ public class DesignStyleSelector3 : MonoBehaviour
 
     string GetStyleNameFromButton(Button button, int index)
     {
-        string[] styleNames = { "Scandinavian", "Traditional", "Art-Deco", "Contemporary", "Eclectic", "Indian-Vernacular" };
+        // Updated for color schemes instead of design styles
+        string[] styleNames = { "Warm", "Calm", "Neutral", "Bold" };
         return index < styleNames.Length ? styleNames[index] : $"Style-{index + 1}";
     }
 
@@ -98,29 +97,29 @@ public class DesignStyleSelector3 : MonoBehaviour
 
         if (isCurrentlySelected)
         {
+            // Deselect if clicking the same button
             DeselectButton(clickedButton);
-            HideWarning();
         }
         else
         {
-            if (selectedButtons.Count < MAX_SELECTIONS)
+            // Deselect previously selected button if any
+            if (selectedButton != null)
             {
-                SelectButton(clickedButton);
-                HideWarning();
+                DeselectButton(selectedButton);
             }
-            else
-            {
-                ShowWarning();
-            }
+            
+            // Select the new button
+            SelectButton(clickedButton);
         }
 
-        LogSelectedStyles();
+        HideWarning();
+        LogSelectedStyle();
     }
 
     void SelectButton(Button button)
     {
         buttonSelectionState[button] = true;
-        selectedButtons.Add(button);
+        selectedButton = button;
 
         button.style.borderTopWidth = 10;
         button.style.borderBottomWidth = 10;
@@ -136,7 +135,8 @@ public class DesignStyleSelector3 : MonoBehaviour
     void DeselectButton(Button button)
     {
         buttonSelectionState[button] = false;
-        selectedButtons.Remove(button);
+        if (selectedButton == button)
+            selectedButton = null;
 
         button.style.borderTopWidth = 0;
         button.style.borderBottomWidth = 0;
@@ -148,7 +148,6 @@ public class DesignStyleSelector3 : MonoBehaviour
     {
         if (warningLabel != null)
         {
-            warningLabel.text = "You can select maximum 3 design styles!";
             warningLabel.AddToClassList("show");
             Invoke(nameof(HideWarning), 3f);
         }
@@ -166,26 +165,21 @@ public class DesignStyleSelector3 : MonoBehaviour
 
     void OnBackButtonClicked()
     {
-        if (previousScreen != null)
-        {
-            SwitchToScreen(previousScreen);
-        }
+        StoreSelectedStyle();
+        UIManager.Instance.OpenScreen(UIScreenType.ModernStyles);
     }
 
     void OnNextButtonClicked()
     {
-        if (selectedButtons.Count == 0)
+        if (selectedButton == null)
         {
-            warningLabel.text = "Please select at least one design style!";
+            warningLabel.text = "Please select a color scheme!";
             ShowWarning();
             return;
         }
 
-        StoreSelectedStyles();
-        if (nextScreen != null)
-        {
-            SwitchToScreen(nextScreen);
-        }
+        StoreSelectedStyle();
+        UIManager.Instance.OpenScreen(UIScreenType.Family);
     }
 
     void SwitchToScreen(GameObject targetScreen)
@@ -197,54 +191,48 @@ public class DesignStyleSelector3 : MonoBehaviour
             targetScreen.SetActive(true);
     }
 
-    void StoreSelectedStyles()
+    void StoreSelectedStyle()
     {
-        List<string> selectedStyleNames = new List<string>();
-        foreach (Button button in selectedButtons)
+        if (selectedButton != null && buttonStyleNames.TryGetValue(selectedButton, out string selectedStyleName))
         {
-            if (buttonStyleNames.ContainsKey(button))
-                selectedStyleNames.Add(buttonStyleNames[button]);
-        }
-
-        string selectedStylesString = string.Join(",", selectedStyleNames);
-        PlayerPrefs.SetString("SelectedDesignStyles", selectedStylesString);
-        PlayerPrefs.Save();
-    }
-
-    void LogSelectedStyles()
-    {
-        Debug.Log($"Selected styles ({selectedButtons.Count}/{MAX_SELECTIONS}):");
-        foreach (Button button in selectedButtons)
-        {
-            if (buttonStyleNames.ContainsKey(button))
-                Debug.Log($"- {buttonStyleNames[button]}");
+            // Normalize the style name for backend format: CALM, WARM, etc.
+            OnboardingData.ColorScheme = selectedStyleName.ToUpper();
+            Debug.Log($"Color scheme saved to OnboardingData: {OnboardingData.ColorScheme}");
         }
     }
 
-    public List<string> GetSelectedStyles()
+    void LogSelectedStyle()
     {
-        List<string> styles = new List<string>();
-        foreach (Button button in selectedButtons)
+        if (selectedButton != null && buttonStyleNames.ContainsKey(selectedButton))
         {
-            if (buttonStyleNames.ContainsKey(button))
-                styles.Add(buttonStyleNames[button]);
+            Debug.Log($"Selected color scheme: {buttonStyleNames[selectedButton]}");
         }
-        return styles;
+        else
+        {
+            Debug.Log("No color scheme selected");
+        }
     }
 
-    public static List<string> GetStoredSelectedStyles()
+    public string GetSelectedStyle()
     {
-        string stored = PlayerPrefs.GetString("SelectedDesignStyles", "");
-        return string.IsNullOrEmpty(stored) ? new List<string>() : new List<string>(stored.Split(','));
+        if (selectedButton != null && buttonStyleNames.ContainsKey(selectedButton))
+        {
+            return buttonStyleNames[selectedButton];
+        }
+        return null;
     }
 
-    public void ResetSelections()
+    public static string GetStoredSelectedStyle()
     {
-        foreach (Button button in selectedButtons.ToArray())
+        return PlayerPrefs.GetString("SelectedColorScheme", "");
+    }
+
+    public void ResetSelection()
+    {
+        if (selectedButton != null)
         {
-            DeselectButton(button);
+            DeselectButton(selectedButton);
         }
-        selectedButtons.Clear();
         HideWarning();
     }
 

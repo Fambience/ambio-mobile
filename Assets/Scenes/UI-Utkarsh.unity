@@ -231,6 +231,7 @@ GameObject:
   m_Component:
   - component: {fileID: 241857860}
   - component: {fileID: 241857859}
+  - component: {fileID: 241857861}
   m_Layer: 0
   m_Name: Onboarding-2
   m_TagString: Untagged
@@ -272,6 +273,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &241857861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 241857858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a116cae48dbdd0f2837c46adc9688f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiDocument: {fileID: 241857859}
+  nextSceneName: NextScreen
+  nextScreenPrefab: {fileID: 0}
+  budgetOptions:
+  - 3L
+  - 3L - 5L
+  - 5L - 7L
 --- !u!1 &324420194
 GameObject:
   m_ObjectHideFlags: 0
@@ -477,6 +497,22 @@ MonoBehaviour:
     screenObject: {fileID: 1816956111}
   - screenType: 4
     screenObject: {fileID: 1788447527}
+  - screenType: 5
+    screenObject: {fileID: 1844930764}
+  - screenType: 10
+    screenObject: {fileID: 1631665318}
+  - screenType: 8
+    screenObject: {fileID: 241857858}
+  - screenType: 6
+    screenObject: {fileID: 2142930228}
+  - screenType: 7
+    screenObject: {fileID: 1940906656}
+  - screenType: 12
+    screenObject: {fileID: 1717646517}
+  - screenType: 9
+    screenObject: {fileID: 1209480911}
+  - screenType: 11
+    screenObject: {fileID: 1197045777}
 --- !u!4 &854714332
 Transform:
   m_ObjectHideFlags: 0
@@ -553,6 +589,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1209480913}
   - component: {fileID: 1209480912}
+  - component: {fileID: 1209480914}
   m_Layer: 0
   m_Name: Onboarding-6
   m_TagString: Untagged
@@ -594,6 +631,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1209480914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1209480911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8923b9dc06ce542da8401e933366c4f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1631665318
 GameObject:
   m_ObjectHideFlags: 0
@@ -611,7 +660,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1631665319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -668,6 +717,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1717646519}
   - component: {fileID: 1717646518}
+  - component: {fileID: 1717646520}
   m_Layer: 0
   m_Name: Onboarding-5
   m_TagString: Untagged
@@ -709,6 +759,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1717646520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1717646517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9f011df7fe4c40bca15ddc126dfa253, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextScreen: {fileID: 0}
+  previousScreen: {fileID: 0}
+  currentScreen: {fileID: 0}
 --- !u!1 &1788447527
 GameObject:
   m_ObjectHideFlags: 0
@@ -850,6 +915,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1844930766}
   - component: {fileID: 1844930765}
+  - component: {fileID: 1844930767}
   m_Layer: 0
   m_Name: userDetails
   m_TagString: Untagged
@@ -891,6 +957,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1844930767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1844930764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b213be6afb1ece4e8f37f5608e6cc37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1850489379
 GameObject:
   m_ObjectHideFlags: 0
@@ -909,7 +987,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1850489380
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -982,6 +1060,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1940906658}
   - component: {fileID: 1940906657}
+  - component: {fileID: 1940906659}
   m_Layer: 0
   m_Name: Onboarding-4
   m_TagString: Untagged
@@ -1023,6 +1102,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1940906659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1940906656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee4485198aa1a4412b9fb002f6a00a90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextScreen: {fileID: 0}
+  previousScreen: {fileID: 0}
+  currentScreen: {fileID: 0}
 --- !u!1 &2010436888
 GameObject:
   m_ObjectHideFlags: 0
@@ -1193,6 +1287,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2142930230}
   - component: {fileID: 2142930229}
+  - component: {fileID: 2142930231}
   m_Layer: 0
   m_Name: Onboarding-3
   m_TagString: Untagged
@@ -1234,6 +1329,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2142930231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142930228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcfa2699bb1ce4707a5faebaea83449f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextScreen: {fileID: 1940906656}
+  previousScreen: {fileID: 241857858}
+  currentScreen: {fileID: 2142930228}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

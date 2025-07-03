@@ -172,7 +172,7 @@ public class LoginHandler : MonoBehaviour
 
             case "ONBOARD_DETAILS":
                 Debug.Log("Onboard Details");
-                //UIManager.Instance.OpenScreen(UIScreenType.OTP);
+                UIManager.Instance.OpenScreen(UIScreenType.UserDetails);
                 break;
 
             case "ONBOARDING_COMPLETED":

@@ -209,13 +209,15 @@ public class CompleteProfileController : MonoBehaviour
     void OnBackButtonClicked()
     {
         Debug.Log("Back button clicked");
-        // Implement back navigation logic here
+        OnboardingData.HomeLocation = null;
+        UIManager.Instance.OpenScreen(UIScreenType.UserDetails);
     }
 
     void OnSkipButtonClicked()
     {
         Debug.Log("Skip button clicked");
-        // Implement skip logic here
+        OnboardingData.HomeLocation = null;
+        UIManager.Instance.OpenScreen(UIScreenType.Budget);
     }
 
     void OnCompleteButtonClicked()
@@ -228,7 +230,8 @@ public class CompleteProfileController : MonoBehaviour
         }
         
         Debug.Log($"Complete button clicked with selected city: {selectedCity}");
-        // Implement completion logic here (e.g., save data, navigate to next screen)
+        OnboardingData.HomeLocation = selectedCity;
+        UIManager.Instance.OpenScreen(UIScreenType.Budget);
     }
 
     // Public method to get selected city

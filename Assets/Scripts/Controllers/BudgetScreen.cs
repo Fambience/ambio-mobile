@@ -101,14 +101,19 @@ public class BudgetScreen : MonoBehaviour
     {
         if (selectedBudgetIndex == -1)
         {
-            Debug.LogWarning("No budget selected!");
-            return;
+            Debug.Log("No budget selected. Proceeding without saving budget.");
+            OnboardingData.BudgetMin = 0;
+            OnboardingData.BudgetMax = 0;
+        }
+        else
+        {
+            // Store the selected budget (you can use PlayerPrefs, ScriptableObject, or a GameManager)
+            SaveSelectedBudget();
+
         }
         
         Debug.Log($"Proceeding with budget: {selectedBudget}");
         
-        // Store the selected budget (you can use PlayerPrefs, ScriptableObject, or a GameManager)
-        SaveSelectedBudget();
         
         // Navigate to next screen
         NavigateToNextScreen();
@@ -125,63 +130,38 @@ public class BudgetScreen : MonoBehaviour
     
     void SaveSelectedBudget()
     {
-        // Save using PlayerPrefs (persistent across sessions)
-        PlayerPrefs.SetString("SelectedBudget", selectedBudget);
-        PlayerPrefs.SetInt("SelectedBudgetIndex", selectedBudgetIndex);
-        PlayerPrefs.Save();
-        
-        // Alternative: Use a GameManager or ScriptableObject for session data
-        // GameManager.Instance.SetSelectedBudget(selectedBudget);
+        switch (selectedBudget)
+        {
+            case "3L":
+                OnboardingData.BudgetMin = 0;
+                OnboardingData.BudgetMax = 300000;
+                break;
+            case "3L - 5L":
+                OnboardingData.BudgetMin = 300000;
+                OnboardingData.BudgetMax = 500000;
+                break;
+            case "5L - 7L":
+                OnboardingData.BudgetMin = 500000;
+                OnboardingData.BudgetMax = 700000;
+                break;
+            default:
+                OnboardingData.BudgetMin = 0;
+                OnboardingData.BudgetMax = 0;
+                break;
+        }
+
+        Debug.Log($"Budget saved to OnboardingData: ₹{OnboardingData.BudgetMin} - ₹{OnboardingData.BudgetMax}");
     }
     
     void NavigateToNextScreen()
     {
-        // Method 1: Load next scene
-        if (!string.IsNullOrEmpty(nextSceneName))
-        {
-            SceneManager.LoadScene(nextSceneName);
-        }
-        // Method 2: Instantiate next screen prefab
-        else if (nextScreenPrefab != null)
-        {
-            // Assuming you're using a root screen container:
-            var root = uiDocument.rootVisualElement;
-
-            // Remove old content
-            root.Clear();
-
-            // Load the new UXML manually
-            var nextScreenAsset = nextScreenPrefab.GetComponent<UIDocument>()?.visualTreeAsset;
-            if (nextScreenAsset != null)
-            {
-                VisualElement newScreen = nextScreenAsset.CloneTree();
-                root.Add(newScreen);
-            }
-            else
-            {
-                Debug.LogWarning("nextScreenPrefab does not have a UIDocument with VisualTreeAsset.");
-            }
-        }
-        // Method 3: Use a custom navigation system
-        else
-        {
-            // Example: Using a hypothetical ScreenManager
-            // ScreenManager.Instance.ShowNextScreen();
-            Debug.LogWarning("No navigation method configured!");
-        }
+        UIManager.Instance.OpenScreen(UIScreenType.CreativeStyles);
+        
     }
     
     void NavigateToPreviousScreen()
     {
-        // Simple back navigation - you can customize this
-        // Method 1: Load previous scene (if you know the scene name)
-        // SceneManager.LoadScene("PreviousScreenName");
-        
-        // Method 2: Use a navigation stack
-        // NavigationManager.Instance.GoBack();
-        
-        // Method 3: Simple scene reload (for testing)
-        Debug.Log("Navigating back...");
+        UIManager.Instance.OpenScreen(UIScreenType.Location);
     }
     
     // Public method to get selected budget (useful for other scripts)

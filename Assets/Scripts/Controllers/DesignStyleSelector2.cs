@@ -166,10 +166,9 @@ public class DesignStyleSelector2 : MonoBehaviour
 
     void OnBackButtonClicked()
     {
-        if (previousScreen != null)
-        {
-            SwitchToScreen(previousScreen);
-        }
+        
+        StoreSelectedStyles();
+        UIManager.Instance.OpenScreen(UIScreenType.CreativeStyles);
     }
 
     void OnNextButtonClicked()
@@ -182,10 +181,7 @@ public class DesignStyleSelector2 : MonoBehaviour
         }
 
         StoreSelectedStyles();
-        if (nextScreen != null)
-        {
-            SwitchToScreen(nextScreen);
-        }
+        UIManager.Instance.OpenScreen(UIScreenType.ColorTone);
     }
 
     void SwitchToScreen(GameObject targetScreen)
@@ -202,13 +198,18 @@ public class DesignStyleSelector2 : MonoBehaviour
         List<string> selectedStyleNames = new List<string>();
         foreach (Button button in selectedButtons)
         {
-            if (buttonStyleNames.ContainsKey(button))
-                selectedStyleNames.Add(buttonStyleNames[button]);
+            if (buttonStyleNames.TryGetValue(button, out var styleName))
+            {
+                // Convert to API-compliant uppercase enum format (e.g., "ARTDECO")
+                string apiStyleName = styleName.Replace("-", "").ToUpper();
+                selectedStyleNames.Add(apiStyleName);
+            }
         }
 
-        string selectedStylesString = string.Join(",", selectedStyleNames);
-        PlayerPrefs.SetString("SelectedDesignStyles", selectedStylesString);
-        PlayerPrefs.Save();
+        // Store in central onboarding data
+        OnboardingData.DesignInspoScreen1 = selectedStyleNames;
+
+        Debug.Log("Design styles stored to OnboardingData: " + string.Join(", ", selectedStyleNames));
     }
 
     void LogSelectedStyles()
