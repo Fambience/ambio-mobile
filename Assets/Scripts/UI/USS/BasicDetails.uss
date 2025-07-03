@@ -301,6 +301,10 @@
     transition: transform 0.3s ease;
 }
 
+.dropdown-arrow.rotated {
+    rotate: 180deg;
+}
+
 /* Dropdown Content */
 .dropdown-content {
     position: absolute;

@@ -1,71 +1,275 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
-public class CompleteProfileController
+using System.Linq;
+
+public class CompleteProfileController : MonoBehaviour
 {
-    public void Initialize(VisualElement root, UIManager manager)
+    [Header("UI Elements")]
+    private VisualElement root;
+    private VisualElement dropdownTrigger;
+    private VisualElement dropdownContent;
+    private Label selectedText;
+    private Label dropdownArrow;
+    private TextField searchField;
+    private ScrollView optionsList;
+    private Button backButton;
+    private Button skipButton;
+    private Button completeButton;
+
+    [Header("Data")]
+    private List<string> indianCities = new List<string>
     {
-        var title = root.Q<Label>("title");
-        if (title != null)
+        "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune", "Ahmedabad",
+        "Jaipur", "Surat", "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane", "Bhopal",
+        "Visakhapatnam", "Pimpri-Chinchwad", "Patna", "Vadodara", "Ghaziabad", "Ludhiana",
+        "Agra", "Nashik", "Faridabad", "Meerut", "Rajkot", "Kalyan-Dombivali", "Vasai-Virar",
+        "Varanasi", "Srinagar", "Dhanbad", "Jodhpur", "Amritsar", "Raipur", "Allahabad",
+        "Coimbatore", "Jabalpur", "Gwalior", "Vijayawada", "Madurai", "Guwahati", "Chandigarh",
+        "Hubli-Dharwad", "Mysore", "Tiruchirappalli", "Bareilly", "Aligarh", "Tiruppur",
+        "Moradabad", "Jalandhar", "Bhubaneswar", "Salem", "Warangal", "Guntur", "Bhiwandi",
+        "Saharanpur", "Gorakhpur", "Bikaner", "Amravati", "Noida", "Jamshedpur", "Bhilai",
+        "Cuttack", "Firozabad", "Kochi", "Nellore", "Bhavnagar", "Dehradun", "Durgapur",
+        "Asansol", "Rourkela", "Nanded", "Kolhapur", "Ajmer", "Akola", "Gulbarga",
+        "Jamnagar", "Ujjain", "Loni", "Siliguri", "Jhansi", "Ulhasnagar", "Jammu",
+        "Sangli-Miraj & Kupwad", "Mangalore", "Erode", "Belgaum", "Ambattur", "Tirunelveli",
+        "Malegaon", "Gaya", "Jalgaon", "Udaipur", "Maheshtala", "Davanagere", "Kozhikode"
+    };
+
+    private List<string> filteredCities;
+    private string selectedCity = "";
+    private bool isDropdownOpen = false;
+
+    void Start()
+    {
+        InitializeUI();
+        SetupEventListeners();
+        filteredCities = new List<string>(indianCities);
+        PopulateOptionsList();
+    }
+
+    void InitializeUI()
+    {
+        root = GetComponent<UIDocument>().rootVisualElement;
+        
+        // Get UI elements
+        dropdownTrigger = root.Q<VisualElement>("dropdownTrigger");
+        dropdownContent = root.Q<VisualElement>("dropdownContent");
+        selectedText = root.Q<Label>("selectedText");
+        dropdownArrow = root.Q<Label>("dropdown-arrow");
+        searchField = root.Q<TextField>("searchField");
+        optionsList = root.Q<ScrollView>("optionsList");
+        backButton = root.Q<Button>("backButton");
+        skipButton = root.Q<Button>("skipButton");
+        completeButton = root.Q<Button>("completeButton");
+
+        // Set initial state
+        dropdownContent.style.display = DisplayStyle.None;
+        isDropdownOpen = false;
+    }
+
+    void SetupEventListeners()
+    {
+        // Dropdown trigger click
+        dropdownTrigger.RegisterCallback<ClickEvent>(OnDropdownTriggerClick);
+        
+        // Search field input
+        searchField.RegisterCallback<ChangeEvent<string>>(OnSearchFieldChanged);
+        
+        // Button clicks
+        backButton.clicked += OnBackButtonClicked;
+        skipButton.clicked += OnSkipButtonClicked;
+        completeButton.clicked += OnCompleteButtonClicked;
+        
+        // Close dropdown when clicking outside
+        root.RegisterCallback<ClickEvent>(OnRootClicked);
+    }
+
+    void OnDropdownTriggerClick(ClickEvent evt)
+    {
+        evt.StopPropagation();
+        ToggleDropdown();
+    }
+
+    void OnRootClicked(ClickEvent evt)
+    {
+        // Close dropdown if clicking outside of it
+        if (isDropdownOpen && !dropdownContent.worldBound.Contains(evt.position))
         {
-            title.text = $"Complete your profile";
-            title.style.fontSize = 22;
-            title.style.color = Color.black;
+            CloseDropdown();
         }
+    }
 
-        var subtitle = root.Q<Label>("subtitle");
-        if (subtitle != null)
+    void ToggleDropdown()
+    {
+        if (isDropdownOpen)
         {
-            subtitle.style.fontSize = 14;
-            subtitle.style.color = new Color(0.2f, 0.2f, 0.2f);
-            subtitle.style.whiteSpace = WhiteSpace.Normal;
-            subtitle.style.unityTextAlign = TextAnchor.MiddleLeft;
+            CloseDropdown();
         }
-
-        var backButton = root.Q<Button>("backButton");
-        if (backButton != null)
+        else
         {
-            backButton.clicked += () => Debug.Log("Back clicked");
+            OpenDropdown();
         }
-        var locations = new List<string>
-        {
-            "New York",
-            "Los Angeles",
-            "Chicago",
-            "Houston",
-            "San Francisco"
-        };
-        var dropdownWrapper = root.Q<VisualElement>("dropdownWrapper");
-        if (dropdownWrapper != null)
-        {
-            var dropdown = new DropdownField(locations, 0);
-            dropdown.name = "locationDropdown";
-            dropdown.value = locations[0];
+    }
 
-            dropdown.style.width = Length.Percent(100);
-            dropdown.style.height = 36;
-            dropdown.style.fontSize = 14;
-            dropdown.style.unityFontStyleAndWeight = FontStyle.Normal;
-            dropdown.style.color = Color.black;
-            dropdown.style.paddingLeft = 10;
-            dropdown.style.paddingRight = 10;
-            dropdown.style.backgroundColor = Color.white;
-            dropdown.style.borderTopLeftRadius = 8;
-            dropdown.style.borderTopRightRadius = 8;
-            dropdown.style.borderBottomLeftRadius = 8;
-            dropdown.style.borderBottomRightRadius = 8;
-            dropdown.style.borderTopWidth = 0;
-            dropdown.style.borderBottomWidth = 0;
-            dropdown.style.borderLeftWidth = 0;
-            dropdown.style.borderRightWidth = 0;
+    void OpenDropdown()
+    {
+        isDropdownOpen = true;
+        dropdownContent.style.display = DisplayStyle.Flex;
+        dropdownTrigger.AddToClassList("active");
+        
+        // Focus search field
+        searchField.Focus();
+    }
 
-            dropdown.RegisterValueChangedCallback(evt =>
+    void CloseDropdown()
+    {
+        isDropdownOpen = false;
+        dropdownContent.style.display = DisplayStyle.None;
+        dropdownTrigger.RemoveFromClassList("active");
+        
+        // Clear search field
+        searchField.value = "";
+        filteredCities = new List<string>(indianCities);
+        PopulateOptionsList();
+    }
+
+    void OnSearchFieldChanged(ChangeEvent<string> evt)
+    {
+        string searchQuery = evt.newValue.ToLower();
+        
+        if (string.IsNullOrEmpty(searchQuery))
+        {
+            filteredCities = new List<string>(indianCities);
+        }
+        else
+        {
+            filteredCities = indianCities.Where(city => 
+                city.ToLower().Contains(searchQuery)).ToList();
+        }
+        
+        PopulateOptionsList();
+    }
+
+    void PopulateOptionsList()
+    {
+        optionsList.Clear();
+        
+        foreach (string city in filteredCities)
+        {
+            VisualElement optionItem = new VisualElement();
+            optionItem.AddToClassList("option-item");
+            
+            Label optionText = new Label(city);
+            optionText.AddToClassList("option-text");
+            optionItem.Add(optionText);
+            
+            // Add selection state
+            if (city == selectedCity)
             {
-                Debug.Log("Location selected: " + evt.newValue);
-                //manager.ShowBudgetScreen();
-            });
-
-            dropdownWrapper.Add(dropdown);
+                optionItem.AddToClassList("selected");
+            }
+            
+            // Add click event
+            optionItem.RegisterCallback<ClickEvent>(evt => OnOptionClicked(city, optionItem));
+            
+            optionsList.Add(optionItem);
         }
+    }
+
+    void OnOptionClicked(string city, VisualElement optionItem)
+    {
+        // Update selected city
+        selectedCity = city;
+        selectedText.text = city;
+        selectedText.AddToClassList("has-selection");
+        
+        // Update visual state
+        RefreshOptionSelection();
+        
+        // Close dropdown
+        CloseDropdown();
+        
+        Debug.Log($"Selected city: {city}");
+    }
+
+    void RefreshOptionSelection()
+    {
+        foreach (VisualElement option in optionsList.Children())
+        {
+            option.RemoveFromClassList("selected");
+            Label optionText = option.Q<Label>("option-text");
+            if (optionText != null && optionText.text == selectedCity)
+            {
+                option.AddToClassList("selected");
+            }
+        }
+    }
+
+    void OnBackButtonClicked()
+    {
+        Debug.Log("Back button clicked");
+        // Implement back navigation logic here
+    }
+
+    void OnSkipButtonClicked()
+    {
+        Debug.Log("Skip button clicked");
+        // Implement skip logic here
+    }
+
+    void OnCompleteButtonClicked()
+    {
+        if (string.IsNullOrEmpty(selectedCity))
+        {
+            Debug.Log("Please select a city before continuing");
+            // You can show a warning message here
+            return;
+        }
+        
+        Debug.Log($"Complete button clicked with selected city: {selectedCity}");
+        // Implement completion logic here (e.g., save data, navigate to next screen)
+    }
+
+    // Public method to get selected city
+    public string GetSelectedCity()
+    {
+        return selectedCity;
+    }
+
+    // Public method to set selected city programmatically
+    public void SetSelectedCity(string city)
+    {
+        if (indianCities.Contains(city))
+        {
+            selectedCity = city;
+            selectedText.text = city;
+            selectedText.AddToClassList("has-selection");
+            RefreshOptionSelection();
+        }
+    }
+
+    // Public method to add custom cities
+    public void AddCustomCity(string city)
+    {
+        if (!indianCities.Contains(city))
+        {
+            indianCities.Add(city);
+            filteredCities = new List<string>(indianCities);
+            PopulateOptionsList();
+        }
+    }
+
+    void OnDestroy()
+    {
+        // Clean up event listeners
+        if (dropdownTrigger != null)
+            dropdownTrigger.UnregisterCallback<ClickEvent>(OnDropdownTriggerClick);
+        
+        if (searchField != null)
+            searchField.UnregisterCallback<ChangeEvent<string>>(OnSearchFieldChanged);
+        
+        if (root != null)
+            root.UnregisterCallback<ClickEvent>(OnRootClicked);
     }
 }
