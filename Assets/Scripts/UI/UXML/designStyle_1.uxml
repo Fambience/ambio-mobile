@@ -1,0 +1,47 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/DesignStyle_1.uss?fileID=7433441132597879392&amp;guid=f05081dc17c6d7b9ebbad2d91e6afd62&amp;type=3#DesignStyle_1" />
+    <ui:VisualElement class="container" style="justify-content: flex-start;">
+        <ui:VisualElement class="top-bar">
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+            <ui:VisualElement class="progress-bar">
+                <ui:VisualElement class="progress-fill" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="VisualElement" style="top: 0;">
+            <ui:Label name="title" text="Which design style inspire you?" class="title" />
+            <ui:VisualElement name="styleGrid" class="style-grid">
+                <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
+                    <ui:Button name="Button" class="button-1">
+                        <ui:Image class="Industrial" />
+                    </ui:Button>
+                    <ui:Button name="Button" class="button-2">
+                        <ui:Image class="Japandi" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
+                    <ui:Button name="Button" class="button-1">
+                        <ui:Image class="Mid-Century-Modern" />
+                    </ui:Button>
+                    <ui:Button name="Button" class="button-2">
+                        <ui:Image class="minimalist" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
+                    <ui:Button name="Button" class="button-1">
+                        <ui:Image class="modern" />
+                    </ui:Button>
+                    <ui:Button name="Button" class="button-2">
+                        <ui:Image class="Rustic" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="warningLabel" class="warning-text" text="You can select maximum 3 design styles!" />
+            <ui:Button name="completeButton" class="primary-button" style="top: 100px;">
+                <ui:Label text="Next" class="button-text" />
+                <ui:Label text="→" class="arrow" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

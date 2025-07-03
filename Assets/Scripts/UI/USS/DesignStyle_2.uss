@@ -1,7 +1,7 @@
 .container {
     flex-direction: column;
     padding: 24px;
-    background-color: rgb(245, 240, 237);
+    background-color: #F5F0ED;
     height: 100%;
     width: 100%;
     justify-content: space-between;
@@ -19,7 +19,7 @@
     background-color: transparent;
     border-width: 0;
     font-size: 18px;
-    color: rgb(51, 51, 51);
+    color: #333333;
     padding: 0;
     justify-content: center;
     margin-top: 20%;
@@ -29,7 +29,7 @@
 .back-icon {
     width: 45px;
     height: 45px;
-    background-image: resource('back-icon');
+    background-image: resource("back-icon");
     background-repeat: no-repeat;
     background-size: contain;
 }
@@ -37,7 +37,7 @@
 .progress-bar {
     flex-grow: 1;
     height: 25px;
-    background-color: rgb(212, 181, 160);
+    background-color: #D4B5A0;
     border-radius: 25px;
     margin-left: 50px;
     margin-right: 95px;
@@ -47,73 +47,78 @@
 }
 
 .progress-fill {
-    width: 100%;
+    width: 87%;
     height: 100%;
-    background-color: rgb(139, 76, 57);
+    background-color: #8B4C39;
     border-radius: 4px;
 }
 
 .title {
-    margin-top: 50px;
+    margin-top: 100px;
     font-size: 45px;
     -unity-font-style: bold;
-    color: rgb(51, 51, 51);
+    color: #333333;
     margin-bottom: 40px;
     white-space: normal;
     max-width: 800px;
     margin-left: 100px;
 }
 
-.checkbox-group {
-    margin-left: 100px;
-    padding-left: 5%;
-    max-width: 800px;
-    height: 400px;
+.style-grid {
+    margin-left: 125px;
+    margin-right: 125px;
 }
 
-.checkbox-item {
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 24px;
-    height: 24px;
-}
+.style-grid1 {
+    margin-top: 80px;
+ }
 
-.custom-checkbox {
-    width: 35px;
-    height: 35px;
-    margin-right: 16px;
-    margin: 0;
-    padding: 0;
-    margin-top: 4%;
-}
-
-.custom-checkbox > .unity-toggle__input {
-    width: 35px;
-    height: 35px;
-    margin: 0;
+.button-1 {
+    width: 250px;
+    height: 250px;
+    border-radius: 25px;
     padding: 0;
     background-color: transparent;
-    border-width: 2px;
-    border-color: rgb(139, 76, 57);
-    border-radius: 50%; /* 👈 make it circular */
-    margin-top: 4%;
+    border-width: 0;
 }
 
-.custom-checkbox > .unity-toggle__input:checked {
-    background-color: rgb(139, 76, 57);
-    border-color: rgb(139, 76, 57);
-    border-radius: 50%; /* 👈 ensure it's round when checked too */
-}
-
-.custom-checkbox .unity-toggle__checkmark {
-    display: none;
-}
-
-.checkbox-label {
+.label {
     font-size: 35px;
-    color: rgb(51, 51, 51);
-    margin-left: 16px;
-    flex-grow: 1;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.button-2 {
+    width: 250px;
+    height: 250px;
+    border-radius: 25px;
+    padding: 0;
+    background-color: transparent;
+    border-width: 0;
+}
+
+.Warm {
+    width: 100%;
+    height: 100%;
+    background-image: resource("Warm");
+}
+
+.Calm {
+    width: 100%;
+    height: 100%;
+    background-image: resource("Calm");
+}
+
+.Neutral {
+    width: 100%;
+    height: 100%;
+    background-image: resource("Neutral");
+}
+
+.Bold {
+    width: 100%;
+    height: 100%;
+    background-image: resource("strong");
 }
 
 .primary-button {
@@ -122,22 +127,21 @@
     justify-content: center;
     align-items: center;
     padding: 16px 24px;
-    background-color: rgb(139, 76, 57);
+    background-color: #8B4C39;
     color: white;
     border-radius: 50px;
     border-width: 0;
-    margin-top: 20px;
     height: 100px;
     margin-left: 2%;
     margin-right: 2%;
 }
 
 .primary-button:hover {
-    background-color: rgb(107, 54, 41);
+    background-color: #6B3629;
 }
 
 .primary-button:active {
-    background-color: rgb(90, 42, 31);
+    background-color: #5A2A1F;
 }
 
 .button-text {
@@ -153,5 +157,20 @@
     -unity-font-style: bold;
 }
 
-.unity-button {
+.warning-text {
+    font-size: 35px;
+    -unity-text-align: middle-center;
+    margin-top: 4px;
+    color: rgb(255, 0, 0);
+    justify-content: flex-end;
+    align-content: flex-end;
+    padding-top: 40px;
+    height: 80px; /* 👈 Reserve space */
+    visibility: hidden; /* 👈 Instead of display: none */
+    opacity: 0;          /* 👈 Smooth transition if needed */
+    transition: opacity 0.3s ease;
+}
+.warning-text.show {
+    visibility: visible;
+    opacity: 1;
 }

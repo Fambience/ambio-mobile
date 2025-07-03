@@ -1,0 +1,7 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/congratulation_screen.uss?fileID=7433441132597879392&amp;guid=dfac1e917277c12b08e47e5bd49e3480&amp;type=3#congratulation_screen" />
+    <ui:VisualElement class="container" style="justify-content: center; align-items: center;">
+        <ui:Image name="Image" class="party-popper" />
+        <ui:Label name="title" text="We&apos;re excited to personalize your experience and help you design a space that truly feels like home. Let’s start creating something beautiful together." class="title" style="-unity-text-align: upper-center;" />
+    </ui:VisualElement>
+</ui:UXML>

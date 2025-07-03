@@ -1,20 +1,40 @@
-﻿<ui:UXML xmlns:ui="UnityEngine.UIElements">
-    <Style src="../USS/HousematesScreen.uss" />
-
-    <ui:VisualElement class="container">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/HousematesScreen.uss?fileID=7433441132597879392&amp;guid=a55ff556a8cb4e6ca3e7a4f7c8a899b9&amp;type=3#HousematesScreen" />
+    <ui:VisualElement class="container" style="justify-content: flex-start;">
         <ui:VisualElement class="top-bar">
-            <ui:Button name="backButton">←</ui:Button>
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+    
             <ui:VisualElement class="progress-bar">
                 <ui:VisualElement class="progress-fill" />
             </ui:VisualElement>
         </ui:VisualElement>
-
-        <ui:Label name="title" class="title" text="Who do you share your home with?" />
-
-        <ui:VisualElement name="checkboxGroup" class="checkbox-group" />
-
+        <ui:Label name="title" text="Who do you share your home with?" class="title" />
+        <ui:VisualElement name="checkboxGroup" class="checkbox-group" style="align-self: auto;">
+            <ui:VisualElement class="checkbox-item">
+                <ui:Toggle name="aloneToggle" class="custom-checkbox" />
+                <ui:Label text="I live alone" class="checkbox-label" />
+            </ui:VisualElement>
+            <ui:VisualElement class="checkbox-item">
+                <ui:Toggle name="partnerToggle" class="custom-checkbox" />
+                <ui:Label text="with partner" class="checkbox-label" />
+            </ui:VisualElement>
+            <ui:VisualElement class="checkbox-item">
+                <ui:Toggle name="familyToggle" class="custom-checkbox" />
+                <ui:Label text="with family" class="checkbox-label" />
+            </ui:VisualElement>
+            <ui:VisualElement class="checkbox-item">
+                <ui:Toggle name="roommatesToggle" class="custom-checkbox" />
+                <ui:Label text="with roommates" class="checkbox-label" />
+            </ui:VisualElement>
+            <ui:VisualElement class="checkbox-item">
+                <ui:Toggle name="petsToggle" class="custom-checkbox" />
+                <ui:Label text="with pets" class="checkbox-label" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:Button name="completeButton" class="primary-button">
-            <ui:Label text="Complete" />
+            <ui:Label text="Complete" class="button-text" />
             <ui:Label text="→" class="arrow" />
         </ui:Button>
     </ui:VisualElement>
