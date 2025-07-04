@@ -40,7 +40,7 @@ public class CompleteProfileController : MonoBehaviour
     private string selectedCity = "";
     private bool isDropdownOpen = false;
 
-    void Start()
+    void OnEnable()
     {
         InitializeUI();
         SetupEventListeners();

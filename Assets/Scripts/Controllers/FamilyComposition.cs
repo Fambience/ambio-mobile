@@ -26,7 +26,7 @@ public class FamilyComposition : MonoBehaviour
     private List<Toggle> allToggles = new();
     private Dictionary<Toggle, string> toggleLabels = new();
 
-    void Start()
+    void OnEnable()
     {
         baseURL = baseScript.baseURL;
         InitializeUI();

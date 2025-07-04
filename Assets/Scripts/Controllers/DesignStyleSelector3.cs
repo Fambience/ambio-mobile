@@ -19,7 +19,7 @@ public class DesignStyleSelector3 : MonoBehaviour
     private Button selectedButton = null; // Changed from List to single Button
     private Dictionary<Button, string> buttonStyleNames = new Dictionary<Button, string>();
 
-    void Start()
+    void OnEnable()
     {
         if (currentScreen == null)
             currentScreen = this.gameObject;

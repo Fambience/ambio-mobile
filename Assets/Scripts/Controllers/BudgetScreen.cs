@@ -24,7 +24,7 @@ public class BudgetScreen : MonoBehaviour
     private int selectedBudgetIndex = -1;
     private string selectedBudget = "";
     
-    void Start()
+    void OnEnable()
     {
         // Get the root visual element
         var root = uiDocument.rootVisualElement;

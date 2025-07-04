@@ -21,7 +21,7 @@ public class DesignStyleSelector : MonoBehaviour
 
     private const int MAX_SELECTIONS = 3;
 
-    void Start()
+    void OnEnable()
     {
         if (currentScreen == null)
             currentScreen = this.gameObject;

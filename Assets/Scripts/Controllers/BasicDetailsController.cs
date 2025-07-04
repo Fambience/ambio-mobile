@@ -35,7 +35,7 @@ public class BasicDetailsController : MonoBehaviour
 
     private readonly List<string> genderOptions = new() { "Male", "Female", "Other" };
 
-    private void Start()
+    private void OnEnable()
     {
         baseURL = baseScript.baseURL;
         var root = uiDocument.rootVisualElement;
