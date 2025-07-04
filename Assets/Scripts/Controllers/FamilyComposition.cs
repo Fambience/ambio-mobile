@@ -62,7 +62,9 @@ public class FamilyComposition : MonoBehaviour
 
     void SetupEventListeners()
     {
-        backButton.clicked += () => Debug.Log("Back button clicked"); // Implement navigation if needed
+        if (backButton != null)
+            backButton.clicked += OnBackButtonClicked;
+        
         completeButton.clicked += OnCompleteButtonClicked;
         if (skipButton != null) skipButton.clicked += () => StartCoroutine(SendOnboardingData());
 
@@ -70,6 +72,11 @@ public class FamilyComposition : MonoBehaviour
             toggle.RegisterValueChangedCallback(OnOtherToggleChanged);
     }
 
+    void OnBackButtonClicked()
+    {
+        UIManager.Instance.OpenScreen(UIScreenType.ColorTone);
+    }
+    
     void OnAloneToggleChanged(ChangeEvent<bool> evt)
     {
         if (evt.newValue)
@@ -121,6 +128,7 @@ public class FamilyComposition : MonoBehaviour
             yield break;
         }
 
+        Debug.Log("himanshu" + OnboardingData.ColorScheme);
         OnboardingPayload data = new OnboardingPayload
         {
             firstName = OnboardingData.FirstName,

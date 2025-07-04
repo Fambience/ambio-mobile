@@ -13,6 +13,7 @@ public class DesignStyleSelector : MonoBehaviour
     private Button backButton;
     private Button nextButton;
     private Label warningLabel;
+    private Button skipButton;
 
     private Dictionary<Button, bool> buttonSelectionState = new Dictionary<Button, bool>();
     private List<Button> selectedButtons = new List<Button>();
@@ -36,6 +37,7 @@ public class DesignStyleSelector : MonoBehaviour
     {
         backButton = root.Q<Button>("backButton");
         nextButton = root.Q<Button>("completeButton");
+        skipButton = root.Q<Button>("skipButton");
 
         var styleButtons = root.Query<Button>().Where(btn =>
             btn.name == "Button" && btn != backButton && btn != nextButton).ToList();
@@ -59,7 +61,7 @@ public class DesignStyleSelector : MonoBehaviour
 
     string GetStyleNameFromButton(Button button, int index)
     {
-        string[] styleNames = { "Art-Deco", "Bohemian", "Coastal", "Contemporary", "Eclectic", "Indian-Vernacular" };
+        string[] styleNames = { "ARTDECO", "BOHEMIAN", "COASTAL", "ECLACTIC", "SCANDINAVIAN", "RUSTIC" };
         return index < styleNames.Length ? styleNames[index] : $"Style-{index + 1}";
     }
 
@@ -70,6 +72,9 @@ public class DesignStyleSelector : MonoBehaviour
 
         if (nextButton != null)
             nextButton.clicked += OnNextButtonClicked;
+        
+        if (skipButton != null)
+            skipButton.clicked += OnSkipButtonClicked;
 
         foreach (var kvp in buttonSelectionState)
         {
@@ -181,6 +186,11 @@ public class DesignStyleSelector : MonoBehaviour
         StoreSelectedStyles();
         UIManager.Instance.OpenScreen(UIScreenType.ModernStyles);
     }
+    
+    void OnSkipButtonClicked()
+    {
+        UIManager.Instance.OpenScreen(UIScreenType.ModernStyles);
+    }
 
     void SwitchToScreen(GameObject targetScreen)
     {
@@ -253,5 +263,7 @@ public class DesignStyleSelector : MonoBehaviour
             backButton.clicked -= OnBackButtonClicked;
         if (nextButton != null)
             nextButton.clicked -= OnNextButtonClicked;
+        if (skipButton != null)
+            skipButton.clicked -= OnSkipButtonClicked;
     }
 }

@@ -8,6 +8,9 @@
             <ui:VisualElement class="progress-bar">
                 <ui:VisualElement class="progress-fill" />
             </ui:VisualElement>
+            <ui:Button name="skipButton" class="skip-button">
+                <ui:Image class="skip-icon" />
+            </ui:Button>
         </ui:VisualElement>
         <ui:VisualElement name="VisualElement" style="top: 0;">
             <ui:Label name="title" text="Which color schemes do you love?" class="title" />

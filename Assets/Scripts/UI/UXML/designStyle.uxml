@@ -8,6 +8,9 @@
             <ui:VisualElement class="progress-bar">
                 <ui:VisualElement class="progress-fill" />
             </ui:VisualElement>
+            <ui:Button name="skipButton" class="skip-button">
+                <ui:Image class="skip-icon" />
+            </ui:Button>
         </ui:VisualElement>
         <ui:VisualElement name="VisualElement" style="top: 0;">
             <ui:Label name="title" text="Which design style inspire you?" class="title" />
@@ -25,15 +28,15 @@
                         <ui:Image class="Coastal" />
                     </ui:Button>
                     <ui:Button name="Button" class="button-2">
-                        <ui:Image class="Contemporary" />
+                        <ui:Image class="Eclectic" />
                     </ui:Button>
                 </ui:VisualElement>
                 <ui:VisualElement name="styleGrid" class="style-grid1" style="align-items: stretch; justify-content: space-between; align-self: auto; align-content: flex-start; flex-direction: row;">
                     <ui:Button name="Button" class="button-1">
-                        <ui:Image class="Eclectic" />
+                        <ui:Image class="Scandinavian" />
                     </ui:Button>
                     <ui:Button name="Button" class="button-2">
-                        <ui:Image class="Indian-Vernacular" />
+                        <ui:Image class="Rustic" />
                     </ui:Button>
                 </ui:VisualElement>
             </ui:VisualElement>

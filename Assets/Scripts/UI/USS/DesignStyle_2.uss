@@ -32,6 +32,7 @@
     background-image: resource("back-icon");
     background-repeat: no-repeat;
     background-size: contain;
+    scale: 2.5;
 }
 
 .progress-bar {
@@ -51,6 +52,29 @@
     height: 100%;
     background-color: #8B4C39;
     border-radius: 4px;
+}
+
+.skip-button {
+    width: 45px;
+    height: 45px;
+    background-color: transparent;
+    border-width: 0;
+    font-size: 18px;
+    color: #333333;
+    padding: 0;
+    justify-content: center;
+    margin-top: 20%;
+    align-items: center;
+}
+
+.skip-icon {
+    width: 45px;
+    height: 45px;
+    rotate: 180deg;
+    background-image: resource("back-icon");
+    background-repeat: no-repeat;
+    background-size: contain;
+    scale: 2.5;
 }
 
 .title {

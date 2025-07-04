@@ -32,6 +32,7 @@
     background-image: resource("back-icon");
     background-repeat: no-repeat;
     background-size: contain;
+    scale: 2.5;
 }
 
 .progress-bar {
@@ -51,6 +52,29 @@
     height: 100%;
     background-color: #8B4C39;
     border-radius: 4px;
+}
+
+.skip-button {
+    width: 45px;
+    height: 45px;
+    background-color: transparent;
+    border-width: 0;
+    font-size: 18px;
+    color: #333333;
+    padding: 0;
+    justify-content: center;
+    margin-top: 20%;
+    align-items: center;
+}
+
+.skip-icon {
+    width: 45px;
+    height: 45px;
+    rotate: 180deg;
+    background-image: resource("back-icon");
+    background-repeat: no-repeat;
+    background-size: contain;
+    scale: 2.5;
 }
 
 .title {
@@ -87,12 +111,6 @@
     padding: 0;
 }
 
-.Industrial {
-    width: 100%;
-    height: 100%;
-    background-image: resource("Industrial");
-}
-
 .Japandi {
     width: 100%;
     height: 100%;
@@ -111,17 +129,23 @@
     background-image: resource("minimalist");
 }
 
-
 .modern {
     width: 100%;
     height: 100%;
     background-image: resource("modern");
 }
 
-.Rustic {
+
+.Industrial {
     width: 100%;
     height: 100%;
-    background-image: resource("Rustic");
+    background-image: resource("Industrial");
+}
+
+.Contemporary {
+    width: 100%;
+    height: 100%;
+    background-image: resource("Contemporary");
 }
 
 

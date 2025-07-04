@@ -32,6 +32,7 @@
     background-image: resource('back-icon');
     background-repeat: no-repeat;
     background-size: contain;
+    scale: 2.5;
 }
 
 .progress-bar {

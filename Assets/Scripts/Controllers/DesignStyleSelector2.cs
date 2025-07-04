@@ -13,6 +13,7 @@ public class DesignStyleSelector2 : MonoBehaviour
     private Button backButton;
     private Button nextButton;
     private Label warningLabel;
+    private Button skipButton;
 
     private Dictionary<Button, bool> buttonSelectionState = new Dictionary<Button, bool>();
     private List<Button> selectedButtons = new List<Button>();
@@ -36,6 +37,7 @@ public class DesignStyleSelector2 : MonoBehaviour
     {
         backButton = root.Q<Button>("backButton");
         nextButton = root.Q<Button>("completeButton");
+        skipButton = root.Q<Button>("skipButton");
 
         var styleButtons = root.Query<Button>().Where(btn =>
             btn.name == "Button" && btn != backButton && btn != nextButton).ToList();
@@ -59,7 +61,7 @@ public class DesignStyleSelector2 : MonoBehaviour
 
     string GetStyleNameFromButton(Button button, int index)
     {
-        string[] styleNames = { "Industrial", "Japandi", "Mid-Century-Modern", "minimalist", "modern", "Rustic" };
+        string[] styleNames = {"JAPANDI", "MIDCENTURYMODERN", "MINIMALIST", "MODERN", "INDUSTRIAL", "CONTEMPORARY" };
         return index < styleNames.Length ? styleNames[index] : $"Style-{index + 1}";
     }
 
@@ -70,6 +72,9 @@ public class DesignStyleSelector2 : MonoBehaviour
 
         if (nextButton != null)
             nextButton.clicked += OnNextButtonClicked;
+        
+        if (skipButton != null)
+            skipButton.clicked += OnSkipButtonClicked;
 
         foreach (var kvp in buttonSelectionState)
         {
@@ -183,6 +188,11 @@ public class DesignStyleSelector2 : MonoBehaviour
         StoreSelectedStyles();
         UIManager.Instance.OpenScreen(UIScreenType.ColorTone);
     }
+    
+    void OnSkipButtonClicked()
+    {
+        UIManager.Instance.OpenScreen(UIScreenType.ColorTone);
+    }
 
     void SwitchToScreen(GameObject targetScreen)
     {
@@ -207,7 +217,7 @@ public class DesignStyleSelector2 : MonoBehaviour
         }
 
         // Store in central onboarding data
-        OnboardingData.DesignInspoScreen1 = selectedStyleNames;
+        OnboardingData.DesignInspoScreen2 = selectedStyleNames;
 
         Debug.Log("Design styles stored to OnboardingData: " + string.Join(", ", selectedStyleNames));
     }
@@ -255,5 +265,7 @@ public class DesignStyleSelector2 : MonoBehaviour
             backButton.clicked -= OnBackButtonClicked;
         if (nextButton != null)
             nextButton.clicked -= OnNextButtonClicked;
+        if (skipButton != null)
+            skipButton.clicked -= OnSkipButtonClicked;
     }
 }

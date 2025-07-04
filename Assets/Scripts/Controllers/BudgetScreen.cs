@@ -18,6 +18,7 @@ public class BudgetScreen : MonoBehaviour
     private RadioButtonGroup radioButtonGroup;
     private Button completeButton;
     private Button backButton;
+    private Button skipButton;
     
     // Selected budget data
     private int selectedBudgetIndex = -1;
@@ -32,6 +33,7 @@ public class BudgetScreen : MonoBehaviour
         radioButtonGroup = root.Q<RadioButtonGroup>();
         completeButton = root.Q<Button>("completeButton");
         backButton = root.Q<Button>("backButton");
+        skipButton = root.Q<Button>("skipButton");
         
         // Subscribe to events
         SetupEventHandlers();
@@ -56,6 +58,9 @@ public class BudgetScreen : MonoBehaviour
         {
             backButton.clicked += OnBackButtonClicked;
         }
+        
+        if (skipButton != null)
+            skipButton.clicked += OnSkipButtonClicked;
     }
     
     void InitializeUI()
@@ -117,6 +122,11 @@ public class BudgetScreen : MonoBehaviour
         
         // Navigate to next screen
         NavigateToNextScreen();
+    }
+    
+    void OnSkipButtonClicked()
+    {
+        UIManager.Instance.OpenScreen(UIScreenType.CreativeStyles);
     }
     
     void OnBackButtonClicked()
