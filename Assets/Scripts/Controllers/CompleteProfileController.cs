@@ -1,7 +1,9 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Networking;
 
 public class CompleteProfileController : MonoBehaviour
 {
@@ -17,24 +19,23 @@ public class CompleteProfileController : MonoBehaviour
     private Button skipButton;
     private Button completeButton;
 
-    [Header("Data")]
-    private List<string> indianCities = new List<string>
-    {
-        "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune", "Ahmedabad",
-        "Jaipur", "Surat", "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane", "Bhopal",
-        "Visakhapatnam", "Pimpri-Chinchwad", "Patna", "Vadodara", "Ghaziabad", "Ludhiana",
-        "Agra", "Nashik", "Faridabad", "Meerut", "Rajkot", "Kalyan-Dombivali", "Vasai-Virar",
-        "Varanasi", "Srinagar", "Dhanbad", "Jodhpur", "Amritsar", "Raipur", "Allahabad",
-        "Coimbatore", "Jabalpur", "Gwalior", "Vijayawada", "Madurai", "Guwahati", "Chandigarh",
-        "Hubli-Dharwad", "Mysore", "Tiruchirappalli", "Bareilly", "Aligarh", "Tiruppur",
-        "Moradabad", "Jalandhar", "Bhubaneswar", "Salem", "Warangal", "Guntur", "Bhiwandi",
-        "Saharanpur", "Gorakhpur", "Bikaner", "Amravati", "Noida", "Jamshedpur", "Bhilai",
-        "Cuttack", "Firozabad", "Kochi", "Nellore", "Bhavnagar", "Dehradun", "Durgapur",
-        "Asansol", "Rourkela", "Nanded", "Kolhapur", "Ajmer", "Akola", "Gulbarga",
-        "Jamnagar", "Ujjain", "Loni", "Siliguri", "Jhansi", "Ulhasnagar", "Jammu",
-        "Sangli-Miraj & Kupwad", "Mangalore", "Erode", "Belgaum", "Ambattur", "Tirunelveli",
-        "Malegaon", "Gaya", "Jalgaon", "Udaipur", "Maheshtala", "Davanagere", "Kozhikode"
-    };
+    [Header("Data")] private List<string> indianCities;
+    // {
+    //     "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune", "Ahmedabad",
+    //     "Jaipur", "Surat", "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane", "Bhopal",
+    //     "Visakhapatnam", "Pimpri-Chinchwad", "Patna", "Vadodara", "Ghaziabad", "Ludhiana",
+    //     "Agra", "Nashik", "Faridabad", "Meerut", "Rajkot", "Kalyan-Dombivali", "Vasai-Virar",
+    //     "Varanasi", "Srinagar", "Dhanbad", "Jodhpur", "Amritsar", "Raipur", "Allahabad",
+    //     "Coimbatore", "Jabalpur", "Gwalior", "Vijayawada", "Madurai", "Guwahati", "Chandigarh",
+    //     "Hubli-Dharwad", "Mysore", "Tiruchirappalli", "Bareilly", "Aligarh", "Tiruppur",
+    //     "Moradabad", "Jalandhar", "Bhubaneswar", "Salem", "Warangal", "Guntur", "Bhiwandi",
+    //     "Saharanpur", "Gorakhpur", "Bikaner", "Amravati", "Noida", "Jamshedpur", "Bhilai",
+    //     "Cuttack", "Firozabad", "Kochi", "Nellore", "Bhavnagar", "Dehradun", "Durgapur",
+    //     "Asansol", "Rourkela", "Nanded", "Kolhapur", "Ajmer", "Akola", "Gulbarga",
+    //     "Jamnagar", "Ujjain", "Loni", "Siliguri", "Jhansi", "Ulhasnagar", "Jammu",
+    //     "Sangli-Miraj & Kupwad", "Mangalore", "Erode", "Belgaum", "Ambattur", "Tirunelveli",
+    //     "Malegaon", "Gaya", "Jalgaon", "Udaipur", "Maheshtala", "Davanagere", "Kozhikode"
+    // };
 
     private List<string> filteredCities;
     private string selectedCity = "";
@@ -44,8 +45,7 @@ public class CompleteProfileController : MonoBehaviour
     {
         InitializeUI();
         SetupEventListeners();
-        filteredCities = new List<string>(indianCities);
-        PopulateOptionsList();
+        StartCoroutine(FetchCitiesFromAPI());
     }
 
     void InitializeUI()
@@ -84,6 +84,45 @@ public class CompleteProfileController : MonoBehaviour
         // Close dropdown when clicking outside
         root.RegisterCallback<ClickEvent>(OnRootClicked);
     }
+    
+    private IEnumerator FetchCitiesFromAPI()
+    {
+        string url = "https://ambiobackend-stage.onrender.com/api/v1/public/cities";
+
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            // TODO: Show loading indicator here
+            yield return request.SendWebRequest();
+            // TODO: Hide loading indicator here
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("City fetch failed: " + request.error);
+                filteredCities = new List<string>(indianCities); // fallback
+                PopulateOptionsList();
+            }
+            else
+            {
+                string json = request.downloadHandler.text;
+                Debug.Log("Fetched City JSON: " + json);
+
+                CityWrapper wrapper = JsonUtility.FromJson<CityWrapper>(json);
+                if (wrapper != null && wrapper.success && wrapper.data != null)
+                {
+                    indianCities = wrapper.data.Select(c => c.cityName).ToList();
+                    filteredCities = new List<string>(indianCities);
+                    PopulateOptionsList();
+                }
+                else
+                {
+                    Debug.LogError("Failed to parse city list.");
+                }
+            }
+        }
+    }
+
 
     void OnDropdownTriggerClick(ClickEvent evt)
     {
@@ -274,5 +313,26 @@ public class CompleteProfileController : MonoBehaviour
         
         if (root != null)
             root.UnregisterCallback<ClickEvent>(OnRootClicked);
+    }
+    
+    [System.Serializable]
+    public class City
+    {
+        public string cityId;
+        public string cityName;
+    }
+
+    [System.Serializable]
+    public class CityResponse
+    {
+        public bool success;
+        public List<City> data;
+    }
+
+    [System.Serializable]
+    public class CityWrapper
+    {
+        public bool success;
+        public List<City> data;
     }
 }
