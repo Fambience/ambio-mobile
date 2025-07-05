@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -40,13 +42,11 @@ public class LoginHandler : MonoBehaviour
     {
         var root = uiDocument.rootVisualElement;
 
-        // Bind UXML fields
         loginScreen = root.Q<VisualElement>("LoginScreen");
         emailField = root.Q<TextField>("emailField");
         passwordField = root.Q<TextField>("passwordField");
         loginButton = root.Q<Button>("signInButton");
 
-        // Create warning labels
         warningEmailText = new Label { style = { color = Color.red, unityFontStyleAndWeight = FontStyle.Bold } };
         warningPasswordText = new Label { style = { color = Color.red, unityFontStyleAndWeight = FontStyle.Bold } };
         warningLoginText = new Label { style = { color = Color.red, unityFontStyleAndWeight = FontStyle.Bold } };
@@ -116,7 +116,6 @@ public class LoginHandler : MonoBehaviour
     private IEnumerator LoginUserCoroutine(string email, string password)
     {
         Debug.Log("LoginUserCoroutine Called");
-        //ShowLoader("Logging in...");
         string jsonData = JsonUtility.ToJson(new LoginData(email, password));
 
         using (UnityWebRequest request = new UnityWebRequest(baseURL + loginEndPoint, "POST"))
@@ -151,46 +150,57 @@ public class LoginHandler : MonoBehaviour
             PlayerPrefs.SetString("role", response.data.role);
             PlayerPrefs.Save();
 
-            HandleLoginStage(response.data.onboardingState, response.data.role, token);
+            HandleLoginStage(response);
         }
     }
 
     private void ShowRegisterScreen()
     {
-            UIManager.Instance.OpenScreen(UIScreenType.Register);
+        UIManager.Instance.OpenScreen(UIScreenType.Register);
     }
 
-    private void HandleLoginStage(string state, string role, string token)
+    private void HandleLoginStage(LoginResponse response)
     {
-        switch (state)
+        switch (response.data.onboardingState)
         {
             case "VERIFY_EMAIL":
-                //UIManager.Instance.OpenScreen(UIScreenType.OTP);
-                //ShowLoader("Sending OTP on");
                 sendOTPFunc(userEmail);
                 break;
 
             case "ONBOARD_DETAILS":
-                Debug.Log("Onboard Details");
-                UIManager.Instance.OpenScreen(UIScreenType.UserDetails);
+                HandleDynamicOnboardingFromQuestions(response.data.remainingOnboardingQuestions);
                 break;
 
             case "ONBOARDING_COMPLETED":
-                //ShowOnly(homeScreen);
-                if (!string.IsNullOrEmpty(token))
-                    userProfileManager.InitializeProfile(token);
+                if (!string.IsNullOrEmpty(response.token))
+                    userProfileManager.InitializeProfile(response.token);
                 break;
-            
+
             case "BASIC_DETAILS":
                 UIManager.Instance.OpenScreen(UIScreenType.BasicDetails);
                 break;
 
             default:
                 Debug.LogError("Unknown onboarding state.");
+                UIManager.Instance.OpenScreen(UIScreenType.Home);
                 break;
         }
     }
-    
+
+    private void HandleDynamicOnboardingFromQuestions(List<string> questions)
+    {
+        var screen = BackendQuestionToScreenMapper.GetFirstMatchingScreen(questions);
+        if (screen.HasValue)
+        {
+            UIManager.Instance.OpenScreen(screen.Value);
+        }
+        else
+        {
+            Debug.LogWarning("No valid screen mapping found in remaining onboarding questions.");
+            UIManager.Instance.OpenScreen(UIScreenType.Home);
+        }
+    }
+
     public void sendOTPFunc(string email)
     {
         Debug.Log("Sending OTP for: " + email);
@@ -199,7 +209,6 @@ public class LoginHandler : MonoBehaviour
 
     private IEnumerator SendOtpCoroutine(string email)
     {
-        // TODO: Show loading screen
         Debug.Log("Sending OTP request...");
 
         string jsonData = JsonUtility.ToJson(new EmailData(email));
@@ -215,8 +224,6 @@ public class LoginHandler : MonoBehaviour
                 request.SetRequestHeader("Authorization", token);
 
             yield return request.SendWebRequest();
-
-            // TODO: Hide loading screen
 
             if (request.result != UnityWebRequest.Result.Success)
             {
@@ -246,7 +253,7 @@ public class LoginHandler : MonoBehaviour
             }
         }
     }
-    
+
     public class OTPResponse
     {
         public bool success;
@@ -278,9 +285,9 @@ public class LoginHandler : MonoBehaviour
         public string password;
         public LoginData(string e, string p) { email = e; password = p; }
     }
-    
+
     [System.Serializable] public class EmailData { public string email; public EmailData(string e) { email = e; } }
-    
+
     [System.Serializable]
     public class LoginResponse
     {
@@ -295,6 +302,7 @@ public class LoginHandler : MonoBehaviour
     {
         public string onboardingState;
         public string role;
+        public List<string> remainingOnboardingQuestions;
     }
 
     [System.Serializable]
