@@ -168,7 +168,11 @@ public class LoginHandler : MonoBehaviour
                 break;
 
             case "ONBOARD_DETAILS":
-                HandleDynamicOnboardingFromQuestions(response.data.remainingOnboardingQuestions);
+                HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
+                break;
+            
+            case "ONBOARDING_PARTIALLY_COMPLETED":
+                HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
                 break;
 
             case "ONBOARDING_COMPLETED":
@@ -302,7 +306,7 @@ public class LoginHandler : MonoBehaviour
     {
         public string onboardingState;
         public string role;
-        public List<string> remainingOnboardingQuestions;
+        public List<string> remainingQuestions;
     }
 
     [System.Serializable]
