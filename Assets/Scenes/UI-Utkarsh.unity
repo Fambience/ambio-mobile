@@ -180,6 +180,7 @@ GameObject:
   m_Component:
   - component: {fileID: 52741822}
   - component: {fileID: 52741821}
+  - component: {fileID: 52741823}
   m_Layer: 0
   m_Name: forgotPasswordScreen
   m_TagString: Untagged
@@ -221,6 +222,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &52741823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 52741820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25e9907ba1fe49343861d72705ece0a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &241857858
 GameObject:
   m_ObjectHideFlags: 0
@@ -511,8 +524,12 @@ MonoBehaviour:
     screenObject: {fileID: 1717646517}
   - screenType: 9
     screenObject: {fileID: 1209480911}
+  - screenType: 13
+    screenObject: {fileID: 1961917870}
   - screenType: 11
     screenObject: {fileID: 1197045777}
+  - screenType: 14
+    screenObject: {fileID: 52741820}
 --- !u!4 &854714332
 Transform:
   m_ObjectHideFlags: 0
@@ -1117,6 +1134,72 @@ MonoBehaviour:
   nextScreen: {fileID: 0}
   previousScreen: {fileID: 0}
   currentScreen: {fileID: 0}
+--- !u!1 &1961917870
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1961917873}
+  - component: {fileID: 1961917872}
+  - component: {fileID: 1961917871}
+  m_Layer: 0
+  m_Name: OtpScreenPassword
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1961917871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961917870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea3ca954512f27445bd9f76deb7e8c73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiDocument: {fileID: 1961917872}
+  verifyOtpEndPoint: /api/v1/user/verify-otp
+--- !u!114 &1961917872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961917870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: dc8aef9b3ff930543bfa71cadfe267cb, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: eeccf52b5350d422292998340a4fa4c7, type: 3}
+  m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+--- !u!4 &1961917873
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961917870}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1207.8541, y: 0, z: -1936.4529}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2010436888
 GameObject:
   m_ObjectHideFlags: 0
@@ -1353,6 +1436,7 @@ SceneRoots:
   - {fileID: 1850489382}
   - {fileID: 484351385}
   - {fileID: 1816956113}
+  - {fileID: 1961917873}
   - {fileID: 1788447529}
   - {fileID: 46986293}
   - {fileID: 52741822}

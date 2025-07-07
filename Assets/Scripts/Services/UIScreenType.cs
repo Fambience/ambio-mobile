@@ -15,5 +15,7 @@ public enum UIScreenType
     Location,
     OnboardingComplete,
     ColorTone,
+    PasswordOTP,
+    forgotPassword,
     
 }

@@ -59,11 +59,19 @@ public class LoginHandler : MonoBehaviour
         emailField.RegisterValueChangedCallback(evt => ValidateEmail(evt.newValue));
         passwordField.RegisterValueChangedCallback(evt => ValidatePassword(evt.newValue));
         loginButton.clicked += LoginUser;
+        
+        Label forgotPassword = root.Q<Label>("forgotPassword");
+        forgotPassword.RegisterCallback<ClickEvent>(evt => showForgotPassword());
 
         Label signUpLabel = root.Q<Label>("SignUpLabel");
         signUpLabel.RegisterCallback<ClickEvent>(evt => ShowRegisterScreen());
 
         PlayerPrefs.DeleteAll();
+    }
+
+    public void showForgotPassword()
+    {
+        UIManager.Instance.OpenScreen(UIScreenType.forgotPassword);
     }
 
     private void ValidateEmail(string email)

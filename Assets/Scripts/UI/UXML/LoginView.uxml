@@ -20,7 +20,7 @@
                     <ui:TextField name="passwordField" is-password="true" placeholder-text="Password" class="input-field" style="align-self: center; background-color: rgba(255, 255, 255, 0); -unity-background-image-tint-color: rgba(255, 255, 255, 0); -unity-slice-scale: 1px; border-left-color: rgba(255, 255, 255, 0); border-right-color: rgba(255, 255, 255, 0); border-top-color: rgba(255, 255, 255, 0); border-bottom-color: rgba(255, 255, 255, 0);" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Label text="Forgot Password?" class="forgot-password" />
+            <ui:Label name="forgotPassword" text="Forgot Password?" class="forgot-password" />
             <ui:VisualElement name="LoginWarningContainer" class="warning-container" />
             
             <ui:Button name="signInButton" text="Sign In" class="sign-in-button" />
