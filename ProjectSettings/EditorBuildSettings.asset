@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/UI-Utkarsh.unity
+    path: Assets/Scenes/UI-Main.unity
     guid: ba73d78b052af4a49a91509be7a78a86
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

@@ -1,0 +1,33 @@
+<ui:UXML xmlns="UnityEngine.UIElements" xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/CompleteProfile.uss?fileID=7433441132597879392&amp;guid=bdcd0fb6f6c34a99895ac7f7b782aa7d&amp;type=3#CompleteProfile" />
+    <ui:VisualElement class="container">
+        <ui:VisualElement class="top-bar">
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+            <ui:VisualElement class="progress-bar">
+                <ui:VisualElement class="progress-fill" />
+            </ui:VisualElement>
+            <ui:Button name="skipButton" class="skip-button">
+                <ui:Image class="skip-icon" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:Label name="title" text="Which city do you primarily serve?" class="title" />
+        <ui:VisualElement name="locationDropdown" class="location-dropdown" style="justify-content: flex-start;">
+            <ui:VisualElement name="dropdownTrigger" class="dropdown-trigger">
+                <ui:Label name="selectedText" text="Select your location" class="selected-text" style="justify-content: flex-start; align-content: flex-start;" />
+                <ui:Label text="▼" class="dropdown-arrow" />
+            </ui:VisualElement>
+            <ui:VisualElement name="dropdownContent" class="dropdown-content" style="display: none;">
+                <ui:VisualElement class="search-wrapper">
+                    <ui:TextField name="searchField" placeholder-text="Search City" class="search-field" />
+                </ui:VisualElement>
+                <ui:ScrollView name="optionsList" class="options-list" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="completeButton" class="primary-button">
+            <ui:Label text="Next" class="button-text" />
+            <ui:Label text="→" class="arrow" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>
