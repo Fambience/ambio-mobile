@@ -5,7 +5,6 @@ using UnityEngine.Networking;
 using UnityEngine.UIElements;
 using System.Linq;
 
-
 public class BasicDetailsController : MonoBehaviour
 {
     [Header("Dependencies")]
@@ -60,6 +59,7 @@ public class BasicDetailsController : MonoBehaviour
         // Setup UI
         SetupDropdown();
         SetupUsernameValidation();
+        SetupAgeValidation();
         SetupButtonCallbacks();
     }
 
@@ -76,6 +76,77 @@ public class BasicDetailsController : MonoBehaviour
             else
                 warningLabelUsername.text = "Username must be at least 6 characters.";
         });
+    }
+
+    private void SetupAgeValidation()
+    {
+        // Restrict input to numbers only
+        ageField.RegisterCallback<KeyDownEvent>(evt => {
+            // Allow backspace, delete, tab, and arrow keys
+            if (evt.keyCode == KeyCode.Backspace || evt.keyCode == KeyCode.Delete || 
+                evt.keyCode == KeyCode.Tab || evt.keyCode == KeyCode.LeftArrow || 
+                evt.keyCode == KeyCode.RightArrow)
+            {
+                return;
+            }
+
+            // Allow only numeric keys (0-9)
+            if (evt.keyCode < KeyCode.Alpha0 || evt.keyCode > KeyCode.Alpha9)
+            {
+                // Also allow numpad numbers
+                if (evt.keyCode < KeyCode.Keypad0 || evt.keyCode > KeyCode.Keypad9)
+                {
+                    evt.PreventDefault();
+                    evt.StopPropagation();
+                }
+            }
+        });
+
+        // Validate age on value change
+        ageField.RegisterValueChangedCallback(evt => {
+            ValidateAge(evt.newValue);
+        });
+    }
+
+    private void ValidateAge(string ageValue)
+    {
+        // Clear previous age-related warnings
+        if (warningLabelAgeGender.text.Contains("age") || warningLabelAgeGender.text.Contains("Age"))
+        {
+            warningLabelAgeGender.text = "";
+        }
+
+        if (string.IsNullOrEmpty(ageValue))
+        {
+            return; // Don't show warning for empty field
+        }
+
+        if (int.TryParse(ageValue, out int age))
+        {
+            if (age < 1)
+            {
+                warningLabelAgeGender.text = "Age must be at least 1.";
+                warningLabelAgeGender.style.color = Color.red;
+            }
+            else if (age > 100)
+            {
+                warningLabelAgeGender.text = "Age cannot be more than 100.";
+                warningLabelAgeGender.style.color = Color.red;
+            }
+            else
+            {
+                // Age is valid, clear any age-related warnings
+                if (warningLabelAgeGender.text.Contains("Age") || warningLabelAgeGender.text.Contains("age"))
+                {
+                    warningLabelAgeGender.text = "";
+                }
+            }
+        }
+        else
+        {
+            warningLabelAgeGender.text = "Please enter a valid age.";
+            warningLabelAgeGender.style.color = Color.red;
+        }
     }
 
     private IEnumerator DelayedUsernameCheck(string username)
@@ -124,12 +195,13 @@ public class BasicDetailsController : MonoBehaviour
     {
         signInButton.clicked += () => {
             if (ValidateForm())
+            {
                 Debug.Log("Basic Details Endpoint Called");
                 StartCoroutine(SubmitBasicDetails());
+            }
         };
 
         backButton.clicked += () => {
-            // Implement navigation back logic if needed
             Debug.Log("Back button clicked");
         };
     }
@@ -139,9 +211,14 @@ public class BasicDetailsController : MonoBehaviour
         dropdownContent.style.display = DisplayStyle.None;
         PopulateDropdownOptions();
         dropdownTrigger.RegisterCallback<ClickEvent>(_ => ToggleDropdown());
+        
+        // Close dropdown when clicking outside
         uiDocument.rootVisualElement.RegisterCallback<ClickEvent>(evt => {
-            if (dropdownContent.style.display == DisplayStyle.Flex && !genderDropdown.worldBound.Contains(evt.position))
+            if (dropdownContent.style.display == DisplayStyle.Flex && 
+                !genderDropdown.worldBound.Contains(evt.position))
+            {
                 CloseDropdown();
+            }
         });
     }
 
@@ -160,8 +237,41 @@ public class BasicDetailsController : MonoBehaviour
     private void ToggleDropdown()
     {
         bool isOpen = dropdownContent.style.display == DisplayStyle.Flex;
-        dropdownContent.style.display = isOpen ? DisplayStyle.None : DisplayStyle.Flex;
-        dropdownArrow.ToggleInClassList("rotated");
+        
+        if (isOpen)
+        {
+            CloseDropdown();
+        }
+        else
+        {
+            OpenDropdown();
+        }
+    }
+
+    private void OpenDropdown()
+    {
+        // Position the dropdown content relative to the trigger
+        var triggerBounds = dropdownTrigger.worldBound;
+        var rootBounds = uiDocument.rootVisualElement.worldBound;
+        
+        // Calculate position relative to root
+        float leftPosition = triggerBounds.x - rootBounds.x;
+        float topPosition = triggerBounds.y + triggerBounds.height - rootBounds.y;
+        
+        dropdownContent.style.position = Position.Absolute;
+        dropdownContent.style.left = leftPosition;
+        dropdownContent.style.top = topPosition;
+        dropdownContent.style.width = triggerBounds.width;
+        dropdownContent.style.display = DisplayStyle.Flex;
+        
+        dropdownArrow.AddToClassList("rotated");
+        
+        // Move dropdown to root level to ensure it appears on top
+        if (dropdownContent.parent != uiDocument.rootVisualElement)
+        {
+            dropdownContent.RemoveFromHierarchy();
+            uiDocument.rootVisualElement.Add(dropdownContent);
+        }
     }
 
     private void CloseDropdown()
@@ -174,6 +284,7 @@ public class BasicDetailsController : MonoBehaviour
     {
         selectedGender = gender;
         selectedText.text = gender;
+        selectedText.AddToClassList("has-selection");
         CloseDropdown();
     }
 
@@ -181,6 +292,8 @@ public class BasicDetailsController : MonoBehaviour
     {
         bool valid = true;
 
+        // Reset warning labels
+        warningLabelUsername.style.color = Color.red;
         warningLabelAgeGender.text = "";
         warningLabelRole.text = "";
 
@@ -190,18 +303,39 @@ public class BasicDetailsController : MonoBehaviour
             valid = false;
         }
 
-        if (string.IsNullOrEmpty(ageField.value) || !int.TryParse(ageField.value, out int age) || age < 1)
+        // Age validation
+        if (string.IsNullOrEmpty(ageField.value))
         {
-            warningLabelAgeGender.text = "Valid age required.";
+            warningLabelAgeGender.text = "Age is required.";
+            valid = false;
+        }
+        else if (!int.TryParse(ageField.value, out int age))
+        {
+            warningLabelAgeGender.text = "Please enter a valid age.";
+            valid = false;
+        }
+        else if (age < 1)
+        {
+            warningLabelAgeGender.text = "Age must be at least 1.";
+            valid = false;
+        }
+        else if (age > 100)
+        {
+            warningLabelAgeGender.text = "Age cannot be more than 100.";
             valid = false;
         }
 
+        // Gender validation
         if (string.IsNullOrEmpty(selectedGender))
         {
-            warningLabelAgeGender.text += " Select gender.";
+            if (!string.IsNullOrEmpty(warningLabelAgeGender.text))
+                warningLabelAgeGender.text += " Please select gender.";
+            else
+                warningLabelAgeGender.text = "Please select gender.";
             valid = false;
         }
 
+        // Role validation
         if (roleGroup.value < 0)
         {
             warningLabelRole.text = "Please select a role.";
@@ -226,8 +360,6 @@ public class BasicDetailsController : MonoBehaviour
         var choicesList = roleGroup.choices.ToList();
         string role = choicesList[roleGroup.value].ToUpper();
 
-
-
         BasicDetailsPayload data = new BasicDetailsPayload
         {
             username = username,
@@ -245,9 +377,7 @@ public class BasicDetailsController : MonoBehaviour
             request.SetRequestHeader("Content-Type", "application/json");
             request.SetRequestHeader("Authorization", token);
 
-            // TODO: Show loader here
             yield return request.SendWebRequest();
-            // TODO: Hide loader here
 
             if (request.result != UnityWebRequest.Result.Success)
             {
@@ -257,13 +387,14 @@ public class BasicDetailsController : MonoBehaviour
             else
             {
                 Debug.Log("Basic details submitted successfully.");
-                //UIManager.Instance.OpenScreen(UIScreenType.Feed); // or next screen
+                //UIManager.Instance.OpenScreen(UIScreenType.Feed);
             }
         }
     }
 
     [System.Serializable]
     private class UsernamePayload { public string user_name; }
+    
     [System.Serializable]
     private class BasicDetailsPayload
     {

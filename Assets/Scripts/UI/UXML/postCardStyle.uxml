@@ -1,0 +1,23 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/postCardStyle.uss?fileID=7433441132597879392&amp;guid=09038cb125b024c38bf3cfc7e8936908&amp;type=3#postCardStyle" />
+    <ui:VisualElement class="card">
+        <ui:VisualElement class="card-header">
+            <ui:Image name="userImage" class="user-image" />
+            <ui:TextElement name="userName" text="Arvind Rao" class="user-name" />
+        </ui:VisualElement>
+        <ui:VisualElement class="card-body">
+            <ui:TextElement name="description" text="This contemporary living room features a warm, minimalist design with a calming neutral..." class="description" />
+            <ui:Image name="card-image" class="card-image" />
+        </ui:VisualElement>
+        <ui:VisualElement class="card-footer">
+            <ui:VisualElement name="VisualElement" class="inner-card-footer">
+                <ui:Image name="favourite" class="footer-icon like" />
+                <ui:VisualElement name="commentSection" class="comment-section">
+                    <ui:TextElement name="commentArea" text="Add your comments..." class="comment-area" />
+                </ui:VisualElement>
+                <ui:Image name="share" class="footer-icon share" />
+                <ui:Image name="bookmark" class="footer-icon bookmark" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
