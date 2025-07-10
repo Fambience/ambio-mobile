@@ -315,6 +315,7 @@ GameObject:
   m_Component:
   - component: {fileID: 324420196}
   - component: {fileID: 324420195}
+  - component: {fileID: 324420197}
   m_Layer: 0
   m_Name: PasswordChangedScreen
   m_TagString: Untagged
@@ -356,6 +357,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &324420197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 324420194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc9dc0b05c8257b44a33fe3013280a53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &484351383
 GameObject:
   m_ObjectHideFlags: 0
@@ -431,6 +444,7 @@ GameObject:
   m_Component:
   - component: {fileID: 601782151}
   - component: {fileID: 601782150}
+  - component: {fileID: 601782152}
   m_Layer: 0
   m_Name: SetNewPasswordScreen
   m_TagString: Untagged
@@ -472,6 +486,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &601782152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 601782149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f76ad71274b8c2449d22160248764fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &854714330
 GameObject:
   m_ObjectHideFlags: 0
@@ -530,6 +556,10 @@ MonoBehaviour:
     screenObject: {fileID: 1197045777}
   - screenType: 14
     screenObject: {fileID: 52741820}
+  - screenType: 15
+    screenObject: {fileID: 601782149}
+  - screenType: 16
+    screenObject: {fileID: 324420194}
 --- !u!4 &854714332
 Transform:
   m_ObjectHideFlags: 0
@@ -921,7 +951,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiDocument: {fileID: 1816956112}
-  verifyOtpEndPoint: /api/v1/user/verify-otp
 --- !u!1 &1844930764
 GameObject:
   m_ObjectHideFlags: 0
@@ -1144,7 +1173,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1961917873}
   - component: {fileID: 1961917872}
-  - component: {fileID: 1961917871}
+  - component: {fileID: 1961917874}
   m_Layer: 0
   m_Name: OtpScreenPassword
   m_TagString: Untagged
@@ -1152,20 +1181,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!114 &1961917871
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1961917870}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea3ca954512f27445bd9f76deb7e8c73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  uiDocument: {fileID: 1961917872}
-  verifyOtpEndPoint: /api/v1/user/verify-otp
 --- !u!114 &1961917872
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1200,6 +1215,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1961917874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961917870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aea04927c06835248a6792856673c3be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiDocument: {fileID: 1961917872}
 --- !u!1 &2010436888
 GameObject:
   m_ObjectHideFlags: 0

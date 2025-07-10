@@ -17,5 +17,7 @@ public enum UIScreenType
     ColorTone,
     PasswordOTP,
     forgotPassword,
+    PasswordReset,
+    PasswordChanged,
     
 }

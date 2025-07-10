@@ -8,7 +8,9 @@ public class OTPController : MonoBehaviour
 {
     [Header("References")]
     public UIDocument uiDocument;
-    public string verifyOtpEndPoint = "/api/v1/user/verify-otp";
+    
+    
+    private string verifyOtpEndPoint = "/api/v1/user/verify-otp";
 
     private string baseURL;
     private List<TextField> otpFields = new List<TextField>();

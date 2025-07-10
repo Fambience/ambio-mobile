@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MiniJSON;
 
 public class FamilyComposition : MonoBehaviour
 {
@@ -140,7 +141,7 @@ public class FamilyComposition : MonoBehaviour
             payload["designInspirations"] = designMap;
         }
 
-        string json = MiniJSON.Serialize(payload);
+        string json = JSON.Serialize(payload);
 
         Debug.Log("Submitting onboarding payload: " + json);
 
