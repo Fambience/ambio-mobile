@@ -9,6 +9,6 @@ public class OnboardingData
     public static int BudgetMax;
     public static List<string> DesignInspoScreen1 = new();
     public static List<string> DesignInspoScreen2 = new();
-    public static string ColorScheme;
+    public static List<string> ColorScheme;
     public static List<string> HomeSharingWith = new();
 }

@@ -4,6 +4,8 @@ using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using MiniJSON;
 
 public class FamilyComposition : MonoBehaviour
 {
@@ -13,15 +15,8 @@ public class FamilyComposition : MonoBehaviour
     private string onboardingEndpoint = "/api/v1/user/onboarding-details";
     private string baseURL;
 
-    private Button backButton;
-    private Button completeButton;
-    private Button skipButton;
-
-    private Toggle aloneToggle;
-    private Toggle partnerToggle;
-    private Toggle familyToggle;
-    private Toggle roommatesToggle;
-    private Toggle petsToggle;
+    private Button backButton, completeButton, skipButton;
+    private Toggle aloneToggle, partnerToggle, familyToggle, roommatesToggle, petsToggle;
 
     private List<Toggle> allToggles = new();
     private Dictionary<Toggle, string> toggleLabels = new();
@@ -51,32 +46,25 @@ public class FamilyComposition : MonoBehaviour
 
         allToggles.AddRange(new[] { aloneToggle, partnerToggle, familyToggle, roommatesToggle, petsToggle });
 
-        toggleLabels[aloneToggle] = "ALONE";
-        toggleLabels[partnerToggle] = "PARTNER";
-        toggleLabels[familyToggle] = "FAMILY";
-        toggleLabels[roommatesToggle] = "ROOMMATES";
-        toggleLabels[petsToggle] = "PET";
+        toggleLabels[aloneToggle] = "LIVING_ALONE";
+        toggleLabels[partnerToggle] = "LIVING_WITH_PARTNER";
+        toggleLabels[familyToggle] = "LIVING_WITH_FAMILY";
+        toggleLabels[roommatesToggle] = "LIVING_WITH_ROOMMATES";
+        toggleLabels[petsToggle] = "LIVING_WITH_PET";
 
         aloneToggle.RegisterValueChangedCallback(OnAloneToggleChanged);
     }
 
     void SetupEventListeners()
     {
-        if (backButton != null)
-            backButton.clicked += OnBackButtonClicked;
-        
+        backButton.clicked += () => UIManager.Instance.OpenScreen(UIScreenType.ColorTone);
         completeButton.clicked += OnCompleteButtonClicked;
-        if (skipButton != null) skipButton.clicked += () => StartCoroutine(SendOnboardingData());
+        skipButton.clicked += () => StartCoroutine(SendOnboardingData());
 
         foreach (var toggle in allToggles.Where(t => t != aloneToggle))
             toggle.RegisterValueChangedCallback(OnOtherToggleChanged);
     }
 
-    void OnBackButtonClicked()
-    {
-        UIManager.Instance.OpenScreen(UIScreenType.ColorTone);
-    }
-    
     void OnAloneToggleChanged(ChangeEvent<bool> evt)
     {
         if (evt.newValue)
@@ -103,18 +91,10 @@ public class FamilyComposition : MonoBehaviour
 
     void OnCompleteButtonClicked()
     {
-        var selected = allToggles.Where(t => t.value && toggleLabels.ContainsKey(t))
-                                 .Select(t => toggleLabels[t])
-                                 .ToList();
-
-        if (selected.Count == 0)
-        {
-            Debug.LogWarning("No selections made.");
-            return;
-        }
-
-        OnboardingData.HomeSharingWith = selected;
-        Debug.Log("Selected options: " + string.Join(", ", selected));
+        OnboardingData.HomeSharingWith = allToggles
+            .Where(t => t.value && toggleLabels.ContainsKey(t))
+            .Select(t => toggleLabels[t])
+            .ToList();
 
         StartCoroutine(SendOnboardingData());
     }
@@ -128,30 +108,46 @@ public class FamilyComposition : MonoBehaviour
             yield break;
         }
 
-        Debug.Log("himanshu" + OnboardingData.ColorScheme);
-        OnboardingPayload data = new OnboardingPayload
-        {
-            firstName = OnboardingData.FirstName,
-            lastName = OnboardingData.LastName,
-            homeLocation = OnboardingData.HomeLocation,
-            colorScheme = OnboardingData.ColorScheme,
-            homeSharingWith = OnboardingData.HomeSharingWith,
-            budget = new OnboardingPayload.Budget
-            {
-                min = OnboardingData.BudgetMin,
-                max = OnboardingData.BudgetMax
-            },
-            designInspoScreen1 = OnboardingData.DesignInspoScreen1,
-            designInspoScreen2 = OnboardingData.DesignInspoScreen2,
-            completedQuestionEnums = BuildCompletedQuestionsList()
-        };
+        var payload = new Dictionary<string, object>();
 
-        string json = JsonUtility.ToJson(data);
+        void AddIfNotEmpty(string key, object value)
+        {
+            if (value is string strVal && !string.IsNullOrEmpty(strVal))
+                payload[key] = strVal;
+            else if (value is int intVal && intVal > 0)
+                payload[key] = intVal;
+            else if (value is List<string> listVal && listVal.Count > 0)
+                payload[key] = listVal;
+            else if (value is Dictionary<string, List<string>> dictVal && dictVal.Count > 0)
+                payload[key] = dictVal;
+        }
+
+        AddIfNotEmpty("firstName", OnboardingData.FirstName);
+        AddIfNotEmpty("lastName", OnboardingData.LastName);
+        AddIfNotEmpty("homeLocation", OnboardingData.HomeLocation);
+        AddIfNotEmpty("colorScheme", OnboardingData.ColorScheme);
+        AddIfNotEmpty("homeSharingWith", OnboardingData.HomeSharingWith);
+        if (OnboardingData.BudgetMin > 0) payload["minBudget"] = OnboardingData.BudgetMin;
+        if (OnboardingData.BudgetMax > 0) payload["maxBudget"] = OnboardingData.BudgetMax;
+
+        if (OnboardingData.DesignInspoScreen1?.Count > 0 || OnboardingData.DesignInspoScreen2?.Count > 0)
+        {
+            var designMap = new Dictionary<string, List<string>>();
+            if (OnboardingData.DesignInspoScreen1?.Count > 0)
+                designMap["CREATIVE_AND_CHARACTERFUL"] = OnboardingData.DesignInspoScreen1;
+            if (OnboardingData.DesignInspoScreen2?.Count > 0)
+                designMap["MODERN_AND_MINIMAL"] = OnboardingData.DesignInspoScreen2;
+
+            payload["designInspirations"] = designMap;
+        }
+
+        string json = JSON.Serialize(payload);
+
         Debug.Log("Submitting onboarding payload: " + json);
 
         using (UnityWebRequest request = new UnityWebRequest(baseURL + onboardingEndpoint, "POST"))
         {
-            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json));
+            request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
             request.SetRequestHeader("Authorization", token);
@@ -166,43 +162,8 @@ public class FamilyComposition : MonoBehaviour
             else
             {
                 Debug.Log("Onboarding data submitted successfully.");
-                // TODO: Navigate to dashboard/success screen
+                // Proceed to next screen
             }
-        }
-    }
-
-    List<string> BuildCompletedQuestionsList()
-    {
-        var q = new List<string>();
-        if (!string.IsNullOrEmpty(OnboardingData.FirstName)) q.Add("Q_FIRST_NAME");
-        if (!string.IsNullOrEmpty(OnboardingData.LastName)) q.Add("Q_LAST_NAME");
-        if (!string.IsNullOrEmpty(OnboardingData.HomeLocation)) q.Add("Q_HOME_LOCATED");
-        if (!string.IsNullOrEmpty(OnboardingData.ColorScheme)) q.Add("Q_COLOR_SCHEME");
-        if (OnboardingData.BudgetMin > 0 && OnboardingData.BudgetMax > 0) q.Add("Q_YOUR_BUDGET");
-        if (OnboardingData.DesignInspoScreen1?.Count > 0) q.Add("Q_DESIGN_INSPO_SCREEN_1");
-        if (OnboardingData.DesignInspoScreen2?.Count > 0) q.Add("Q_DESIGN_INSPO_SCREEN_2");
-        if (OnboardingData.HomeSharingWith?.Count > 0) q.Add("Q_HOME_SHARING_WITH");
-        return q;
-    }
-
-    [System.Serializable]
-    public class OnboardingPayload
-    {
-        public string firstName;
-        public string lastName;
-        public string homeLocation;
-        public string colorScheme;
-        public List<string> homeSharingWith;
-        public Budget budget;
-        public List<string> designInspoScreen1;
-        public List<string> designInspoScreen2;
-        public List<string> completedQuestionEnums;
-
-        [System.Serializable]
-        public class Budget
-        {
-            public int min;
-            public int max;
         }
     }
 }

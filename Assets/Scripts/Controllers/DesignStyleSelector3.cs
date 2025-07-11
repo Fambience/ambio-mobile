@@ -206,7 +206,7 @@ public class DesignStyleSelector3 : MonoBehaviour
         if (selectedButton != null && buttonStyleNames.TryGetValue(selectedButton, out string selectedStyleName))
         {
             // Normalize the style name for backend format: CALM, WARM, etc.
-            OnboardingData.ColorScheme = selectedStyleName.ToUpper();
+            OnboardingData.ColorScheme = new List<string> { selectedStyleName.ToUpper() };
             Debug.Log($"Color scheme saved to OnboardingData: {OnboardingData.ColorScheme}");
         }
     }
