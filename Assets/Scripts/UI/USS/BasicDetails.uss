@@ -442,6 +442,7 @@
     opacity: 0;          /* 👈 Smooth transition if needed */
     transition: opacity 0.3s ease;
 }
+
 .warning-text-3.show {
     visibility: visible;
     opacity: 1;
