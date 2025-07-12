@@ -12,17 +12,19 @@
                     <ui:Image class="input-icon email-icon" />
                     <ui:TextField name="emailField" placeholder-text="Email" class="input-field" />
                 </ui:VisualElement>
+                <ui:Label name="WarningEmail" class="warning-text" style="align-self: flex-start;" />
             </ui:VisualElement>
             <ui:VisualElement class="input-group">
                 <ui:Label text="Password" class="input-label" />
                 <ui:VisualElement class="input-wrapper">
                     <ui:Image class="input-icon password-icon" />
-                    <ui:TextField name="passwordField" is-password="true" placeholder-text="Password" class="input-field" style="align-self: center; background-color: rgba(255, 255, 255, 0); -unity-background-image-tint-color: rgba(255, 255, 255, 0); -unity-slice-scale: 1px; border-left-color: rgba(255, 255, 255, 0); border-right-color: rgba(255, 255, 255, 0); border-top-color: rgba(255, 255, 255, 0); border-bottom-color: rgba(255, 255, 255, 0);" />
+                    <ui:TextField name="passwordField" is-password="true" placeholder-text="Password" class="input-field with-icon" style="align-self: center; background-color: rgba(255, 255, 255, 0); -unity-background-image-tint-color: rgba(255, 255, 255, 0); -unity-slice-scale: 1px; border-left-color: rgba(255, 255, 255, 0); border-right-color: rgba(255, 255, 255, 0); border-top-color: rgba(255, 255, 255, 0); border-bottom-color: rgba(255, 255, 255, 0);" />
+                    <ui:Image name="eyeIcon" class="password-eye" />
                 </ui:VisualElement>
+                <ui:Label name="WarningPassword" class="warning-text" style="align-self: flex-start;" />
             </ui:VisualElement>
             <ui:Label name="forgotPassword" text="Forgot Password?" class="forgot-password" />
             <ui:VisualElement name="LoginWarningContainer" class="warning-container" />
-            
             <ui:Button name="signInButton" text="Sign In" class="sign-in-button" />
             <ui:VisualElement class="signup-section">
                 <ui:Label text="Don&apos;t have an account? " class="signup-text" />

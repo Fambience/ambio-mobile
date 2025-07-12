@@ -28,16 +28,19 @@ public class LoginHandler : MonoBehaviour
     private TextField emailField;
     private TextField passwordField;
     private Button loginButton;
+    private Image eyeIcon;
 
     private Label warningEmailText;
     private Label warningPasswordText;
-    private Label warningLoginText;
+    private VisualElement loginWarningContainer;
 
     private string userEmail;
     private string baseURL = baseScript.baseURL;
     private string loginEndPoint = "/api/v1/auth/login";
     private string sendOtpEndPoint = "/api/v1/user/trigger-otp";
 
+    private bool isPasswordVisible = false;
+    
     private void OnEnable()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
@@ -46,19 +49,38 @@ public class LoginHandler : MonoBehaviour
         emailField = root.Q<TextField>("emailField");
         passwordField = root.Q<TextField>("passwordField");
         loginButton = root.Q<Button>("signInButton");
+        eyeIcon = root.Q<Image>("eyeIcon");
 
-        warningEmailText = new Label { style = { color = Color.red, unityFontStyleAndWeight = FontStyle.Bold } };
-        warningPasswordText = new Label { style = { color = Color.red, unityFontStyleAndWeight = FontStyle.Bold } };
-        warningLoginText = new Label { style = { color = Color.red, unityFontStyleAndWeight = FontStyle.Bold } };
+        // Ensure password field is initially hidden
+        passwordField.isPasswordField = true;
+        
+        // Initialize eye icon to show the correct initial state
+        eyeIcon.style.backgroundImage = new StyleBackground(Resources.Load<Texture2D>("eye-off-outline"));
 
-        var warningContainer = root.Q<VisualElement>("LoginWarningContainer");
-        warningContainer.Add(warningEmailText);
-        warningContainer.Add(warningPasswordText);
-        warningContainer.Add(warningLoginText);
+        warningEmailText = root.Q<Label>("WarningEmail");
+        warningPasswordText = root.Q<Label>("WarningPassword");
+        loginWarningContainer = root.Q<VisualElement>("LoginWarningContainer");
 
-        emailField.RegisterValueChangedCallback(evt => ValidateEmail(evt.newValue));
-        passwordField.RegisterValueChangedCallback(evt => ValidatePassword(evt.newValue));
+        emailField.RegisterValueChangedCallback(evt =>
+        {
+            if (string.IsNullOrWhiteSpace(evt.newValue))
+                ShowEmailWarning("Email is required.");
+            else
+                ClearEmailWarning();
+        });
+
+        passwordField.RegisterValueChangedCallback(evt =>
+        {
+            if (string.IsNullOrWhiteSpace(evt.newValue))
+                ShowPasswordWarning("Password is required.");
+            else
+                ClearPasswordWarning();
+        });
+
         loginButton.clicked += LoginUser;
+
+        // Register eye icon click event for password visibility toggle
+        eyeIcon.RegisterCallback<ClickEvent>(_ => TogglePasswordVisibility());
         
         Label forgotPassword = root.Q<Label>("forgotPassword");
         forgotPassword.RegisterCallback<ClickEvent>(evt => showForgotPassword());
@@ -69,61 +91,89 @@ public class LoginHandler : MonoBehaviour
         PlayerPrefs.DeleteAll();
     }
 
-    public void showForgotPassword()
+    private void TogglePasswordVisibility()
     {
-        UIManager.Instance.OpenScreen(UIScreenType.forgotPassword);
+        isPasswordVisible = !isPasswordVisible;
+        
+        if (isPasswordVisible)
+        {
+            // Show password - change to text field and update icon
+            passwordField.isPasswordField = false;
+            eyeIcon.style.backgroundImage = new StyleBackground(Resources.Load<Texture2D>("eye-outline"));
+        }
+        else
+        {
+            // Hide password - change to password field and update icon
+            passwordField.isPasswordField = true;
+            eyeIcon.style.backgroundImage = new StyleBackground(Resources.Load<Texture2D>("eye-off-outline"));
+        }
     }
 
-    private void ValidateEmail(string email)
+    private void ShowEmailWarning(string msg)
     {
-        if (string.IsNullOrWhiteSpace(email))
-            warningEmailText.text = "Email is required.";
-        else if (!emailValidator.isValidEmail(email))
-            warningEmailText.text = "Invalid email format.";
-        else
-            warningEmailText.text = string.Empty;
+        warningEmailText.text = msg;
+        warningEmailText.AddToClassList("show");
     }
 
-    private void ValidatePassword(string password)
+    private void ShowPasswordWarning(string msg)
     {
-        if (string.IsNullOrWhiteSpace(password))
-            warningPasswordText.text = "Password is required.";
-        else if (!PasswordValidator.IsValidPassword(password, out string error))
-            warningPasswordText.text = error;
-        else
-            warningPasswordText.text = string.Empty;
+        warningPasswordText.text = msg;
+        warningPasswordText.AddToClassList("show");
+    }
+
+    private void ClearEmailWarning()
+    {
+        warningEmailText.text = "";
+        warningEmailText.RemoveFromClassList("show");
+    }
+
+    private void ClearPasswordWarning()
+    {
+        warningPasswordText.text = "";
+        warningPasswordText.RemoveFromClassList("show");
     }
 
     private void LoginUser()
     {
         string email = emailField.value?.Trim();
         string password = passwordField.value?.Trim();
+        bool hasError = false;
 
-        bool hasEmpty = false;
+        loginWarningContainer.Clear();
 
-        if (string.IsNullOrEmpty(email))
+        if (string.IsNullOrWhiteSpace(email))
         {
-            warningEmailText.text = "Email is required.";
-            hasEmpty = true;
+            ShowEmailWarning("Email is required.");
+            hasError = true;
+        }
+        else if (!emailValidator.isValidEmail(email))
+        {
+            ShowEmailWarning("Invalid email format.");
+            hasError = true;
+        }
+        else
+        {
+            ClearEmailWarning();
         }
 
-        if (string.IsNullOrEmpty(password))
+        if (string.IsNullOrWhiteSpace(password))
         {
-            warningPasswordText.text = "Password is required.";
-            hasEmpty = true;
+            ShowPasswordWarning("Password is required.");
+            hasError = true;
+        }
+        else
+        {
+            ClearPasswordWarning();
         }
 
-        if (hasEmpty) return;
-
-        if (!string.IsNullOrEmpty(warningEmailText.text) || !string.IsNullOrEmpty(warningPasswordText.text))
-            return;
+        if (hasError) return;
 
         StartCoroutine(LoginUserCoroutine(email, password));
     }
 
     private IEnumerator LoginUserCoroutine(string email, string password)
     {
-        Debug.Log("LoginUserCoroutine Called");
+        SetUIInteractable(false);
         string jsonData = JsonUtility.ToJson(new LoginData(email, password));
 
         using (UnityWebRequest request = new UnityWebRequest(baseURL + loginEndPoint, "POST"))
@@ -139,13 +189,17 @@ public class LoginHandler : MonoBehaviour
             {
                 Debug.LogError($"Login Error: {request.error}");
                 messege error = JsonUtility.FromJson<messege>(request.downloadHandler.text);
-                warningLoginText.text = error?.message ?? "Login failed. Please try again.";
-                passwordField.value = "";
+
+                Label apiError = new Label(error?.message ?? "Login failed. Please try again.");
+                apiError.AddToClassList("login-error-message");
+
+                loginWarningContainer.Clear();
+                loginWarningContainer.Add(apiError);
+                SetUIInteractable(true);
                 yield break;
             }
 
-            warningLoginText.text = "";
-            passwordField.value = "";
+            loginWarningContainer.Clear();
 
             var response = JsonUtility.FromJson<LoginResponse>(request.downloadHandler.text);
             string token = response.token;
@@ -160,11 +214,17 @@ public class LoginHandler : MonoBehaviour
 
             HandleLoginStage(response);
         }
+        SetUIInteractable(true);
     }
 
     private void ShowRegisterScreen()
     {
         UIManager.Instance.OpenScreen(UIScreenType.Register);
+    }
+
+    public void showForgotPassword()
+    {
+        UIManager.Instance.OpenScreen(UIScreenType.forgotPassword);
     }
 
     private void HandleLoginStage(LoginResponse response)
@@ -174,7 +234,6 @@ public class LoginHandler : MonoBehaviour
             case "VERIFY_EMAIL":
                 sendOTPFunc(userEmail);
                 break;
-
             case "ONBOARD_DETAILS":
                 HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
                 break;
@@ -239,17 +298,16 @@ public class LoginHandler : MonoBehaviour
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("OTP send failed (network issue): " + request.error);
-                warningLoginText.text = "Failed to send OTP. Please try again.";
+                Label otpError = new Label("Failed to send OTP. Please try again.");
+                otpError.AddToClassList("login-error-message");
+                loginWarningContainer.Clear();
+                loginWarningContainer.Add(otpError);
+
                 UIManager.Instance.OpenScreen(UIScreenType.Register);
             }
             else
             {
-                string responseText = request.downloadHandler.text;
-                Debug.Log("OTP Response: " + responseText);
-
-                OTPResponse otpResponse = JsonUtility.FromJson<OTPResponse>(responseText);
-
+                OTPResponse otpResponse = JsonUtility.FromJson<OTPResponse>(request.downloadHandler.text);
                 if (otpResponse != null && otpResponse.success)
                 {
                     Debug.Log("OTP sent successfully. Opening OTP screen...");
@@ -257,40 +315,24 @@ public class LoginHandler : MonoBehaviour
                 }
                 else
                 {
-                    string errorMsg = otpResponse?.message ?? "Failed to send OTP.";
-                    Debug.LogWarning("OTP response failure: " + errorMsg);
-                    warningLoginText.text = errorMsg;
+                    Label otpFail = new Label(otpResponse?.message ?? "Failed to send OTP.");
+                    otpFail.AddToClassList("login-error-message");
+                    loginWarningContainer.Clear();
+                    loginWarningContainer.Add(otpFail);
+
                     UIManager.Instance.OpenScreen(UIScreenType.Register);
                 }
             }
         }
     }
-
-    public class OTPResponse
+    
+    private void SetUIInteractable(bool state)
     {
-        public bool success;
-        public string message;
+        emailField.SetEnabled(state);
+        passwordField.SetEnabled(state);
     }
 
-    private void ShowLoader(string message)
-    {
-        if (loaderScreen != null)
-        {
-            loaderText.text = message;
-            loaderScreen.style.display = DisplayStyle.Flex;
-        }
-    }
-
-    private void HideLoader()
-    {
-        if (loaderScreen != null)
-        {
-            loaderText.text = "";
-            loaderScreen.style.display = DisplayStyle.None;
-        }
-    }
-
-    [System.Serializable]
+    [Serializable]
     public class LoginData
     {
         public string email;
@@ -320,6 +362,13 @@ public class LoginHandler : MonoBehaviour
     [System.Serializable]
     public class messege
     {
+        public string message;
+    }
+
+    [Serializable]
+    public class OTPResponse
+    {
+        public bool success;
         public string message;
     }
 }

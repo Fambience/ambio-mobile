@@ -22,7 +22,8 @@
                 <ui:Label text="Enter Password" class="input-label" />
                 <ui:VisualElement class="input-wrapper">
                     <ui:Image class="input-icon password-icon" />
-                    <ui:TextField name="passwordField" is-password="true" placeholder-text="Password" class="input-field" />
+                    <ui:TextField name="passwordField" is-password="true" placeholder-text="Password" class="input-field with-icon" />
+                    <ui:Image name="eyeIconPass" class="password-eye" />
                 </ui:VisualElement>
                 <ui:Label name="WarningPassword" class="warning-text" style="align-self: flex-start;" />
             </ui:VisualElement>
@@ -30,7 +31,8 @@
                 <ui:Label text="Confirm Password" class="input-label" />
                 <ui:VisualElement class="input-wrapper">
                     <ui:Image class="input-icon password-icon" />
-                    <ui:TextField name="confirmPasswordField" is-password="true" placeholder-text="Confirm Password" class="input-field" />
+                    <ui:TextField name="confirmPasswordField" is-password="true" placeholder-text="Confirm Password" class="input-field with-icon" />
+                    <ui:Image name="eyeIconConPass" class="password-eye" />
                 </ui:VisualElement>
                 <ui:Label name="WarningConfirmPassword" class="warning-text" style="align-self: flex-start;" />
             </ui:VisualElement>

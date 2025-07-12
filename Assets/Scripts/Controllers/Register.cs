@@ -2,18 +2,20 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
+using System.Text.RegularExpressions;
 
 public class Register : MonoBehaviour
 {
     [Header("UI Toolkit")]
     public UIDocument uiDocument;
-    //public UserProfileManager userProfileManager;
 
     private TextField emailField;
     private TextField passwordField;
     private TextField confirmPasswordField;
     private Button continueButton;
     private Button backToLoginButton;
+    private Image eyeIcon1;
+    private Image eyeIcon2;
 
     private Label warningEmail;
     private Label warningPassword;
@@ -25,7 +27,9 @@ public class Register : MonoBehaviour
 
     private string registerEndPoint = "/api/v1/auth/register";
     private string sendOtpEndPoint = "/api/v1/user/trigger-otp";
-    private string verifyOtpEndPoint = "/api/v1/user/verify-otp";
+    
+    private bool isPasswordVisible = false;
+    private bool isConPasswordVisible = false;
 
     private void OnEnable()
     {
@@ -37,62 +41,76 @@ public class Register : MonoBehaviour
         confirmPasswordField = root.Q<TextField>("confirmPasswordField");
         continueButton = root.Q<Button>("continueButton");
         backToLoginButton = root.Q<Button>("BackToLoginLabel");
+        eyeIcon1 = root.Q<Image>("eyeIconPass");
+        eyeIcon2 = root.Q<Image>("eyeIconConPass");
 
-        // Bind pre-defined warning labels
+        // Ensure password field is initially hidden
+        passwordField.isPasswordField = true;
+        confirmPasswordField.isPasswordField = true;
+        
+        // Initialize eye icon to show the correct initial state
+        eyeIcon1.style.backgroundImage = new StyleBackground(Resources.Load<Texture2D>("eye-off-outline"));
+        eyeIcon2.style.backgroundImage = new StyleBackground(Resources.Load<Texture2D>("eye-off-outline"));
+
         warningEmail = root.Q<Label>("WarningEmail");
         warningPassword = root.Q<Label>("WarningPassword");
         warningConfirmPassword = root.Q<Label>("WarningConfirmPassword");
         warningRegister = root.Q<Label>("WarningRegister");
 
-        emailField.RegisterValueChangedCallback(evt => ValidateEmail(evt.newValue));
-        passwordField.RegisterValueChangedCallback(evt => ValidatePassword(evt.newValue));
-        confirmPasswordField.RegisterValueChangedCallback(evt => ValidateConfirmPassword(evt.newValue));
+        // Only real-time update on confirm password field for matching
+        confirmPasswordField.RegisterValueChangedCallback(evt =>
+        {
+            if (confirmPasswordField.value != passwordField.value)
+                warningConfirmPassword.text = "Passwords do not match.";
+            else
+                warningConfirmPassword.text = "";
+        });
+        
+        eyeIcon1.RegisterCallback<ClickEvent>(_ => TogglePasswordVisibility("passowrd"));
+        eyeIcon2.RegisterCallback<ClickEvent>(_ => TogglePasswordVisibility("confirmPassword"));
 
         continueButton.clicked += RegisterUser;
 
         backToLoginButton?.RegisterCallback<ClickEvent>(evt =>
         {
-            Debug.Log("Back to Login Called");
             UIManager.Instance.OpenScreen(UIScreenType.Login);
         });
     }
-
-    private void ValidateEmail(string email)
+    
+    private void TogglePasswordVisibility(string check)
     {
-        if (!emailValidator.isValidEmail(email))
+        if (check == "passowrd")
         {
-            warningEmail.text = "Invalid email format.";
-            Debug.LogWarning(warningEmail.text);
-        }
-        else
-        {
-            warningEmail.text = "";
-        }
-    }
+            isPasswordVisible = !isPasswordVisible;
 
-    private void ValidatePassword(string password)
-    {
-        if (!PasswordValidator.IsValidPassword(password, out string error))
+            if (isPasswordVisible)
+            {
+                // Show password - change to text field and update icon
+                passwordField.isPasswordField = false;
+                eyeIcon1.style.backgroundImage = new StyleBackground(Resources.Load<Texture2D>("eye-outline"));
+            }
+            else
+            {
+                // Hide password - change to password field and update icon
+                passwordField.isPasswordField = true;
+                eyeIcon1.style.backgroundImage = new StyleBackground(Resources.Load<Texture2D>("eye-off-outline"));
+            }
+        } else if (check == "confirmPassword")
         {
-            warningPassword.text = error;
-            Debug.LogWarning(error);
-        }
-        else
-        {
-            warningPassword.text = "";
-        }
-    }
+            isConPasswordVisible = !isConPasswordVisible;
 
-    private void ValidateConfirmPassword(string confirm)
-    {
-        if (confirm != passwordField.value)
-        {
-            warningConfirmPassword.text = "Passwords do not match.";
-            Debug.LogWarning(warningConfirmPassword.text);
-        }
-        else
-        {
-            warningConfirmPassword.text = "";
+            if (isConPasswordVisible)
+            {
+                // Show password - change to text field and update icon
+                confirmPasswordField.isPasswordField = false;
+                eyeIcon2.style.backgroundImage = new StyleBackground(Resources.Load<Texture2D>("eye-outline"));
+            }
+            else
+            {
+                // Hide password - change to password field and update icon
+                confirmPasswordField.isPasswordField = true;
+                eyeIcon2.style.backgroundImage = new StyleBackground(Resources.Load<Texture2D>("eye-off-outline"));
+            }
         }
     }
 
@@ -102,25 +120,69 @@ public class Register : MonoBehaviour
         string password = passwordField.value.Trim();
         string confirmPassword = confirmPasswordField.value.Trim();
 
-        ValidateEmail(email);
-        ValidatePassword(password);
-        ValidateConfirmPassword(confirmPassword);
+        bool hasError = false;
 
-        if (!string.IsNullOrEmpty(warningEmail.text) ||
-            !string.IsNullOrEmpty(warningPassword.text) ||
-            !string.IsNullOrEmpty(warningConfirmPassword.text))
+        // Email validation
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            warningEmail.text = "Email is required.";
+            hasError = true;
+        }
+        else if (!emailValidator.isValidEmail(email))
+        {
+            warningEmail.text = "Invalid email format.";
+            hasError = true;
+        }
+        else
+        {
+            warningEmail.text = "";
+        }
+
+        // Password validation
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            warningPassword.text = "Password is required.";
+            hasError = true;
+        }
+        else if (!IsValidPassword(password))
+        {
+            warningPassword.text = "Should be of at least 8 characters, with one number.";
+            hasError = true;
+        }
+        else
+        {
+            warningPassword.text = "";
+        }
+
+        // Confirm password validation
+        if (string.IsNullOrWhiteSpace(confirmPassword))
+        {
+            warningConfirmPassword.text = "Please confirm your password.";
+            hasError = true;
+        }
+        else if (confirmPassword != password)
+        {
+            warningConfirmPassword.text = "Passwords do not match.";
+            hasError = true;
+        }
+        else
+        {
+            warningConfirmPassword.text = "";
+        }
+
+        if (hasError)
         {
             Debug.LogWarning("Validation failed. Registration aborted.");
             return;
         }
 
-        Debug.Log("Sending registration request...");
         StartCoroutine(RegisterUserCoroutine(email, password));
     }
 
     private IEnumerator RegisterUserCoroutine(string email, string password)
     {
-        // ShowLoader("Registering your account...");
+        SetUIInteractable(false); // Disable input
+
         string jsonData = JsonUtility.ToJson(new LoginData(email, password));
 
         using (UnityWebRequest request = new UnityWebRequest(baseURL + registerEndPoint, "POST"))
@@ -131,25 +193,39 @@ public class Register : MonoBehaviour
 
             yield return request.SendWebRequest();
 
-            // HideLoader();
-
             if (request.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Registration failed: " + request.error);
-                messege error = JsonUtility.FromJson<messege>(request.downloadHandler.text);
-                warningRegister.text = error?.message ?? "Registration failed. Try again.";
+
+                try
+                {
+                    messege error = JsonUtility.FromJson<messege>(request.downloadHandler.text);
+                    warningRegister.text = error?.message ?? "Registration failed. Try again.";
+                }
+                catch
+                {
+                    warningRegister.text = "Registration failed. Try again.";
+                }
             }
             else
             {
                 warningRegister.text = "";
                 var response = JsonUtility.FromJson<RegisterResponse>(request.downloadHandler.text);
-                Debug.Log("Registration successful. Token: " + response.token);
                 AuthTokenManager.SetToken(response.token);
-                //userProfileManager.InitializeProfile(response.token);
                 sendOTPFunc(email);
-                //UIManager.Instance.OpenScreen(UIScreenType.OTP); 
             }
         }
+
+        SetUIInteractable(true); // Re-enable input no matter what
+    }
+    
+    private void SetUIInteractable(bool state)
+    {
+        emailField.SetEnabled(state);
+        passwordField.SetEnabled(state);
+        confirmPasswordField.SetEnabled(state);
+        continueButton.SetEnabled(state);
+        backToLoginButton.SetEnabled(state);
     }
 
     public void sendOTPFunc(string email)
@@ -160,9 +236,6 @@ public class Register : MonoBehaviour
 
     private IEnumerator SendOtpCoroutine(string email)
     {
-        // TODO: Show loading screen
-        Debug.Log("Sending OTP request...");
-
         string jsonData = JsonUtility.ToJson(new EmailData(email));
         string token = AuthTokenManager.GetToken();
 
@@ -177,30 +250,23 @@ public class Register : MonoBehaviour
 
             yield return request.SendWebRequest();
 
-            // TODO: Hide loading screen
-
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("OTP send failed (network issue): " + request.error);
                 warningRegister.text = "Failed to send OTP. Please try again.";
                 UIManager.Instance.OpenScreen(UIScreenType.Register);
             }
             else
             {
                 string responseText = request.downloadHandler.text;
-                Debug.Log("OTP Response: " + responseText);
-
                 OTPResponse otpResponse = JsonUtility.FromJson<OTPResponse>(responseText);
 
                 if (otpResponse != null && otpResponse.success)
                 {
-                    Debug.Log("OTP sent successfully. Opening OTP screen...");
                     UIManager.Instance.OpenScreen(UIScreenType.OTP);
                 }
                 else
                 {
                     string errorMsg = otpResponse?.message ?? "Failed to send OTP.";
-                    Debug.LogWarning("OTP response failure: " + errorMsg);
                     warningRegister.text = errorMsg;
                     UIManager.Instance.OpenScreen(UIScreenType.Register);
                 }
@@ -208,18 +274,16 @@ public class Register : MonoBehaviour
         }
     }
 
-
-
-    [System.Serializable] public class LoginData { public string email, password; public LoginData(string e, string p) { email = e; password = p; } }
-    
-    [System.Serializable]
-    public class OTPResponse
+    // Helper for Google-like password rule
+    private static readonly string passwordPattern = @"^(?=.*[a-zA-Z])(?=.*\d).{8,}$";
+    private bool IsValidPassword(string password)
     {
-        public bool success;
-        public string message;
+        return Regex.IsMatch(password, passwordPattern);
     }
 
-    [System.Serializable] public class OTPData { public string otp; public OTPData(string o) { otp = o; } }
+    // Data Models
+    [System.Serializable] public class LoginData { public string email, password; public LoginData(string e, string p) { email = e; password = p; } }
+    [System.Serializable] public class OTPResponse { public bool success; public string message; }
     [System.Serializable] public class EmailData { public string email; public EmailData(string e) { email = e; } }
     [System.Serializable] public class RegisterResponse { public string token; public bool success; public string message; }
     [System.Serializable] public class messege { public string message; }

@@ -15,7 +15,7 @@
                     <ui:Image class="input-icon user-icon" />
                     <ui:TextField name="userName" placeholder-text="username" class="input-field" />
                 </ui:VisualElement>
-                <ui:Label name="warningLabelUserName" text="username should be unique" class="warning-text-1" style="align-self: flex-start;" />
+                <ui:Label name="warningLabelUserName" class="warning-text-1" style="align-self: flex-start;" />
             </ui:VisualElement>
             <ui:VisualElement class="form-row">
                 <ui:VisualElement class="age-input-group">
@@ -35,11 +35,11 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Label name="warningLabelAgeGender" text="username should be unique" class="warning-text-2" style="align-self: flex-start;" />
+            <ui:Label name="warningLabelAgeGender" class="warning-text-2" style="align-self: flex-start;" />
             <ui:VisualElement name="roleRadioButton" style="top: 25px;">
                 <ui:Label text="We welcome you as a" class="age-input-label" />
                 <ui:RadioButtonGroup value="-1" choices="User, Creator" enabled="true" focusable="true" class="radio-group" />
-                <ui:Label name="warningLabelRole" text="username should be unique" class="warning-text-3" style="align-self: flex-start;" />
+                <ui:Label name="warningLabelRole" class="warning-text-3" style="align-self: flex-start;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Button name="signIn" text="Sign in" class="signin-button" />

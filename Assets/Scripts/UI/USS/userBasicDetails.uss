@@ -208,8 +208,8 @@
     justify-content: flex-end;
     align-content: flex-end;
     height: 80px; /* 👈 Reserve space */
-    visibility: hidden; /* 👈 Instead of display: none */
-    opacity: 0;          /* 👈 Smooth transition if needed */
+    /*visibility: hidden; !* 👈 Instead of display: none *!*/
+    /*opacity: 0;          !* 👈 Smooth transition if needed *!*/
     transition: opacity 0.3s ease;
 }
 .warning-text.show {

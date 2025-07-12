@@ -181,7 +181,7 @@ public class BasicDetailsController : MonoBehaviour
                 isUsernameValid = true;
                 Debug.Log("Username verified and accepted");
                 warningLabelUsername.text = "Username available!";
-                warningLabelUsername.style.color = Color.green;
+                warningLabelUsername.style.color = Color.forestGreen;
             }
             else
             {
@@ -293,7 +293,16 @@ public class BasicDetailsController : MonoBehaviour
         bool valid = true;
 
         // Reset warning labels
-        warningLabelUsername.style.color = Color.red;
+        if (!isUsernameValid)
+        {
+            warningLabelUsername.text = "Invalid username.";
+            warningLabelUsername.style.color = Color.red;
+            valid = false;
+        }
+        else if (warningLabelUsername.text == "Username available!")
+        {
+            warningLabelUsername.style.color = Color.forestGreen;
+        }
         warningLabelAgeGender.text = "";
         warningLabelRole.text = "";
 
