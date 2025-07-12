@@ -247,6 +247,7 @@ GameObject:
   m_Component:
   - component: {fileID: 688508168}
   - component: {fileID: 688508169}
+  - component: {fileID: 688508170}
   m_Layer: 0
   m_Name: ProfileScreen
   m_TagString: Untagged
@@ -288,6 +289,19 @@ MonoBehaviour:
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920
   m_WorldSpaceHeight: 1080
+--- !u!114 &688508170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688508167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fa525def97f44b7ab62f9d7b592818f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  postCardTemplate: {fileID: 9197481963319205126, guid: 3fca1bac0f8d944ae934d8efaf2ae40a, type: 3}
 --- !u!1 &758697889
 GameObject:
   m_ObjectHideFlags: 0

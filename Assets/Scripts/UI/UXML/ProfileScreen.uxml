@@ -45,6 +45,22 @@
                         <ui:Button name="aboutTab" class="button" text="About"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
+                
+                <!-- About section -->
+                <ui:VisualElement name="aboutContent" class="about-content" style="display: none;">
+                    <ui:VisualElement name="aboutCard" class="about-card">
+                        <ui:TextElement text="About Me" class="about-title" />
+                        <ui:TextElement text="Interior designer with over 5 years of experience creating beautiful, functional spaces. Specializing in minimalist and Scandinavian design aesthetics with a focus on sustainability and natural materials." class="about-description" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="experienceCard" class="experience-card">
+                        <ui:TextElement text="Experience" class="about-title" />
+                        <ui:TextElement text="5 yeards" class="total-experience" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="contactCard" class="contact-card">
+                        <ui:TextElement text="Contact" class="about-title" />
+                        <ui:TextElement text="www.google.com" class="contact-links" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:ScrollView>
     </ui:VisualElement>

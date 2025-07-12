@@ -21,7 +21,6 @@
 .user-name {
     font-size: 35px;
     -unity-font-style: bold;
-    text-align: center;
 }
 
 .primary-button {

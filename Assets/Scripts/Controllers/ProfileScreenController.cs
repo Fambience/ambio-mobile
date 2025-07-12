@@ -3,10 +3,12 @@ using UnityEngine.UIElements;
 
 public class ProfileScreenController : MonoBehaviour
 {
-    [SerializeField] private VisualTreeAsset postCardTemplate;
+    [Header("Card Templates")] public VisualTreeAsset postCardTemplate;
     
     private VisualElement root;
-    private VisualElement contentContainer;
+    private ScrollView scrollView;
+    private VisualElement tabContentContainer;
+    private VisualElement aboutContent;
     private Button designsTab;
     private Button savedTab;
     private Button aboutTab;
@@ -18,63 +20,73 @@ public class ProfileScreenController : MonoBehaviour
     void Start()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
+        scrollView = root.Q<ScrollView>("scroll-container");
+        scrollView.verticalScrollerVisibility = ScrollerVisibility.Hidden;
+        scrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
         
-        // Get tab buttons
         designsTab = root.Q<Button>("designsTab");
         savedTab = root.Q<Button>("savedTab");
         aboutTab = root.Q<Button>("aboutTab");
         
-        // Get tab button containers for styling
         designsTabButton = designsTab.parent;
         savedTabButton = savedTab.parent;
         aboutTabButton = aboutTab.parent;
         
-        // Create content container after scroll view
-        var scrollView = root.Q<ScrollView>("scroll-container");
-        contentContainer = new VisualElement();
-        contentContainer.name = "tabContent";
-        contentContainer.AddToClassList("tab-content");
-        scrollView.Add(contentContainer);
+        // Get the about content element
+        aboutContent = root.Q<VisualElement>("aboutContent");
         
-        // Set up event listeners
+        // Create dynamic content container for designs and saved tabs
+        tabContentContainer = new VisualElement();
+        tabContentContainer.name = "tabContentContainer";
+        tabContentContainer.AddToClassList("tab-content");
+        scrollView.Add(tabContentContainer);
+        
         designsTab.clicked += () => ShowDesignsTab();
         savedTab.clicked += () => ShowSavedTab();
         aboutTab.clicked += () => ShowAboutTab();
         
-        // Show designs tab by default
         ShowDesignsTab();
     }
     
     private void ShowDesignsTab()
     {
-        // Update tab styling
         RemoveSelectedFromAllTabs();
         designsTabButton.AddToClassList("selected");
         
-        // Clear content and show designs
-        contentContainer.Clear();
+        // Hide about content and show dynamic content
+        if (aboutContent != null)
+            aboutContent.style.display = DisplayStyle.None;
+        
+        tabContentContainer.style.display = DisplayStyle.Flex;
+        tabContentContainer.Clear();
         LoadDesignCards();
     }
     
     private void ShowSavedTab()
     {
-        // Update tab styling
         RemoveSelectedFromAllTabs();
         savedTabButton.AddToClassList("selected");
         
-        // Clear content and show saved items
-        contentContainer.Clear();
+        // Hide about content and show dynamic content
+        if (aboutContent != null)
+            aboutContent.style.display = DisplayStyle.None;
+        
+        tabContentContainer.style.display = DisplayStyle.Flex;
+        tabContentContainer.Clear();
         LoadSavedCards();
     }
     
     private void ShowAboutTab()
     {
-        // Update tab styling
         RemoveSelectedFromAllTabs();
         aboutTabButton.AddToClassList("selected");
         
-        // Clear content and show about section
-        contentContainer.Clear();
+        // Hide dynamic content and show about content
+        tabContentContainer.style.display = DisplayStyle.None;
+        tabContentContainer.Clear();
+        
+        if (aboutContent != null)
+            aboutContent.style.display = DisplayStyle.Flex;
     }
     
     private void RemoveSelectedFromAllTabs()
@@ -86,112 +98,90 @@ public class ProfileScreenController : MonoBehaviour
     
     private void LoadDesignCards()
     {
-        // Create multiple post cards for designs
-        for (int i = 0; i < 3; i++)
+        if (postCardTemplate == null)
         {
-            var postCard = CreatePostCard(
-                $"Design {i + 1}",
-                "This contemporary living room features a warm, minimalist design with a calming neutral color palette..."
-            );
-            contentContainer.Add(postCard);
+            Debug.LogError("Post card template is not assigned!");
+            ShowEmptyState("No card template assigned");
+            return;
+        }
+        for (int i = 0; i < 5; i++)
+        {
+            VisualElement postCard = postCardTemplate.CloneTree();
+            var userName = postCard.Q<TextElement>("userName");
+            if (userName != null)
+                userName.text = "Krishna Yadav";
+            var description = postCard.Q<TextElement>("description");
+            if (description != null)
+                description.text = $"Design {i + 1}: This contemporary living room features a warm, minimalist design with a calming neutral color palette and modern furniture arrangement.";
+            var userImage = postCard.Q<Image>("userImage");
+            if (userImage != null)
+                userImage.image = LoadImage("person");
+            var cardImage = postCard.Q<Image>("card-image");
+            if (cardImage != null)
+                cardImage.image = LoadImage("Contemporary");   
+            tabContentContainer.Add(postCard);
         }
     }
     
     private void LoadSavedCards()
     {
-        // Create saved post cards
-        for (int i = 0; i < 2; i++)
+        if (postCardTemplate == null)
         {
-            var postCard = CreatePostCard(
-                $"Saved Design {i + 1}",
-                "This saved design showcases beautiful interior styling with modern furniture and elegant decor..."
-            );
-            contentContainer.Add(postCard);
+            Debug.LogError("Post card template is not assigned!");
+            ShowEmptyState("No card template assigned");
+            return;
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            VisualElement postCard = postCardTemplate.CloneTree();
+            var userName = postCard.Q<TextElement>("userName");
+            if (userName != null)
+                userName.text = "Krishna Yadav";
+            var description = postCard.Q<TextElement>("description");
+            if (description != null)
+                description.text = $"Saved Design {i + 1}: This beautiful interior design has been saved to your collection for future inspiration and reference.";
+            var userImage = postCard.Q<Image>("userImage");
+            if (userImage != null)
+                userImage.image = LoadImage("person");
+            var cardImage = postCard.Q<Image>("card-image");
+            if (cardImage != null)
+                cardImage.image = LoadImage("Contemporary");
+            tabContentContainer.Add(postCard);
         }
     }
     
-    private VisualElement CreatePostCard(string title, string description)
+    private void ShowEmptyState(string message)
     {
-        var card = new VisualElement();
-        card.AddToClassList("card");
-        
-        // Card Header
-        var cardHeader = new VisualElement();
-        cardHeader.AddToClassList("card-header");
-        
-        var userImage = new Image();
-        userImage.name = "userImage";
-        userImage.AddToClassList("user-image");
-        
-        var userName = new TextElement();
-        userName.name = "userName";
-        userName.text = "Krishna Yadav";
-        userName.AddToClassList("user-name");
-        
-        cardHeader.Add(userImage);
-        cardHeader.Add(userName);
-        
-        // Card Body
-        var cardBody = new VisualElement();
-        cardBody.AddToClassList("card-body");
-        
-        var descriptionElement = new TextElement();
-        descriptionElement.name = "description";
-        descriptionElement.text = description;
-        descriptionElement.AddToClassList("description");
-        
-        var cardImage = new Image();
-        cardImage.name = "card-image";
-        cardImage.AddToClassList("card-image");
-        
-        cardBody.Add(descriptionElement);
-        cardBody.Add(cardImage);
-        
-        // Card Footer
-        var cardFooter = new VisualElement();
-        cardFooter.AddToClassList("card-footer");
-        
-        var innerCardFooter = new VisualElement();
-        innerCardFooter.AddToClassList("inner-card-footer");
-        
-        var favouriteIcon = new Image();
-        favouriteIcon.name = "favourite";
-        favouriteIcon.AddToClassList("footer-icon");
-        favouriteIcon.AddToClassList("like");
-        
-        var commentSection = new VisualElement();
-        commentSection.name = "commentSection";
-        commentSection.AddToClassList("comment-section");
-        
-        var commentArea = new TextElement();
-        commentArea.name = "commentArea";
-        commentArea.text = "Add your comments...";
-        commentArea.AddToClassList("comment-area");
-        
-        commentSection.Add(commentArea);
-        
-        var shareIcon = new Image();
-        shareIcon.name = "share";
-        shareIcon.AddToClassList("footer-icon");
-        shareIcon.AddToClassList("share");
-        
-        var bookmarkIcon = new Image();
-        bookmarkIcon.name = "bookmark";
-        bookmarkIcon.AddToClassList("footer-icon");
-        bookmarkIcon.AddToClassList("bookmark");
-        
-        innerCardFooter.Add(favouriteIcon);
-        innerCardFooter.Add(commentSection);
-        innerCardFooter.Add(shareIcon);
-        innerCardFooter.Add(bookmarkIcon);
-        
-        cardFooter.Add(innerCardFooter);
-        
-        // Assemble card
-        card.Add(cardHeader);
-        card.Add(cardBody);
-        card.Add(cardFooter);
-        
-        return card;
+        var emptyState = new VisualElement();
+        emptyState.AddToClassList("empty-state");
+        var emptyText = new TextElement();
+        emptyText.text = message;
+        emptyText.AddToClassList("empty-state-text");
+        emptyState.Add(emptyText);
+        tabContentContainer.Add(emptyState);
+    }
+    
+    private Texture2D LoadImage(string imageName)
+    {
+        Texture2D texture = Resources.Load<Texture2D>(imageName);
+        if (texture == null)
+        {
+            texture = Resources.Load<Texture2D>($"Images/{imageName}");
+        }
+        if (texture == null)
+        {
+            Debug.LogWarning($"Could not load image: {imageName}");
+        }
+        return texture;
+    }
+    
+    private void OnDisable()
+    {
+        if (designsTab != null)
+            designsTab.clicked -= ShowDesignsTab;
+        if (savedTab != null)
+            savedTab.clicked -= ShowSavedTab;
+        if (aboutTab != null)
+            aboutTab.clicked -= ShowAboutTab;
     }
 }
