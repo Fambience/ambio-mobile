@@ -183,7 +183,6 @@ public class LoginHandler : MonoBehaviour
             request.SetRequestHeader("Content-Type", "application/json");
 
             yield return request.SendWebRequest();
-            HideLoader();
 
             if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
             {
