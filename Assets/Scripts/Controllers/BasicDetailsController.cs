@@ -392,7 +392,7 @@ public class BasicDetailsController : MonoBehaviour
                     UIManager.Instance.OpenScreen(UIScreenType.UserDetails);
                 }else if (role == "CREATOR")
                 {
-                    //UIManager.Instance.OpenScreen(UIScreenType.CreatorBasicDetails);
+                    UIManager.Instance.OpenScreen(UIScreenType.CreatorBasicDetails);
                 }
             }
         }

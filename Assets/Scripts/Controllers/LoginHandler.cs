@@ -38,9 +38,9 @@ public class LoginHandler : MonoBehaviour
     private string loginEndPoint = "/api/v1/auth/login";
     private string sendOtpEndPoint = "/api/v1/user/trigger-otp";
 
-    private void Awake()
+    private void OnEnable()
     {
-        var root = uiDocument.rootVisualElement;
+        var root = GetComponent<UIDocument>().rootVisualElement;
 
         loginScreen = root.Q<VisualElement>("LoginScreen");
         emailField = root.Q<TextField>("emailField");

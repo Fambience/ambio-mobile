@@ -27,7 +27,7 @@ public class Register : MonoBehaviour
     private string sendOtpEndPoint = "/api/v1/user/trigger-otp";
     private string verifyOtpEndPoint = "/api/v1/user/verify-otp";
 
-    private void Awake()
+    private void OnEnable()
     {
         baseURL = baseScript.baseURL;
 
