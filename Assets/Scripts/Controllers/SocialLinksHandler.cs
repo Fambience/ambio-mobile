@@ -89,47 +89,51 @@ public class SocialLinksController : MonoBehaviour
     StartCoroutine(SubmitDesignerOnboarding());
 }
 
-private IEnumerator SubmitDesignerOnboarding()
-{
-    string endpoint = "/api/v1/onboarding"; // Replace with actual endpoint
-    string url = baseScript.baseURL + endpoint;
-
-    // Convert social links dictionary to a list of URLs
-    List<string> socials = new List<string>(OnboardingData.SocialLinks.Values);
-
-    var payload = new Dictionary<string, object>
+    private IEnumerator SubmitDesignerOnboarding()
     {
-        { "name", OnboardingData.DesignerName },
-        { "region", OnboardingData.SelectedCities },
-        { "creatorType", OnboardingData.TypeOfDesigner },
-        { "yearsOfExperience", int.TryParse(OnboardingData.YearsOfExperience, out var yoe) ? yoe : 0 },
-        { "tagline", OnboardingData.Tagline },
-        { "socials", socials },
-        { "occupation", "Freelancer" }, // If you have this dynamically, replace accordingly
-        { "website", OnboardingData.Website }
-    };
+        string endpoint = "/api/v1/user/onboarding-details";
+        string url = baseScript.baseURL + endpoint;
 
-    //string json = MiniJSON.JSON.Serialize(payload);
-    //Debug.Log("Payload: " + json);
+        // Convert social links dictionary to a list of URLs
+        List<string> socials = new List<string>(OnboardingData.SocialLinks.Values);
 
-    using UnityWebRequest request = new UnityWebRequest(url, "POST");
-    //byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
-    //request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-    request.downloadHandler = new DownloadHandlerBuffer();
-    request.SetRequestHeader("Content-Type", "application/json");
+        var payload = new Dictionary<string, object>
+        {
+            { "name", OnboardingData.DesignerName },
+            { "region", OnboardingData.SelectedCities },
+            { "creatorType", OnboardingData.TypeOfDesigner },
+            { "yearsOfExperience", int.TryParse(OnboardingData.YearsOfExperience, out var yoe) ? yoe : 0 },
+            { "tagline", OnboardingData.Tagline },
+            { "socials", socials },
+            { "occupation", "Freelancer" },
+            { "website", OnboardingData.Website }
+        };
 
-    yield return request.SendWebRequest();
+        string json = MiniJSON.JSON.Serialize(payload);
+        Debug.Log("Payload: " + json);
 
-    if (request.result == UnityWebRequest.Result.Success)
-    {
-        Debug.Log("Onboarding submission successful: " + request.downloadHandler.text);
-        UIManager.Instance.OpenScreen(UIScreenType.Location); // Or next screen
+        using UnityWebRequest request = new UnityWebRequest(url, "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        // ✅ Set Authorization header
+        string token = AuthTokenManager.GetToken(); // replace with your actual token holder
+        request.SetRequestHeader("Authorization", $"Bearer {token}");
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("Onboarding submission successful: " + request.downloadHandler.text);
+            UIManager.Instance.OpenScreen(UIScreenType.Location);
+        }
+        else
+        {
+            Debug.LogError("Onboarding submission failed: " + request.downloadHandler.text);
+        }
     }
-    else
-    {
-        Debug.LogError("Onboarding submission failed: " + request.downloadHandler.text);
-        // You can display an error label if needed
-    }
-}
+
 
 }
