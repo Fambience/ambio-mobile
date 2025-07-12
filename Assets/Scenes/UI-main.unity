@@ -742,10 +742,10 @@ MonoBehaviour:
     screenObject: {fileID: 1717646517}
   - screenType: 9
     screenObject: {fileID: 1209480911}
-  - screenType: 19
-    screenObject: {fileID: 1961917870}
   - screenType: 11
     screenObject: {fileID: 1197045777}
+  - screenType: 19
+    screenObject: {fileID: 1961917870}
   - screenType: 16
     screenObject: {fileID: 52741820}
   - screenType: 20
@@ -753,15 +753,15 @@ MonoBehaviour:
   - screenType: 21
     screenObject: {fileID: 324420194}
   - screenType: 13
-    screenObject: {fileID: 324420194}
+    screenObject: {fileID: 62952973}
   - screenType: 14
-    screenObject: {fileID: 324420194}
+    screenObject: {fileID: 241816153}
   - screenType: 17
-    screenObject: {fileID: 324420194}
+    screenObject: {fileID: 755938071}
   - screenType: 15
-    screenObject: {fileID: 324420194}
-  - screenType: 15
-    screenObject: {fileID: 324420194}
+    screenObject: {fileID: 1899570902}
+  - screenType: 18
+    screenObject: {fileID: 1957634424}
 --- !u!4 &854714332
 Transform:
   m_ObjectHideFlags: 0
