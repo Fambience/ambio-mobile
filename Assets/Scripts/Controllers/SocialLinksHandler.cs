@@ -1,18 +1,24 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using System.Text;
+using UnityEngine.Networking;
+
 
 public class SocialLinksController : MonoBehaviour
 {
     public UIDocument uiDocument;
-    public VisualTreeAsset socialInputTemplate; // Create a UXML for single input row with icon and TextField
+    public VisualTreeAsset socialInputTemplate;
 
     private VisualElement container;
     private Button addNewButton;
     private Button completeButton;
     private Button backButton;
 
-    private List<string> platformsAdded = new();
+    private TextField taglineField;
+    private TextField websiteField;
+
     private Dictionary<string, string> socialsData = new();
 
     private void Awake()
@@ -23,10 +29,13 @@ public class SocialLinksController : MonoBehaviour
         completeButton = root.Q<Button>("completeButton");
         backButton = root.Q<Button>("backButton");
 
-        addNewButton.clicked += AddSocialInput;
-        completeButton.clicked += SubmitSocialLinks;
+        taglineField = root.Q<TextField>("taglineField");
+        websiteField = root.Q<TextField>("websiteField");
 
-        AddSocialInput(); // Add one by default
+        addNewButton.clicked += AddSocialInput;
+        completeButton.clicked += SubmitProfileDetails;
+
+        AddSocialInput(); // Add one input by default
     }
 
     void AddSocialInput()
@@ -70,12 +79,57 @@ public class SocialLinksController : MonoBehaviour
         icon.AddToClassList($"icon-{platform}");
     }
 
-    void SubmitSocialLinks()
+    void SubmitProfileDetails()
+{
+    // Store in OnboardingData
+    OnboardingData.Tagline = taglineField.value?.Trim();
+    OnboardingData.Website = websiteField.value?.Trim();
+    OnboardingData.SocialLinks = new Dictionary<string, string>(socialsData);
+
+    StartCoroutine(SubmitDesignerOnboarding());
+}
+
+private IEnumerator SubmitDesignerOnboarding()
+{
+    string endpoint = "/api/v1/onboarding"; // Replace with actual endpoint
+    string url = baseScript.baseURL + endpoint;
+
+    // Convert social links dictionary to a list of URLs
+    List<string> socials = new List<string>(OnboardingData.SocialLinks.Values);
+
+    var payload = new Dictionary<string, object>
     {
-        foreach (var entry in socialsData)
-        {
-            Debug.Log($"Platform: {entry.Key}, ID: {entry.Value}");
-            // Prepare payload for backend here
-        }
+        { "name", OnboardingData.DesignerName },
+        { "region", OnboardingData.SelectedCities },
+        { "creatorType", OnboardingData.TypeOfDesigner },
+        { "yearsOfExperience", int.TryParse(OnboardingData.YearsOfExperience, out var yoe) ? yoe : 0 },
+        { "tagline", OnboardingData.Tagline },
+        { "socials", socials },
+        { "occupation", "Freelancer" }, // If you have this dynamically, replace accordingly
+        { "website", OnboardingData.Website }
+    };
+
+    //string json = MiniJSON.JSON.Serialize(payload);
+    //Debug.Log("Payload: " + json);
+
+    using UnityWebRequest request = new UnityWebRequest(url, "POST");
+    //byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+    //request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+    request.downloadHandler = new DownloadHandlerBuffer();
+    request.SetRequestHeader("Content-Type", "application/json");
+
+    yield return request.SendWebRequest();
+
+    if (request.result == UnityWebRequest.Result.Success)
+    {
+        Debug.Log("Onboarding submission successful: " + request.downloadHandler.text);
+        UIManager.Instance.OpenScreen(UIScreenType.Location); // Or next screen
     }
+    else
+    {
+        Debug.LogError("Onboarding submission failed: " + request.downloadHandler.text);
+        // You can display an error label if needed
+    }
+}
+
 }

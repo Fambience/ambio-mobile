@@ -12,19 +12,24 @@
                 <ui:Image class="skip-icon" />
             </ui:Button>
         </ui:VisualElement>
-        <ui:Label name="title" text="Which city do you primarily serve?" class="title" />
+
+        <ui:Label name="title" text="Which cities do you primarily serve? (Select up to 3)" class="title" />
+
         <ui:VisualElement name="locationDropdown" class="location-dropdown" style="justify-content: flex-start;">
             <ui:VisualElement name="dropdownTrigger" class="dropdown-trigger">
-                <ui:Label name="selectedText" text="Select your location" class="selected-text" style="justify-content: flex-start; align-content: flex-start;" />
+                <ui:Label name="selectedText" text="Select up to 3 locations" class="selected-text" style="justify-content: flex-start; align-content: flex-start;" />
                 <ui:Label text="▼" class="dropdown-arrow" />
             </ui:VisualElement>
+
             <ui:VisualElement name="dropdownContent" class="dropdown-content" style="display: none;">
                 <ui:VisualElement class="search-wrapper">
                     <ui:TextField name="searchField" placeholder-text="Search City" class="search-field" />
                 </ui:VisualElement>
                 <ui:ScrollView name="optionsList" class="options-list" />
+                <ui:Label name="cityLimitWarning" text="You can only select up to 3 cities." class="warning-label" style="display: none; color: red; margin-top: 4px;" />
             </ui:VisualElement>
         </ui:VisualElement>
+
         <ui:Button name="completeButton" class="primary-button">
             <ui:Label text="Next" class="button-text" />
             <ui:Label text="→" class="arrow" />

@@ -15,5 +15,9 @@ public enum UIScreenType
     Location,
     OnboardingComplete,
     ColorTone,
-    
+    CreatorBasicDetails,
+    CreatorLocation,
+    CeatorExperience,
+    CreatorType,
+    taglineSocials,
 }
