@@ -388,11 +388,11 @@ public class BasicDetailsController : MonoBehaviour
             {
                 Debug.Log("Basic details submitted successfully.");
                 if (role == "USER")
-                { 
-                    UIManager.Instance.OpenScreen(UIScreenType.UserDetails);   
-                }else if (role == "CREATOR")
-                { 
+                {
                     UIManager.Instance.OpenScreen(UIScreenType.UserDetails);
+                }else if (role == "CREATOR")
+                {
+                    //UIManager.Instance.OpenScreen(UIScreenType.CreatorBasicDetails);
                 }
             }
         }

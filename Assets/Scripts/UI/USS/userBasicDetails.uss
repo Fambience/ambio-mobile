@@ -99,7 +99,17 @@
     background-color: #FFFFFF;
     overflow: hidden;
 }
-
+.input-wrappers {
+    flex-direction: row;
+    align-items: center;
+    border-width: 1.5px;
+    border-color: #D4B5A0;
+    border-radius: 50px;
+    height: 100px;
+    width: 100%;
+    background-color: #FFFFFF;
+    overflow: hidden;
+}
 .input-wrapper {
     border-color: #8B4C39;
 }
@@ -114,12 +124,16 @@
     background-repeat: no-repeat;
 }
 
-.email-icon {
-    background-image: resource("person"); /* Replace with your email icon resource */
+.person-icon {
+    background-image: resource("person"); 
+}
+
+.mail-icon{
+    background-image: resource("email");
 }
 
 .password-icon {
-    background-image: resource("person"); /* Replace with your lock icon resource */
+    background-image: resource("person"); 
 }
 
 /* Input Field */
@@ -201,4 +215,53 @@
 .warning-text.show {
     visibility: visible;
     opacity: 1;
+}
+
+/* Container for all social input rows */
+.social-container {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+/* A single row with icon + input */
+.social-input-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Icon that updates dynamically */
+.social-icon {
+    width: 24px;
+    height: 24px;
+    background-image: resource("default-social-icon"); /* fallback */
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-left: 8px;
+}
+
+/* Social input */
+.social-text-field {
+    flex-grow: 1;
+    height: 48px;
+    padding-left: 8px;
+    font-size: 14px;
+}
+
+/* + Add Another button */
+.add-social-button {
+    align-self: flex-start;
+    background-color: transparent;
+    border-width: 0;
+    padding: 6px 12px;
+    margin-top: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-label {
+    font-size: 14px;
+    color: #8B4C39;
+    -unity-font-style: bold;
 }

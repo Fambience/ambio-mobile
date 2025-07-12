@@ -15,9 +15,13 @@ public enum UIScreenType
     Location,
     OnboardingComplete,
     ColorTone,
-    PasswordOTP,
+    CreatorBasicDetails,
+    CreatorLocation,
+    CeatorExperience,
     forgotPassword,
+    CreatorType,
+    taglineSocials,
+    PasswordOTP,
     PasswordReset,
     PasswordChanged,
-    
 }

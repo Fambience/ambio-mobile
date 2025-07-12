@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/BudgeScreen.uss?fileID=7433441132597879392&amp;guid=98c09e83a73643d69804598909eb4c66&amp;type=3#BudgeScreen" />
+    <ui:VisualElement class="container" style="justify-content: flex-start;">
+        <ui:VisualElement class="top-bar">
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+            <ui:VisualElement class="progress-bar">
+                <ui:VisualElement class="progress-fill" />
+            </ui:VisualElement>
+            <ui:Button name="skipButton" class="skip-button">
+                <ui:Image class="skip-icon" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="VisualElement" style="top: 50px;">
+            <ui:Label name="title" text="How do you work?" class="title" style="top: auto;" />
+            <ui:RadioButtonGroup value="-1" choices=">1 year,  1-3 years, 3+ years" enabled="true" focusable="true" class="radio-group" style="font-size: 35px; -unity-font-style: normal; align-self: auto; align-items: center; left: 150px; -unity-text-align: upper-left; padding-left: 0;" />
+            <ui:Button name="completeButton" class="primary-button" style="top: 100px;">
+                <ui:Label text="Complete" class="button-text" />
+                <ui:Label text="→" class="arrow" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

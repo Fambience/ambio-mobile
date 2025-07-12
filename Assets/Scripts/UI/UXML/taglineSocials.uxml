@@ -1,0 +1,53 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/userBasicDetails.uss?fileID=7433441132597879392&amp;guid=e601fafbd3bb342db8a116487a307767&amp;type=3#userBasicDetails" />
+    <ui:VisualElement class="container" style="justify-content: flex-start;">
+        <ui:VisualElement class="top-bar">
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+            <ui:VisualElement class="progress-bar">
+                <ui:VisualElement class="progress-fill" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:Label name="title" text="Complete Your Profile!" class="title" />
+
+        <ui:VisualElement class="form-section">
+
+            <!-- Tagline input -->
+            <ui:VisualElement class="input-group">
+                <ui:Label text="What's your tagline?" class="input-label" />
+                <ui:VisualElement class="input-wrappers" style="margin-top: 20px;">
+                    <ui:Image class="input-icon tagline-icon" />
+                    <ui:TextField name="taglineField" placeholder-text="Designs that inspire..." class="input-field" />
+                </ui:VisualElement>
+                <ui:Label name="WarningTagline" class="warning-text" style="align-self: flex-start;" />
+            </ui:VisualElement>
+
+            <!-- Website input -->
+            <ui:VisualElement class="input-group">
+                <ui:Label text="Website (optional)" class="input-label" />
+                <ui:VisualElement class="input-wrappers" style="margin-top: 20px;">
+                    <ui:Image class="input-icon website-icon" />
+                    <ui:TextField name="websiteField" placeholder-text="https://yourwebsite.com" class="input-field" />
+                </ui:VisualElement>
+                <ui:Label name="WarningWebsite" class="warning-text" style="align-self: flex-start;" />
+            </ui:VisualElement>
+
+            <!-- Socials dynamic input -->
+            <ui:VisualElement class="input-group">
+                <ui:Label text="Add your social handles" class="input-label" />
+                <ui:VisualElement name="socialInputsContainer" class="social-container" />
+                <ui:Button name="addNewButton" class="add-social-button">
+                    <ui:Label text="+ Add Another" class="add-label" />
+                </ui:Button>
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+        <ui:Button name="completeButton" class="primary-button">
+            <ui:Label text="Next" class="button-text" />
+            <ui:Label text="→" class="arrow" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

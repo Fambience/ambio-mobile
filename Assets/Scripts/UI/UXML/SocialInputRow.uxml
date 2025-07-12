@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:VisualElement class="social-input-row">
+        <ui:Image name="socialIcon" class="social-icon" />
+        <ui:TextField name="socialInputField" class="social-text-field" />
+    </ui:VisualElement>
+</ui:UXML>
