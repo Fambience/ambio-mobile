@@ -169,33 +169,66 @@ public class LoginHandler : MonoBehaviour
 
     private void HandleLoginStage(LoginResponse response)
     {
-        switch (response.data.onboardingState)
+        if (response.data.role == "USER")
         {
-            case "VERIFY_EMAIL":
-                sendOTPFunc(userEmail);
-                break;
+            switch (response.data.onboardingState)
+            {
+                case "VERIFY_EMAIL":
+                    sendOTPFunc(userEmail);
+                    break;
 
-            case "ONBOARD_DETAILS":
-                HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
-                break;
-            
-            case "ONBOARDING_PARTIALLY_COMPLETED":
-                HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
-                break;
+                case "ONBOARD_DETAILS":
+                    HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
+                    break;
 
-            case "ONBOARDING_COMPLETED":
-                if (!string.IsNullOrEmpty(response.token))
-                    userProfileManager.InitializeProfile(response.token);
-                break;
+                case "ONBOARDING_PARTIALLY_COMPLETED":
+                    HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
+                    break;
 
-            case "BASIC_DETAILS":
-                UIManager.Instance.OpenScreen(UIScreenType.BasicDetails);
-                break;
+                case "ONBOARDING_COMPLETED":
+                    if (!string.IsNullOrEmpty(response.token))
+                        userProfileManager.InitializeProfile(response.token);
+                    break;
 
-            default:
-                Debug.LogError("Unknown onboarding state.");
-                UIManager.Instance.OpenScreen(UIScreenType.Home);
-                break;
+                case "BASIC_DETAILS":
+                    UIManager.Instance.OpenScreen(UIScreenType.BasicDetails);
+                    break;
+
+                default:
+                    Debug.LogError("Unknown onboarding state.");
+                    UIManager.Instance.OpenScreen(UIScreenType.Home);
+                    break;
+            }
+        }else if (response.data.role == "CREATOR")
+        {
+            switch (response.data.onboardingState)
+            {
+               case "VERIFY_EMAIL":
+                   sendOTPFunc(userEmail);
+                   break;
+
+               case "ONBOARD_DETAILS":
+                   HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
+                   break;
+
+               case "ONBOARDING_PARTIALLY_COMPLETED":
+                   HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
+                   break;
+
+               case "ONBOARDING_COMPLETED":
+                   if (!string.IsNullOrEmpty(response.token))
+                       userProfileManager.InitializeProfile(response.token);
+                   break;
+
+               case "BASIC_DETAILS":
+                   UIManager.Instance.OpenScreen(UIScreenType.BasicDetails);
+                   break;
+
+               default:
+                   Debug.LogError("Unknown onboarding state.");
+                   UIManager.Instance.OpenScreen(UIScreenType.Home);
+                   break;
+            }
         }
     }
 

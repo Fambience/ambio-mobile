@@ -21,8 +21,10 @@ public class SocialLinksController : MonoBehaviour
 
     private Dictionary<string, string> socialsData = new();
 
-    private void Awake()
+    private string token = "";
+    private void OnEnable()
     {
+        token = AuthTokenManager.GetToken();
         var root = uiDocument.rootVisualElement;
         container = root.Q<VisualElement>("socialInputsContainer");
         addNewButton = root.Q<Button>("addNewButton");
@@ -117,9 +119,6 @@ public class SocialLinksController : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-
-        // ✅ Set Authorization header
-        string token = AuthTokenManager.GetToken(); // replace with your actual token holder
         request.SetRequestHeader("Authorization", $"Bearer {token}");
 
         yield return request.SendWebRequest();

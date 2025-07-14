@@ -14,6 +14,7 @@ public static class BackendQuestionToScreenMapper
         { BackendQuestion.Q_MODERN_AND_MINIMAL_STYLE, UIScreenType.ModernStyles },
         { BackendQuestion.Q_COLOR_SCHEME, UIScreenType.ColorTone },
         { BackendQuestion.Q_HOME_SHARING_WITH, UIScreenType.Family },
+        { BackendQuestion.Q_COLOR_SCHEME , UIScreenType.BasicDetails},
     };
 
     public static UIScreenType? GetFirstMatchingScreen(List<string> remainingQuestionsRaw)
