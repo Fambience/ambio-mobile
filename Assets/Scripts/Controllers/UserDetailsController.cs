@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Text.RegularExpressions;
 
 public class UserDetailsController : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class UserDetailsController : MonoBehaviour
     private Label warningFirstName;
     private Label warningLastName;
     private Button completeButton;
+
+    // Regex pattern for names like "John", "Alice", "Martin"
+    private readonly Regex nameRegex = new(@"^[A-Z][a-z]+$");
 
     private void OnEnable()
     {
@@ -33,15 +37,27 @@ public class UserDetailsController : MonoBehaviour
 
         bool isValid = true;
 
+        // Validate first name
         if (string.IsNullOrEmpty(firstName))
         {
-            warningFirstName.text = "First name is required";
+            warningFirstName.text = "First name is required.";
+            isValid = false;
+        }
+        else if (!nameRegex.IsMatch(firstName))
+        {
+            warningFirstName.text = "Are you sure you entered your name correctly?";
             isValid = false;
         }
 
+        // Validate last name
         if (string.IsNullOrEmpty(lastName))
         {
-            warningLastName.text = "Last name is required";
+            warningLastName.text = "Last name is required.";
+            isValid = false;
+        }
+        else if (!nameRegex.IsMatch(lastName))
+        {
+            warningLastName.text = "Are you sure you entered your name correctly?";
             isValid = false;
         }
 
