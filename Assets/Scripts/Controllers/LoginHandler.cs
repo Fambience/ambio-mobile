@@ -237,11 +237,11 @@ public class LoginHandler : MonoBehaviour
                     break;
 
                 case "ONBOARD_DETAILS":
-                    HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
+                    HandleDynamicOnboardingFromQuestions(response.data.role, response.data.remainingQuestions);
                     break;
 
                 case "ONBOARDING_PARTIALLY_COMPLETED":
-                    HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
+                    HandleDynamicOnboardingFromQuestions(response.data.role, response.data.remainingQuestions);
                     break;
 
                 case "ONBOARDING_COMPLETED":
@@ -267,11 +267,11 @@ public class LoginHandler : MonoBehaviour
                    break;
 
                case "ONBOARD_DETAILS":
-                   HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
+                   HandleDynamicOnboardingFromQuestions(response.data.role, response.data.remainingQuestions);
                    break;
 
                case "ONBOARDING_PARTIALLY_COMPLETED":
-                   HandleDynamicOnboardingFromQuestions(response.data.remainingQuestions);
+                   HandleDynamicOnboardingFromQuestions(response.data.role ,response.data.remainingQuestions);
                    break;
 
                case "ONBOARDING_COMPLETED":
@@ -291,9 +291,9 @@ public class LoginHandler : MonoBehaviour
         }
     }
 
-    private void HandleDynamicOnboardingFromQuestions(List<string> questions)
+    private void HandleDynamicOnboardingFromQuestions(string role, List<string> questions)
     {
-        var screen = BackendQuestionToScreenMapper.GetFirstMatchingScreen(questions);
+        var screen = BackendQuestionToScreenMapper.GetFirstMatchingScreen(role, questions);
         if (screen.HasValue)
         {
             UIManager.Instance.OpenScreen(screen.Value);
