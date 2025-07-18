@@ -33,7 +33,7 @@ public class DesignerTypeController : MonoBehaviour
         if (selectedIndex >= 0 && selectedIndex < designerOptions.Length)
         {
             string selectedType = designerOptions[selectedIndex];
-            OnboardingData.TypeOfDesigner = selectedType;
+            OnboardingData.Occupation = selectedType;
             Debug.Log("Selected Designer Type: " + selectedType);
 
            UIManager.Instance.OpenScreen(UIScreenType.CeatorExperience); // Adjust screen as needed
@@ -51,7 +51,7 @@ public class DesignerTypeController : MonoBehaviour
 
     private void OnSkip()
     {
-        OnboardingData.TypeOfDesigner = null;
+        OnboardingData.Occupation = null;
         UIManager.Instance.OpenScreen(UIScreenType.CeatorExperience); // Adjust screen as needed
     }
 }

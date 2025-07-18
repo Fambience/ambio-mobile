@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine.Networking;
 
@@ -93,6 +94,8 @@ public class SocialLinksController : MonoBehaviour
 
     private IEnumerator SubmitDesignerOnboarding()
     {
+        token = AuthTokenManager.GetToken();
+        Debug.Log("Creator Profile: " + token);
         string endpoint = "/api/v1/user/onboarding-details";
         string url = baseScript.baseURL + endpoint;
 
@@ -102,14 +105,15 @@ public class SocialLinksController : MonoBehaviour
         var payload = new Dictionary<string, object>
         {
             { "name", OnboardingData.DesignerName },
-            { "region", OnboardingData.SelectedCities },
-            { "creatorType", OnboardingData.TypeOfDesigner },
-            { "yearsOfExperience", int.TryParse(OnboardingData.YearsOfExperience, out var yoe) ? yoe : 0 },
-            { "tagline", OnboardingData.Tagline },
-            { "socials", socials },
-            { "occupation", "Freelancer" },
-            { "website", OnboardingData.Website }
+            { "region", OnboardingData.SelectedCities?.Count > 0 ? OnboardingData.SelectedCities : null },
+            { "creatorType", string.IsNullOrWhiteSpace(OnboardingData.Occupation) ? null : OnboardingData.Occupation },
+            {  "yearsOfExperience", OnboardingData.YearsOfExperience > 0 ? OnboardingData.YearsOfExperience : null },
+            { "tagline", string.IsNullOrWhiteSpace(OnboardingData.Tagline) ? null : OnboardingData.Tagline },
+            { "socials", OnboardingData.SocialLinks?.Values?.ToList() ?? new List<string>() },
+            { "occupation", string.IsNullOrWhiteSpace(OnboardingData.Occupation) ? null : OnboardingData.Occupation },
+            { "website", string.IsNullOrWhiteSpace(OnboardingData.Website) ? null : OnboardingData.Website }
         };
+
 
         string json = MiniJSON.JSON.Serialize(payload);
         Debug.Log("Payload: " + json);
@@ -119,7 +123,7 @@ public class SocialLinksController : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        request.SetRequestHeader("Authorization", $"Bearer {token}");
+        request.SetRequestHeader("Authorization", $"{token}");
 
         yield return request.SendWebRequest();
 

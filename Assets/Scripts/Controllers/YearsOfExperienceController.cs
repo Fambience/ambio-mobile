@@ -4,55 +4,65 @@ using UnityEngine.UIElements;
 public class YearsOfExperienceController : MonoBehaviour
 {
     private UIDocument uiDocument;
-    private RadioButtonGroup experienceRadioGroup;
+    private TextField experienceInput;
+    private Label warningLabel;
     private Button completeButton;
     private Button backButton;
     private Button skipButton;
-
-    // Match this with your UXML choices
-    private readonly string[] experienceOptions = { ">1 year", "1-3 years", "3+ years" };
 
     private void Awake()
     {
         uiDocument = GetComponent<UIDocument>();
         var root = uiDocument.rootVisualElement;
 
-        experienceRadioGroup = root.Q<RadioButtonGroup>();
+        experienceInput = root.Q<TextField>("firstName"); // Name from UXML
+        warningLabel = root.Q<Label>("WarningFirstName");
         completeButton = root.Q<Button>("completeButton");
         backButton = root.Q<Button>("backButton");
         skipButton = root.Q<Button>("skipButton");
 
+        warningLabel.text = string.Empty;
+        completeButton.SetEnabled(false); // Disable submit initially
+
+        experienceInput.RegisterValueChangedCallback(evt => ValidateInput(evt.newValue));
+
         completeButton.clicked += OnComplete;
-        backButton.clicked += OnBack;
-        skipButton.clicked += OnSkip;
+        backButton.clicked += () => UIManager.Instance.OpenScreen(UIScreenType.CreatorType);
+        skipButton.clicked += () =>
+        {
+            OnboardingData.YearsOfExperience = null;
+            UIManager.Instance.OpenScreen(UIScreenType.taglineSocials);
+        };
+    }
+
+    private void ValidateInput(string input)
+    {
+        input = input.Trim();
+
+        if (int.TryParse(input, out int value) && value >= 1 && value <= 99)
+        {
+            warningLabel.text = string.Empty;
+            completeButton.SetEnabled(true);
+        }
+        else
+        {
+            warningLabel.text = "Please enter a whole number between 1 and 99.";
+            completeButton.SetEnabled(false);
+        }
     }
 
     private void OnComplete()
     {
-        int selectedIndex = experienceRadioGroup.value;
+        string input = experienceInput.value.Trim();
 
-        if (selectedIndex >= 0 && selectedIndex < experienceOptions.Length)
+        if (int.TryParse(input, out int years) && years >= 1 && years <= 99)
         {
-            string selectedExperience = experienceOptions[selectedIndex];
-            OnboardingData.YearsOfExperience = selectedExperience;
-            Debug.Log("Selected Experience: " + selectedExperience);
-
-            UIManager.Instance.OpenScreen(UIScreenType.taglineSocials); // Replace as needed
+            OnboardingData.YearsOfExperience = years;
+            UIManager.Instance.OpenScreen(UIScreenType.taglineSocials);
         }
         else
         {
-            Debug.LogWarning("Please select your years of experience before continuing.");
+            warningLabel.text = "Invalid input. Please correct it.";
         }
-    }
-
-    private void OnBack()
-    {
-        UIManager.Instance.OpenScreen(UIScreenType.CreatorType); // Replace as needed
-    }
-
-    private void OnSkip()
-    {
-        OnboardingData.YearsOfExperience = null;
-        UIManager.Instance.OpenScreen(UIScreenType.taglineSocials); // Replace as needed
     }
 }

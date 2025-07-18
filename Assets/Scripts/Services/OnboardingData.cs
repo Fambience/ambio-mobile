@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 public class OnboardingData
 {
@@ -15,7 +16,7 @@ public class OnboardingData
     public static List<string> DesignInspoScreen2 = new();
     public static List<string> ColorScheme;
     public static List<string> HomeSharingWith = new();
-    public static string TypeOfDesigner;
-    public static string YearsOfExperience;
+    [CanBeNull] public static string Occupation;
+    public static int? YearsOfExperience;
     public static string DesignerName;
 }

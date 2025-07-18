@@ -175,6 +175,8 @@ public class LoginHandler : MonoBehaviour
     {
         SetUIInteractable(false);
         string jsonData = JsonUtility.ToJson(new LoginData(email, password));
+        
+        Debug.Log("Payload: "+jsonData);
 
         using (UnityWebRequest request = new UnityWebRequest(baseURL + loginEndPoint, "POST"))
         {
@@ -210,7 +212,7 @@ public class LoginHandler : MonoBehaviour
             PlayerPrefs.SetString("password", password);
             PlayerPrefs.SetString("role", response.data.role);
             PlayerPrefs.Save();
-
+			Debug.Log("Role : " + response.data.role);
             HandleLoginStage(response);
         }
         SetUIInteractable(true);
@@ -228,6 +230,7 @@ public class LoginHandler : MonoBehaviour
 
     private void HandleLoginStage(LoginResponse response)
     {
+        Debug.Log("Onboarding State " + response.data.onboardingState);
         if (response.data.role == "USER")
         {
             switch (response.data.onboardingState)

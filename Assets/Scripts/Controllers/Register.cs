@@ -183,7 +183,8 @@ public class Register : MonoBehaviour
     {
         SetUIInteractable(false); // Disable input
 
-        string jsonData = JsonUtility.ToJson(new LoginData(email, password));
+        string jsonData = JsonUtility.ToJson(new RegisterData(email, password));
+        Debug.Log("Payload ="  + jsonData );
 
         using (UnityWebRequest request = new UnityWebRequest(baseURL + registerEndPoint, "POST"))
         {
@@ -282,7 +283,20 @@ public class Register : MonoBehaviour
     }
 
     // Data Models
-    [System.Serializable] public class LoginData { public string email, password; public LoginData(string e, string p) { email = e; password = p; } }
+    [System.Serializable]
+    public class RegisterData
+    {
+        public string email;
+        public string password;
+        public bool isTermsAndConditionsAccepted = true;
+
+        public RegisterData(string email, string password)
+        {
+            this.email = email;
+            this.password = password;
+        }
+    }
+
     [System.Serializable] public class OTPResponse { public bool success; public string message; }
     [System.Serializable] public class EmailData { public string email; public EmailData(string e) { email = e; } }
     [System.Serializable] public class RegisterResponse { public string token; public bool success; public string message; }
