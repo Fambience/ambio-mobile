@@ -2113,8 +2113,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   verticalCardTemplate: {fileID: 0}
   horizontalCardTemplate: {fileID: 0}
-  totalVerticalCards: 50
-  horizontalCardsPerGroup: 5
+  baseURL: 
+  exploreFeedUrl: /api/v1/post/explore-feed
+  homeFeedUrl: /api/v1/post/home
+  trendingDesignersUrl: /api/v1/post/trending-designers
+  authToken: 
+  postsPerPage: 10
+  designersPerPage: 10
+  homeCheckInterval: 10
   pullThreshold: 100
   refreshIndicatorSize: 50
   refreshDuration: 2

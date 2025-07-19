@@ -257,6 +257,7 @@ public class LoginHandler : MonoBehaviour
 
                 default:
                     Debug.LogError("Unknown onboarding state.");
+                    UIManager.Instance.OpenScreen(UIScreenType.Home);
                     break;
             }
         }else if (response.data.role == "CREATOR")
