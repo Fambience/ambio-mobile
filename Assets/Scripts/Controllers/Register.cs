@@ -30,6 +30,7 @@ public class Register : MonoBehaviour
     
     private bool isPasswordVisible = false;
     private bool isConPasswordVisible = false;
+    private bool isTermsAndConditionsAccepted = false;
 
     private void OnEnable()
     {
@@ -43,7 +44,21 @@ public class Register : MonoBehaviour
         backToLoginButton = root.Q<Button>("BackToLoginLabel");
         eyeIcon1 = root.Q<Image>("eyeIconPass");
         eyeIcon2 = root.Q<Image>("eyeIconConPass");
-
+        Toggle termsToggle = root.Q<Toggle>("termsToggle");
+        termsToggle.RegisterValueChangedCallback(evt =>
+        {
+            isTermsAndConditionsAccepted = evt.newValue;
+            if (isTermsAndConditionsAccepted)
+            {
+                Debug.Log("TermsAndConditions accepted");
+                warningRegister.text = "";
+            }
+        });
+        Label termsLink = root.Q<Label>("termsLink");
+        termsLink.RegisterCallback<ClickEvent>(evt =>
+        {
+            Application.OpenURL("https://example.com");
+        });
         // Ensure password field is initially hidden
         passwordField.isPasswordField = true;
         confirmPasswordField.isPasswordField = true;
@@ -113,6 +128,7 @@ public class Register : MonoBehaviour
             }
         }
     }
+    
 
     private void RegisterUser()
     {
@@ -168,6 +184,17 @@ public class Register : MonoBehaviour
         else
         {
             warningConfirmPassword.text = "";
+        }
+        
+        //terms and conditions
+        if (!isTermsAndConditionsAccepted)
+        {
+            warningRegister.text = "Please accept the terms and conditions.";
+            hasError = true;
+        }
+        else if  (isTermsAndConditionsAccepted)
+        {
+            warningRegister.text = "";
         }
 
         if (hasError)
@@ -288,7 +315,7 @@ public class Register : MonoBehaviour
     {
         public string email;
         public string password;
-        public bool isTermsAndConditionsAccepted = true;
+        public bool isTermsAndConditionsAccepted = false;
 
         public RegisterData(string email, string password)
         {
