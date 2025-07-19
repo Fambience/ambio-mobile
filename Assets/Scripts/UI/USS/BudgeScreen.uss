@@ -130,7 +130,6 @@ unity-radio-button Label {
 experience-input-wrapper {
     flex-direction: row;
     align-items: center;
-    gap: 16px;
     margin-top: 20px;
 }
 
@@ -143,4 +142,16 @@ experience-input-wrapper {
 .experience-scroller {
     height: 100px;
     width: 30px;
+}
+
+.unity-radio-button__checkmark-background {
+    margin-right: 20px;
+    width: 40px;
+    height: 40px;
+    border-width: 2px;
+    border-radius: 50%;
+}
+
+.unity-radio-button {
+    margin-bottom: 20px;
 }

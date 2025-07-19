@@ -287,3 +287,8 @@
     background-size: contain;
     scale: 2.5;
 }
+
+.add-label{
+    font-size: 30px;
+    -unity-font-style: bold;
+}

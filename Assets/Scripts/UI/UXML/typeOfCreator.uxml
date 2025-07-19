@@ -12,7 +12,7 @@
                 <ui:Image class="skip-icon" />
             </ui:Button>
         </ui:VisualElement>
-        <ui:VisualElement name="VisualElement" style="top: 50px;">
+        <ui:VisualElement name="VisualElement" style="top: 0px;">
             <ui:Label name="title" text="How do you work?" class="title" style="top: auto;" />
             <ui:RadioButtonGroup value="-1" choices="Interior Designer,  Design Studio, Contractor" enabled="true" focusable="true" class="radio-group" style="font-size: 35px; -unity-font-style: normal; align-self: auto; align-items: center; left: 150px; -unity-text-align: upper-left; padding-left: 0;" />
             <ui:Button name="completeButton" class="primary-button" style="top: 100px;">

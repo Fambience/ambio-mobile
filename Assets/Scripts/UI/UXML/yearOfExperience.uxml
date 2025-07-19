@@ -8,22 +8,21 @@
             <ui:VisualElement class="progress-bar">
                 <ui:VisualElement class="progress-fill" />
             </ui:VisualElement>
+            <ui:Button name="skipButton" class="skip-button">
+                <ui:Image class="skip-icon" />
+            </ui:Button>
         </ui:VisualElement>
-        <ui:Button name="skipButton" class="skip-button">
-            <ui:Image class="skip-icon" />
-        </ui:Button>
         <ui:Label name="title" text="How long have you been practicing interior designing?" class="title" />
         <ui:VisualElement class="form-section">
             <ui:VisualElement class="input-group">
-                <ui:Label text="Please enter the number of years!" class="input-label" style="-unity-text-align: upper-left; align-self: center; align-content: flex-start;" />
-                <ui:VisualElement class="input-wrappers" style="margin-top: 50px;">
+                <ui:VisualElement class="input-wrappers" style="margin-top: 0px;">
                     <ui:Image class="input-icon person-icon" />
                     <ui:TextField name="firstName" placeholder-text="10" class="input-field" />
                 </ui:VisualElement>
                 <ui:Label name="WarningFirstName" class="warning-text" style="align-self: flex-start;" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Button name="completeButton" class="primary-button">
+        <ui:Button name="completeButton" class="primary-button" style="margin-top: 50px;">
             <ui:Label text="Next" class="button-text" />
             <ui:Label text="→" class="arrow" />
         </ui:Button>

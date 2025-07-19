@@ -36,12 +36,12 @@
                 </ui:VisualElement>
                 <ui:Label name="WarningConfirmPassword" class="warning-text" style="align-self: flex-start;" />
             </ui:VisualElement>
-            <ui:Label name="WarningRegister" class="warning-text" style="align-self: middle-center; top: 0px; margin-left: 0px;" />
             <ui:VisualElement name="termsSection" class="checkbox-item" >
                 <ui:Toggle name="termsToggle" class="custom-checkbox" />
-                <ui:Label text="I agree to" class="checkbox-label"> </ui:Label>
-                <ui:Label name="termsLink" class="terms-link" text="Terms and Conditions"> </ui:Label>
+                <ui:Label text="I agree to" class="checkbox-label" />
+                <ui:Label name="termsLink" class="terms-link" text="Terms and Conditions" />
             </ui:VisualElement>
+            <ui:Label name="WarningRegister" class="warning-text" style="align-self: middle-center; top: 0px; margin-left: 0px;" />
             <ui:Button name="continueButton" text="Continue" class="continue-button" />
         </ui:VisualElement>
     </ui:VisualElement>
