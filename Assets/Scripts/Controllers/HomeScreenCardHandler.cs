@@ -15,6 +15,13 @@ public class ApiResponse<T>
 }
 
 [System.Serializable]
+public class FollowResponse
+{
+    public string message;
+    public bool followed;
+}
+
+[System.Serializable]
 public class BookmarkResponse
 {
     public string message;
@@ -290,7 +297,7 @@ public class HomeScreenCardHandler : MonoBehaviour
     
     private IEnumerator BookmarkPost(string postId, Image bookmarkIcon)
     {
-        string url = $"{baseURL}/api/v1/bookmark/like/{postId}";
+        string url = $"{baseURL}/api/v1/post/bookmark/like/{postId}";
         
         using (UnityWebRequest request = UnityWebRequest.PostWwwForm(url, ""))
         {
@@ -314,7 +321,7 @@ public class HomeScreenCardHandler : MonoBehaviour
                             }
                             Debug.Log("Post bookmarked successfully");
                         }
-                        else if (response.data.message == "unbookmark" || response.data.message == "removed")
+                        else if (response.data.message == "unbookmark" || response.data.message == "removed" || response.data.message == "removed bookmark")
                         {
                             Texture2D outlineBookmark = LoadImage("Bookmark");
                             if (outlineBookmark != null)
@@ -463,6 +470,88 @@ public class HomeScreenCardHandler : MonoBehaviour
                 hasMoreExplorePosts = false;
             }
         }
+    }
+    
+    private IEnumerator FollowUser(string userId, Label followText, Button followButton, VisualElement horizontalCard)
+    {
+        string url = $"{baseURL}/api/v1/profile/toggle-follow/{userId}";
+        string originalText = followText.text;
+        StyleColor originalBackgroundColor = followButton.resolvedStyle.backgroundColor;
+        StyleColor originalTextColor = followText.resolvedStyle.color;
+        
+        using (UnityWebRequest request = UnityWebRequest.PostWwwForm(url, ""))
+        {
+            request.SetRequestHeader("Authorization", authToken);
+            request.SetRequestHeader("Content-Type", "application/json");
+            yield return request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                string jsonResponse = request.downloadHandler.text;
+                try
+                {
+                    var response = JsonUtility.FromJson<FollowResponse>(jsonResponse);
+                    if (response.followed)
+                    {
+                        Debug.Log($"Successfully followed user: {response.message}");
+                        StartCoroutine(HideCardAfterDelay(horizontalCard, 10f));
+                    }
+                    else
+                    {
+                        Debug.Log($"Successfully unfollowed user: {response.message}");
+                        followText.text = "Follow";
+                        followButton.style.backgroundColor = StyleKeyword.Null;
+                        followText.style.color = StyleKeyword.Null;
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"Error parsing follow response: {e.Message}");
+                    RevertFollowButton(followText, followButton, originalText, originalBackgroundColor, originalTextColor);
+                }
+            }
+            else
+            {
+                Debug.LogError($"Follow Network Error: {request.error}");
+                RevertFollowButton(followText, followButton, originalText, originalBackgroundColor, originalTextColor);
+            }
+        }
+    }
+    
+    private void RevertFollowButton(Label followText, Button followButton, string originalText, 
+        StyleColor originalBackgroundColor, StyleColor originalTextColor)
+    {
+        followText.text = originalText;
+        followButton.style.backgroundColor = originalBackgroundColor;
+        followText.style.color = originalTextColor;
+        Debug.Log("Reverted follow button state due to error");
+    }
+    
+    private IEnumerator HideCardAfterDelay(VisualElement card, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        // if (card != null && card.parent != null)
+        // {
+        //     StartCoroutine(FadeOutCard(card));
+        // }
+    }
+    
+    private IEnumerator FadeOutCard(VisualElement card)
+    {
+        float fadeDuration = 0.5f;
+        float elapsedTime = 0f;
+        float startOpacity = card.resolvedStyle.opacity;
+    
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float progress = elapsedTime / fadeDuration;
+            card.style.opacity = Mathf.Lerp(startOpacity, 0f, progress);
+            yield return null;
+        }
+    
+        // Remove the card from its parent
+        card.parent.Remove(card);
+        Debug.Log("Designer card hidden after successful follow");
     }
     
     private IEnumerator LoadTrendingDesigners(int page)
@@ -827,8 +916,6 @@ public class HomeScreenCardHandler : MonoBehaviour
     private VisualElement CreateHorizontalCard(User designerPost)
     {
         VisualElement horizontalCard = horizontalCardTemplate.CloneTree();
-        
-        // Set designer name
         string displayName = designerPost.userName;
         
         Debug.Log($"[HORIZONTAL CARD] Creating card for: {displayName}");
@@ -849,9 +936,10 @@ public class HomeScreenCardHandler : MonoBehaviour
         // Set up follow button
         Label followText = horizontalCard.Q<Label>("followText");
         followText.text = "Follow";
-        
         Button followButton = horizontalCard.Q<Button>("followButton");
-        followButton.clicked += () => ToggleFollow(followText);
+    
+        // Passing the userId and horizontalCard reference to the ToggleFollow function
+        followButton.clicked += () => ToggleFollow(followText, designerPost.userId, horizontalCard);
         
         return horizontalCard;
     }
@@ -1010,23 +1098,32 @@ public class HomeScreenCardHandler : MonoBehaviour
         return Resources.Load<Texture2D>(imageName);
     }
     
-    private void ToggleFollow(Label followText)
+    private void ToggleFollow(Label followText, string userId, VisualElement horizontalCard)
     {
         Button followButton = followText.parent as Button;
-        
+    
         if (followText.text == "Follow")
         {
+            // Immediately update UI to show "Following" state
             followText.text = "Following";
             followButton.style.backgroundColor = new StyleColor(new Color32(139, 76, 57, 255));
             followText.style.color = new StyleColor(Color.white);
+        
+            // Making API call
+            StartCoroutine(FollowUser(userId, followText, followButton, horizontalCard));
         }
         else
         {
+            // For unfollow action
             followText.text = "Follow";
             followButton.style.backgroundColor = StyleKeyword.Null;
             followText.style.color = StyleKeyword.Null;
+        
+            // Making API call
+            StartCoroutine(FollowUser(userId, followText, followButton, horizontalCard));
         }
     }
+
     
     private void OnDisable()
     {
