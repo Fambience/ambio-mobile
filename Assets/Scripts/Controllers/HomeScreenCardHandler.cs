@@ -62,8 +62,33 @@ public class Post
     public string category;
     public int likesCount;
     public List<Media> media;
-    public List<PostMedia> postMedia; // For home API
+    public List<PostMedia> postMedia;
     public User user;
+    
+    // Helper method to get all image URLs
+    public List<string> GetAllImageUrls()
+    {
+        List<string> urls = new List<string>();
+        
+        if (postMedia != null && postMedia.Count > 0)
+        {
+            foreach (var pm in postMedia)
+            {
+                if (!string.IsNullOrEmpty(pm.filePath))
+                    urls.Add(pm.filePath);
+            }
+        }
+        else if (media != null && media.Count > 0)
+        {
+            foreach (var m in media)
+            {
+                if (!string.IsNullOrEmpty(m.url))
+                    urls.Add(m.url);
+            }
+        }
+        
+        return urls;
+    }
 }
 
 [System.Serializable]
@@ -240,6 +265,7 @@ public class HomeScreenCardHandler : MonoBehaviour
     private IEnumerator LikePost(string postId, Image likeIcon, Post post)
     {
         string url = $"{baseURL}/api/v1/post/like/{postId}";
+        Debug.Log($"Liking post {postId}");
         
         using (UnityWebRequest request = UnityWebRequest.PostWwwForm(url, ""))
         {
@@ -298,7 +324,8 @@ public class HomeScreenCardHandler : MonoBehaviour
     private IEnumerator BookmarkPost(string postId, Image bookmarkIcon)
     {
         string url = $"{baseURL}/api/v1/post/bookmark/like/{postId}";
-        
+        Debug.Log($"Bookmarking post {postId}");
+        Debug.Log($"Bookmark URL: {url}");
         using (UnityWebRequest request = UnityWebRequest.PostWwwForm(url, ""))
         {
             request.SetRequestHeader("Authorization", authToken);
@@ -790,8 +817,8 @@ public class HomeScreenCardHandler : MonoBehaviour
             userImage.image = LoadImage("user_placeholder");
         }
         
-        // Set post image (prioritize postMedia from home API, then media from explore API)
-        Image cardImage = verticalCard.Q<Image>("card-image");
+        // Handle multiple images
+        SetupMultipleImages(verticalCard, post);
         
         // setting the like icon for each post
         Image likeIcon = verticalCard.Q<Image>("favourite");
@@ -833,27 +860,191 @@ public class HomeScreenCardHandler : MonoBehaviour
             });
         }
         
-        string imageUrl = null;
-        
-        if (post.postMedia != null && post.postMedia.Count > 0)
-        {
-            imageUrl = post.postMedia[0].filePath;
-        }
-        else if (post.media != null && post.media.Count > 0)
-        {
-            imageUrl = post.media[0].url;
-        }
-        
-        if (!string.IsNullOrEmpty(imageUrl))
-        {
-            StartCoroutine(LoadImageFromURL(imageUrl, cardImage));
-        }
-        else
-        {
-            cardImage.image = LoadImage("room_placeholder");
-        }
-        
         return verticalCard;
+    }
+
+    private void SetupMultipleImages(VisualElement verticalCard, Post post)
+    {
+        Image cardImage = verticalCard.Q<Image>("card-image");
+        List<string> imageUrls = post.GetAllImageUrls();
+        if (imageUrls.Count == 0)
+        {
+            cardImage.image = LoadImage("Contemporary");
+            return;
+        }
+        if (imageUrls.Count == 1)
+        {
+            StartCoroutine(LoadImageFromURL(imageUrls[0], cardImage));
+            return;
+        }
+        cardImage.image = null;
+        VisualElement imageContainer = new VisualElement();
+        imageContainer.style.position = Position.Absolute;
+        imageContainer.style.top = 0;
+        imageContainer.style.left = 0;
+        imageContainer.style.right = 0;
+        imageContainer.style.bottom = 0;
+        imageContainer.style.borderBottomLeftRadius = 25;
+        imageContainer.style.borderBottomRightRadius = 25;
+        imageContainer.style.borderTopLeftRadius = 25;
+        imageContainer.style.borderTopRightRadius = 25;
+        imageContainer.style.overflow = Overflow.Hidden;
+        ScrollView imageScrollView = new ScrollView(ScrollViewMode.Horizontal);
+        imageScrollView.style.width = Length.Percent(100);
+        imageScrollView.style.height = Length.Percent(100);
+        imageScrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+        imageScrollView.style.overflow = Overflow.Hidden;
+        VisualElement imagesList = new VisualElement();
+        imagesList.style.flexDirection = FlexDirection.Row;
+        imagesList.style.height = Length.Percent(100);
+        imagesList.style.flexWrap = Wrap.NoWrap;
+        imagesList.style.width = Length.Percent(100 * imageUrls.Count);
+        for (int i = 0; i < imageUrls.Count; i++) 
+        {     
+            Image newImage = new Image();
+    
+            // Set constant pixel size instead of percentage
+            newImage.style.width = 850; // Set your desired width in pixels
+            newImage.style.height = 550; // Set your desired height in pixels
+    
+            newImage.style.flexShrink = 0;
+            newImage.style.flexGrow = 0;
+    
+            // Change scale mode to preserve aspect ratio without cropping
+            newImage.scaleMode = ScaleMode.ScaleToFit; // or ScaleMode.StretchToFill
+    
+            string imageUrl = imageUrls[i];
+            StartCoroutine(LoadImageFromURL(imageUrl, newImage));
+    
+            int imageIndex = i;
+            newImage.RegisterCallback<ClickEvent>(evt =>     
+            {         
+                evt.StopPropagation();         
+                OnImageClick(imageScrollView, imageIndex, imageUrls.Count);     
+            });     
+    
+            newImage.RegisterCallback<MouseDownEvent>(evt => evt.StopPropagation());     
+            newImage.RegisterCallback<MouseUpEvent>(evt => evt.StopPropagation());     
+    
+            imagesList.Add(newImage); 
+        }
+        imageScrollView.Add(imagesList);
+        imageContainer.Add(imageScrollView);
+        if (imageUrls.Count > 1)
+        {
+            VisualElement imageIndicator = new VisualElement();
+            imageIndicator.style.position = Position.Absolute;
+            imageIndicator.style.top = 10;
+            imageIndicator.style.right = 10;
+            imageIndicator.style.backgroundColor = new StyleColor(new Color(0, 0, 0, 0.7f));
+            imageIndicator.style.borderBottomLeftRadius = 12;
+            imageIndicator.style.borderBottomRightRadius = 12;
+            imageIndicator.style.borderTopLeftRadius = 12;
+            imageIndicator.style.borderTopRightRadius = 12;
+            imageIndicator.style.paddingTop = 4;
+            imageIndicator.style.paddingBottom = 4;
+            imageIndicator.style.paddingLeft = 8;
+            imageIndicator.style.paddingRight = 8;
+            Label imageCount = new Label($"1/{imageUrls.Count}");
+            imageCount.style.color = Color.white;
+            imageCount.style.fontSize = 30;
+            imageCount.name = "imageCounter";
+            imageIndicator.Add(imageCount);
+            imageContainer.Add(imageIndicator);
+            imageScrollView.RegisterCallback<WheelEvent>(evt => {
+                StartCoroutine(UpdateCounterOnScroll(imageScrollView, imageUrls.Count));
+            });
+            imageScrollView.RegisterCallback<PointerUpEvent>(evt => {
+                StartCoroutine(UpdateCounterOnScroll(imageScrollView, imageUrls.Count));
+            });
+        }
+        cardImage.style.position = Position.Relative;
+        cardImage.Add(imageContainer);
+    }
+
+    private void OnImageClick(ScrollView scrollView, int currentIndex, int totalImages)
+    {
+        int nextIndex = (currentIndex + 1) % totalImages;
+        
+        // Get the actual container width more reliably
+        float containerWidth = scrollView.contentContainer.resolvedStyle.width;
+        if (containerWidth <= 0)
+        {
+            containerWidth = scrollView.resolvedStyle.width;
+        }
+        if (containerWidth <= 0)
+        {
+            // Fallback: traverse up to find a valid width
+            VisualElement parent = scrollView.parent;
+            while (parent != null && containerWidth <= 0)
+            {
+                containerWidth = parent.resolvedStyle.width;
+                parent = parent.parent;
+            }
+            if (containerWidth <= 0) containerWidth = 300; // Final fallback
+        }
+        
+        // Calculate scroll position (each image takes full container width)
+        // float scrollPosition = nextIndex * containerWidth;
+        //
+        // // Smoothly scroll to next image
+        // StartCoroutine(SmoothScrollTo(scrollView, scrollPosition));
+        
+        // Update counter immediately
+        UpdateImageCounter(scrollView, nextIndex + 1, totalImages);
+    }
+
+    private IEnumerator UpdateCounterOnScroll(ScrollView scrollView, int totalImages)
+    {
+        yield return new WaitForEndOfFrame(); // Wait for scroll to settle
+        
+        float containerWidth = scrollView.contentContainer.resolvedStyle.width / totalImages;
+        if (containerWidth <= 0)
+        {
+            containerWidth = scrollView.resolvedStyle.width;
+        }
+        
+        if (containerWidth > 0)
+        {
+            float currentScroll = scrollView.horizontalScroller.value;
+            int currentImageIndex = Mathf.RoundToInt(currentScroll / containerWidth);
+            currentImageIndex = Mathf.Clamp(currentImageIndex, 0, totalImages - 1);
+            
+            UpdateImageCounter(scrollView, currentImageIndex + 1, totalImages);
+        }
+    }
+    
+    private IEnumerator SmoothScrollTo(ScrollView scrollView, float targetPosition)
+    {
+        float startPosition = scrollView.horizontalScroller.value;
+        float duration = 0.3f;
+        float elapsedTime = 0f;
+        
+        // Ensure target position is within valid range
+        float maxScroll = scrollView.horizontalScroller.highValue;
+        targetPosition = Mathf.Clamp(targetPosition, 0f, maxScroll);
+        
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float progress = elapsedTime / duration;
+            // Use easing for smoother animation
+            float easedProgress = 1f - Mathf.Pow(1f - progress, 3f);
+            float currentPosition = Mathf.Lerp(startPosition, targetPosition, easedProgress);
+            scrollView.horizontalScroller.value = currentPosition;
+            yield return null;
+        }
+        
+        scrollView.horizontalScroller.value = targetPosition;
+    }
+    private void UpdateImageCounter(ScrollView scrollView, int currentImageNumber, int totalImages)
+    {
+        VisualElement container = scrollView.parent;
+        Label counter = container.Q<Label>("imageCounter");
+        if (counter != null)
+        {
+            counter.text = $"{currentImageNumber}/{totalImages}";
+        }
     }
     
     private IEnumerator AddTrendingDesignersSection()
