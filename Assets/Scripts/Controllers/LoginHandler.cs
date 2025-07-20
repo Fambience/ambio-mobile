@@ -250,6 +250,7 @@ public class LoginHandler : MonoBehaviour
                 case "ONBOARDING_COMPLETED":
                     if (!string.IsNullOrEmpty(response.token))
                         userProfileManager.InitializeProfile(response.token);
+                    UIManager.Instance.OpenScreen(UIScreenType.Home);
                     break;
 
                 case "BASIC_DETAILS":
@@ -258,7 +259,6 @@ public class LoginHandler : MonoBehaviour
 
                 default:
                     Debug.LogError("Unknown onboarding state.");
-                    UIManager.Instance.OpenScreen(UIScreenType.Home);
                     break;
             }
         }else if (response.data.role == "CREATOR")
@@ -280,6 +280,7 @@ public class LoginHandler : MonoBehaviour
                case "ONBOARDING_COMPLETED":
                    if (!string.IsNullOrEmpty(response.token))
                        userProfileManager.InitializeProfile(response.token);
+                   UIManager.Instance.OpenScreen(UIScreenType.Home);
                    break;
 
                case "BASIC_DETAILS":
@@ -288,7 +289,6 @@ public class LoginHandler : MonoBehaviour
 
                default:
                    Debug.LogError("Unknown onboarding state.");
-                   UIManager.Instance.OpenScreen(UIScreenType.Home);
                    break;
             }
         }

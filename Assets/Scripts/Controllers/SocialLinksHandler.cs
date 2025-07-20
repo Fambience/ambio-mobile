@@ -130,7 +130,7 @@ public class SocialLinksController : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             Debug.Log("Onboarding submission successful: " + request.downloadHandler.text);
-            UIManager.Instance.OpenScreen(UIScreenType.Location);
+            UIManager.Instance.OpenScreen(UIScreenType.Home);
         }
         else
         {

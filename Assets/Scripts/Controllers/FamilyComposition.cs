@@ -162,7 +162,7 @@ public class FamilyComposition : MonoBehaviour
             else
             {
                 Debug.Log("Onboarding data submitted successfully.");
-                // Proceed to next screen
+                UIManager.Instance.OpenScreen(UIScreenType.Home);
             }
         }
     }
