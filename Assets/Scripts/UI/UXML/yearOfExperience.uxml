@@ -6,7 +6,7 @@
                 <ui:Image class="back-icon" />
             </ui:Button>
             <ui:VisualElement class="progress-bar">
-                <ui:VisualElement class="progress-fill" />
+                <ui:VisualElement class="progress-fill-creator-experience" />
             </ui:VisualElement>
             <ui:Button name="skipButton" class="skip-button">
                 <ui:Image class="skip-icon" />

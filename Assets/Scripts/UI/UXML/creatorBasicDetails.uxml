@@ -6,7 +6,7 @@
                 <ui:Image class="back-icon" />
             </ui:Button>
             <ui:VisualElement class="progress-bar">
-                <ui:VisualElement class="progress-fill" />
+                <ui:VisualElement class="progress-fill-creator" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Label name="title" text="Complete Your Profile!" class="title" />
