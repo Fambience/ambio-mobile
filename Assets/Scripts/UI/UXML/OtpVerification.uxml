@@ -19,6 +19,9 @@
                 <ui:TextField name="otp-5" max-length="1" class="otp-box otp-box-margin" style="-unity-text-align: middle-center;" />
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:Label name= "ResendOTPText" text="Resend OTP in" class ="ResendOtpText"/> 
+        <ui:Label name= "ResendOTPTimer" text="00:00" class ="ResendOtpTimer"/>
+        <ui:Button name="ResendOTPButton" text="Resend OTP" class="ResendOTPButton" />
         <ui:Label name="warningLabelRole" text="username should be unique" class="warning-text" style="align-self: flex-start; align-content: flex-end;" />
         <ui:Button name="verfiyOTP" text="Verify" class="verify-button" />
     </ui:VisualElement>

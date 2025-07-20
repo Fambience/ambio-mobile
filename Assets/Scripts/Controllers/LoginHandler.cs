@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Services;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -208,8 +209,7 @@ public class LoginHandler : MonoBehaviour
             AuthTokenManager.SetToken(token);
             userEmail = email;
 
-            PlayerPrefs.SetString("email", email);
-            PlayerPrefs.SetString("password", password);
+            PasswordResetSession.Email = email;
             PlayerPrefs.SetString("role", response.data.role);
             PlayerPrefs.Save();
 			Debug.Log("Role : " + response.data.role);

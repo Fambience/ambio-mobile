@@ -1,30 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using Services;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.Networking;
 using MiniJSON;
+
 public class OTPSCreenPassword : MonoBehaviour
 {
     [Header("References")]
     public UIDocument uiDocument;
-    
-    private string verifyOtpEndPoint = "/api/v1/auth/password/verify-otp";
 
-    private string baseURL=baseScript.baseURL;
+    private string verifyOtpEndPoint = "/api/v1/auth/password/verify-otp";
+    private string sendOtpEndPoint = "/api/v1/auth/password/send-otp";
+    private string baseURL;
+
     private List<TextField> otpFields = new List<TextField>();
     private Label warningLabel;
     private Button verifyButton;
+    private Button resendButton;
+    private Label resendTimeLabel;
+    private Label resendTextLabel;
 
     private const string otpBoxClass = "otp-box";
     private const string otpErrorClass = "otp-box-error";
     private const string warningMessage = "Invalid OTP. Please try again.";
-    
-    
-    private void Awake()
+
+    private Coroutine timerCoroutine;
+    private readonly int countdownSeconds = 120;
+
+    private void OnEnable()
     {
+        baseURL = baseScript.baseURL;
         var root = uiDocument.rootVisualElement;
+
         for (int i = 0; i < 6; i++)
         {
             var field = root.Q<TextField>($"otp-{i}");
@@ -51,15 +61,97 @@ public class OTPSCreenPassword : MonoBehaviour
             }
         }
 
+        resendTextLabel = root.Q<Label>("ResendOTPText");
+        resendTimeLabel = root.Q<Label>("ResendOTPTimer");
         warningLabel = root.Q<Label>("warningLabelRole");
         verifyButton = root.Q<Button>("verfiyOTP");
+        resendButton = root.Q<Button>("ResendOTPButton");
 
         if (verifyButton != null)
         {
             verifyButton.clicked += HandleVerifyClicked;
         }
 
+        if (resendButton != null)
+        {
+            resendButton.clicked += () =>
+            {
+                ResendOTP();
+                StartTimer();
+            };
+        }
+
         ResetOtpUI();
+        StartTimer(); // Start timer on screen enable
+    }
+
+    private void StartTimer()
+    {
+        if (timerCoroutine != null)
+        {
+            StopCoroutine(timerCoroutine);
+        }
+
+        resendButton.style.display = DisplayStyle.None;
+        timerCoroutine = StartCoroutine(TimerCountdown(countdownSeconds));
+    }
+
+    private IEnumerator TimerCountdown(int totalSeconds)
+    {
+        int secondsRemaining = totalSeconds;
+
+        while (secondsRemaining > 0)
+        {
+            int minutes = secondsRemaining / 60;
+            int seconds = secondsRemaining % 60;
+            resendTimeLabel.text = $"{minutes:00}:{seconds:00}";
+            yield return new WaitForSeconds(1f);
+            secondsRemaining--;
+        }
+
+        resendTimeLabel.text = "00:00";
+        resendButton.style.display = DisplayStyle.Flex;
+    }
+
+    private IEnumerator SendOtpRequest(string email)
+    {
+        string payload = $"{{\"email\":\"{email}\"}}";
+        var request = new UnityWebRequest(baseURL + sendOtpEndPoint, "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(payload);
+
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("OTP sent successfully.");
+        }
+        else
+        {
+            if (request.result == UnityWebRequest.Result.ConnectionError)
+                warningLabel.text = "Connection error. Please check your internet.";
+            else if (request.result == UnityWebRequest.Result.ProtocolError)
+                warningLabel.text = "Server error. Please try again.";
+            else
+                warningLabel.text = "Something went wrong. Try again.";
+        }
+
+        request.Dispose();
+    }
+
+    private void ResendOTP()
+    {
+        if (!string.IsNullOrEmpty(PasswordResetSession.Email))
+        {
+            StartCoroutine(SendOtpRequest(PasswordResetSession.Email));
+        }
+        else
+        {
+            warningLabel.text = "Unable to resend OTP. Please restart the process.";
+        }
     }
 
     private void HandleVerifyClicked()
@@ -69,8 +161,6 @@ public class OTPSCreenPassword : MonoBehaviour
         {
             otp += field.value;
         }
-
-        Debug.Log("Entered OTP: " + otp);
 
         if (otp.Length == 6)
         {
@@ -84,160 +174,92 @@ public class OTPSCreenPassword : MonoBehaviour
     }
 
     private IEnumerator VerifyOtpCoroutine(string otp)
-{
-    string finalURL = baseURL + verifyOtpEndPoint;
-    Debug.Log("Request URL: " + finalURL);
-    string email = PasswordResetSession.Email;
-    Debug.Log(email);
-
-    if (string.IsNullOrEmpty(email))
     {
-        Debug.LogError("Missing email. Cannot verify OTP.");
-        warningLabel.text = "Something went wrong. Please restart the process.";
-        yield break;
-    }
+        string email = PasswordResetSession.Email;
+        if (string.IsNullOrEmpty(email))
+        {
+            warningLabel.text = "Something went wrong. Please restart the process.";
+            yield break;
+        }
 
-    string jsonData = JsonUtility.ToJson(new OTPData(otp, email));
-    Debug.Log("Request payload: " + jsonData);
-
-    using (UnityWebRequest request = new UnityWebRequest(finalURL, "POST"))
-    {
-        request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonData));
+        string jsonData = JsonUtility.ToJson(new OTPData(otp, email));
+        var request = new UnityWebRequest(baseURL + verifyOtpEndPoint, "POST");
+        request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonData));
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
         yield return request.SendWebRequest();
 
-        Debug.Log("Request result: " + request.result);
-        Debug.Log("Response code: " + request.responseCode);
-        Debug.Log("Response text: " + request.downloadHandler.text);
-
         if (request.result == UnityWebRequest.Result.Success)
         {
             string responseText = request.downloadHandler.text;
-            Debug.Log("OTP Verified successfully: " + responseText);
-
             SetOtpErrorState(false);
             warningLabel.text = "";
 
             try
             {
-                // Method 1: Simple string-based check for success
-                if (responseText.Contains("\"success\":true") || responseText.Contains("\"success\": true"))
+                if (responseText.Contains("\"success\":true"))
                 {
-                    Debug.Log("Success field found in response");
-                    
-                    // Extract reset token using string methods
-                    string resetToken = ExtractResetToken(responseText);
-                    
-                    if (!string.IsNullOrEmpty(resetToken))
+                    string token = ExtractResetToken(responseText);
+                    if (!string.IsNullOrEmpty(token))
                     {
-                        PasswordResetSession.ResetToken = resetToken;
-                        Debug.Log("Reset token received: " + resetToken);
-                        UIManager.Instance.OpenScreen(UIScreenType.PasswordReset);
-                        yield break;
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Reset token not found in response");
-                    }
-                }
-
-                // Method 2: Try Unity's JsonUtility as fallback
-                try
-                {
-                    var response = JsonUtility.FromJson<OTPVerificationResponse>(responseText);
-                    if (response != null && response.success && !string.IsNullOrEmpty(response.resetToken))
-                    {
-                        PasswordResetSession.ResetToken = response.resetToken;
-                        Debug.Log("Reset token received via JsonUtility: " + response.resetToken);
+                        PasswordResetSession.ResetToken = token;
                         UIManager.Instance.OpenScreen(UIScreenType.PasswordReset);
                         yield break;
                     }
                 }
-                catch (System.Exception jsonUtilityException)
+
+                var jsonResponse = JsonUtility.FromJson<OTPVerificationResponse>(responseText);
+                if (jsonResponse != null && jsonResponse.success && !string.IsNullOrEmpty(jsonResponse.resetToken))
                 {
-                    Debug.Log("JsonUtility failed: " + jsonUtilityException.Message);
+                    PasswordResetSession.ResetToken = jsonResponse.resetToken;
+                    UIManager.Instance.OpenScreen(UIScreenType.PasswordReset);
+                    yield break;
                 }
 
-                // Method 3: Try MiniJSON as last resort
-                try
+                var miniJson = MiniJSON.JSON.Deserialize(responseText) as Dictionary<string, object>;
+                if (miniJson != null && miniJson.TryGetValue("resetToken", out object tokenObj))
                 {
-                    var response = MiniJSON.JSON.Deserialize(responseText) as Dictionary<string, object>;
-                    if (response != null && response.TryGetValue("resetToken", out object tokenObj))
-                    {
-                        PasswordResetSession.ResetToken = tokenObj.ToString();
-                        Debug.Log("Reset token received via MiniJSON: " + PasswordResetSession.ResetToken);
-                        UIManager.Instance.OpenScreen(UIScreenType.PasswordReset);
-                        yield break;
-                    }
-                }
-                catch (System.Exception miniJsonException)
-                {
-                    Debug.Log("MiniJSON failed: " + miniJsonException.Message);
+                    PasswordResetSession.ResetToken = tokenObj.ToString();
+                    UIManager.Instance.OpenScreen(UIScreenType.PasswordReset);
+                    yield break;
                 }
 
-                Debug.LogWarning("All parsing methods failed. Response: " + responseText);
                 warningLabel.text = "Unexpected response. Please try again.";
             }
-            catch (System.Exception e)
+            catch
             {
-                Debug.LogError("Error processing response: " + e.Message);
                 warningLabel.text = "Unable to process server response.";
             }
         }
         else
         {
-            Debug.LogError("OTP Verification failed: " + request.downloadHandler.text);
             SetOtpErrorState(true);
             warningLabel.text = warningMessage;
         }
-    }
-}
 
-// Helper method to extract reset token using string manipulation
-private string ExtractResetToken(string jsonResponse)
-{
-    try
+        request.Dispose();
+    }
+
+    private string ExtractResetToken(string jsonResponse)
     {
-        string pattern = "\"resetToken\"";
-        int tokenIndex = jsonResponse.IndexOf(pattern);
-        if (tokenIndex == -1) return null;
-        
-        // Find the value after resetToken
-        int colonIndex = jsonResponse.IndexOf(":", tokenIndex);
-        if (colonIndex == -1) return null;
-        
-        // Find the opening quote
-        int openQuoteIndex = jsonResponse.IndexOf("\"", colonIndex);
-        if (openQuoteIndex == -1) return null;
-        
-        // Find the closing quote
-        int closeQuoteIndex = jsonResponse.IndexOf("\"", openQuoteIndex + 1);
-        if (closeQuoteIndex == -1) return null;
-        
-        // Extract the token
-        string token = jsonResponse.Substring(openQuoteIndex + 1, closeQuoteIndex - openQuoteIndex - 1);
-        return token;
+        try
+        {
+            string pattern = "\"resetToken\"";
+            int tokenIndex = jsonResponse.IndexOf(pattern);
+            if (tokenIndex == -1) return null;
+
+            int colonIndex = jsonResponse.IndexOf(":", tokenIndex);
+            int openQuoteIndex = jsonResponse.IndexOf("\"", colonIndex);
+            int closeQuoteIndex = jsonResponse.IndexOf("\"", openQuoteIndex + 1);
+
+            return jsonResponse.Substring(openQuoteIndex + 1, closeQuoteIndex - openQuoteIndex - 1);
+        }
+        catch
+        {
+            return null;
+        }
     }
-    catch (System.Exception e)
-    {
-        Debug.LogError("Error extracting reset token: " + e.Message);
-        return null;
-    }
-}
-
-// Response class for JsonUtility
-[System.Serializable]
-public class OTPVerificationResponse
-{
-    public bool success;
-    public string message;
-    public string resetToken;
-}
-
-
-
 
     private void SetOtpErrorState(bool error)
     {
@@ -271,12 +293,14 @@ public class OTPVerificationResponse
     {
         public string otp;
         public string email;
-
-        public OTPData(string o, string e)
-        {
-            otp = o;
-            email = e;
-        }
+        public OTPData(string o, string e) { otp = o; email = e; }
     }
 
+    [System.Serializable]
+    public class OTPVerificationResponse
+    {
+        public bool success;
+        public string message;
+        public string resetToken;
+    }
 }

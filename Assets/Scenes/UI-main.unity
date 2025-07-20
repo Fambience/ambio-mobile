@@ -700,7 +700,7 @@ GameObject:
   m_Component:
   - component: {fileID: 778476176}
   m_Layer: 0
-  m_Name: Onboarding
+  m_Name: Onboarding Screens
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -728,7 +728,6 @@ Transform:
   - {fileID: 1717646519}
   - {fileID: 1209480913}
   - {fileID: 1197045779}
-  - {fileID: 2076168901}
   - {fileID: 62952976}
   - {fileID: 241816156}
   - {fileID: 755938074}
@@ -808,6 +807,8 @@ MonoBehaviour:
     screenObject: {fileID: 1899570902}
   - screenType: 18
     screenObject: {fileID: 1957634424}
+  - screenType: 18
+    screenObject: {fileID: 1957634424}
 --- !u!4 &854714332
 Transform:
   m_ObjectHideFlags: 0
@@ -855,9 +856,9 @@ Transform:
   - {fileID: 1850489382}
   - {fileID: 484351385}
   - {fileID: 1816956113}
-  - {fileID: 1961917873}
   - {fileID: 46986293}
   - {fileID: 52741822}
+  - {fileID: 1961917873}
   - {fileID: 601782151}
   - {fileID: 324420196}
   m_Father: {fileID: 0}
@@ -1447,6 +1448,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 778476176}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1913344320
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1913344321}
+  m_Layer: 0
+  m_Name: MainScreens
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1913344321
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1913344320}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2076168901}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1940906656
 GameObject:
   m_ObjectHideFlags: 0
@@ -1836,7 +1869,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 778476176}
+  m_Father: {fileID: 1913344321}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2076168902
 MonoBehaviour:
@@ -1952,3 +1985,4 @@ SceneRoots:
   - {fileID: 854714332}
   - {fileID: 1119881445}
   - {fileID: 778476176}
+  - {fileID: 1913344321}
