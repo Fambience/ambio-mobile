@@ -156,9 +156,30 @@
     opacity: 0;          /* 👈 Smooth transition if needed */
     transition: opacity 0.3s ease;
 }
+
 .warning-text.show {
     visibility: visible;
     opacity: 1;
 }
+
+.resendText{
+    margin-top: 80px;
+    flex-direction: row;
+}
+
 .ResendOtpText{
+    font-size: 35px;
+}
+
+.ResendOtpTimer{
+    font-size: 35px;
+    -unity-font-style: bold;
+}
+
+.ResendOTPButton{
+    font-size: 35px;
+    border-width: 0;
+    -unity-font-style: bold;
+    color: #6B3629;
+    background-color: transparent;
 }
