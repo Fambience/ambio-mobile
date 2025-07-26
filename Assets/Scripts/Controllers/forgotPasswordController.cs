@@ -103,7 +103,7 @@ private IEnumerator SendOtpRequest(string email)
             if (responseText.Contains("\"success\":true") || responseText.Contains("\"success\": true"))
             {
                 Debug.Log("SUCCESS! (String check) OTP sent successfully. Navigating to OTP screen.");
-                PasswordResetSession.Email = email;
+                UserData.Email = email;
                 UIManager.Instance.OpenScreen(UIScreenType.PasswordOTP);
                 request.Dispose();
                 yield break;
@@ -116,7 +116,7 @@ private IEnumerator SendOtpRequest(string email)
                 if (simpleResponse != null && simpleResponse.success)
                 {
                     Debug.Log("SUCCESS! (JsonUtility) OTP sent successfully. Navigating to OTP screen.");
-                    PasswordResetSession.Email = email;
+                    UserData.Email = email;
                     UIManager.Instance.OpenScreen(UIScreenType.PasswordOTP);
                     request.Dispose();
                     yield break;
@@ -131,7 +131,7 @@ private IEnumerator SendOtpRequest(string email)
             if (ParseSuccessManually(responseText))
             {
                 Debug.Log("SUCCESS! (Manual parsing) OTP sent successfully. Navigating to OTP screen.");
-                PasswordResetSession.Email = email;
+                UserData.Email = email;
                 UIManager.Instance.OpenScreen(UIScreenType.PasswordOTP);
                 request.Dispose();
                 yield break;

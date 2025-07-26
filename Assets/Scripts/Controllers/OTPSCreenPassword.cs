@@ -144,9 +144,9 @@ public class OTPSCreenPassword : MonoBehaviour
 
     private void ResendOTP()
     {
-        if (!string.IsNullOrEmpty(PasswordResetSession.Email))
+        if (!string.IsNullOrEmpty(UserData.Email))
         {
-            StartCoroutine(SendOtpRequest(PasswordResetSession.Email));
+            StartCoroutine(SendOtpRequest(UserData.Email));
         }
         else
         {
@@ -175,7 +175,7 @@ public class OTPSCreenPassword : MonoBehaviour
 
     private IEnumerator VerifyOtpCoroutine(string otp)
     {
-        string email = PasswordResetSession.Email;
+        string email = UserData.Email;
         if (string.IsNullOrEmpty(email))
         {
             warningLabel.text = "Something went wrong. Please restart the process.";
@@ -203,7 +203,7 @@ public class OTPSCreenPassword : MonoBehaviour
                     string token = ExtractResetToken(responseText);
                     if (!string.IsNullOrEmpty(token))
                     {
-                        PasswordResetSession.ResetToken = token;
+                        UserData.ResetToken = token;
                         UIManager.Instance.OpenScreen(UIScreenType.PasswordReset);
                         yield break;
                     }
@@ -212,7 +212,7 @@ public class OTPSCreenPassword : MonoBehaviour
                 var jsonResponse = JsonUtility.FromJson<OTPVerificationResponse>(responseText);
                 if (jsonResponse != null && jsonResponse.success && !string.IsNullOrEmpty(jsonResponse.resetToken))
                 {
-                    PasswordResetSession.ResetToken = jsonResponse.resetToken;
+                    UserData.ResetToken = jsonResponse.resetToken;
                     UIManager.Instance.OpenScreen(UIScreenType.PasswordReset);
                     yield break;
                 }
@@ -220,7 +220,7 @@ public class OTPSCreenPassword : MonoBehaviour
                 var miniJson = MiniJSON.JSON.Deserialize(responseText) as Dictionary<string, object>;
                 if (miniJson != null && miniJson.TryGetValue("resetToken", out object tokenObj))
                 {
-                    PasswordResetSession.ResetToken = tokenObj.ToString();
+                    UserData.ResetToken = tokenObj.ToString();
                     UIManager.Instance.OpenScreen(UIScreenType.PasswordReset);
                     yield break;
                 }

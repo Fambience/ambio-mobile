@@ -13,7 +13,6 @@ public class LoginHandler : MonoBehaviour
 
     [Header("External References")]
     public Register register;
-    public UserProfileManager userProfileManager;
     public VisualTreeAsset registerUXMLAsset;
 
     private VisualElement loginScreen;
@@ -40,6 +39,8 @@ public class LoginHandler : MonoBehaviour
     private string loginEndPoint = "/api/v1/auth/login";
     private string sendOtpEndPoint = "/api/v1/user/trigger-otp";
 
+    public GameObject scriptHandler;
+
     private bool isPasswordVisible = false;
     
     private void OnEnable()
@@ -54,7 +55,7 @@ public class LoginHandler : MonoBehaviour
 
         // Ensure password field is initially hidden
         passwordField.isPasswordField = true;
-        
+        scriptHandler.SetActive(false);   
         // Initialize eye icon to show the correct initial state
         eyeIcon.style.backgroundImage = new StyleBackground(Resources.Load<Texture2D>("eye-off-outline"));
 
@@ -206,13 +207,11 @@ public class LoginHandler : MonoBehaviour
             var response = JsonUtility.FromJson<LoginResponse>(request.downloadHandler.text);
             string token = response.token;
 
-            AuthTokenManager.SetToken(token);
+                AuthTokenManager.SetToken(token);
             userEmail = email;
-
-            PasswordResetSession.Email = email;
-            PlayerPrefs.SetString("role", response.data.role);
-            PlayerPrefs.Save();
-			Debug.Log("Role : " + response.data.role);
+            scriptHandler.SetActive(true);
+            UserData.Email = email;
+            UserData.Role = response.data.role;
             HandleLoginStage(response);
         }
         SetUIInteractable(true);
@@ -249,8 +248,7 @@ public class LoginHandler : MonoBehaviour
 
                 case "ONBOARDING_COMPLETED":
                     if (!string.IsNullOrEmpty(response.token))
-                        userProfileManager.InitializeProfile(response.token);
-                    UIManager.Instance.OpenScreen(UIScreenType.Home);
+                        UIManager.Instance.OpenScreen(UIScreenType.Home);
                     break;
 
                 case "BASIC_DETAILS":
@@ -279,8 +277,7 @@ public class LoginHandler : MonoBehaviour
 
                case "ONBOARDING_COMPLETED":
                    if (!string.IsNullOrEmpty(response.token))
-                       userProfileManager.InitializeProfile(response.token);
-                   UIManager.Instance.OpenScreen(UIScreenType.Home);
+                       UIManager.Instance.OpenScreen(UIScreenType.Home);
                    break;
 
                case "BASIC_DETAILS":

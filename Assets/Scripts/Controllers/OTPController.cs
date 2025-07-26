@@ -111,9 +111,9 @@ public class OTPController : MonoBehaviour
 
     private void ResendOTP()
     {
-        if (!string.IsNullOrEmpty(PasswordResetSession.Email))
+        if (!string.IsNullOrEmpty(UserData.Email))
         {
-            StartCoroutine(SendOtpCoroutine(PasswordResetSession.Email));
+            StartCoroutine(SendOtpCoroutine(UserData.Email));
         }
         else
         {

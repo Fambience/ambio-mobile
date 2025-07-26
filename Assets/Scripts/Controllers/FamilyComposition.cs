@@ -125,24 +125,47 @@ public class FamilyComposition : MonoBehaviour
         AddIfNotEmpty("firstName", OnboardingData.FirstName);
         AddIfNotEmpty("lastName", OnboardingData.LastName);
         AddIfNotEmpty("homeLocation", OnboardingData.HomeLocation);
-        AddIfNotEmpty("colorScheme", OnboardingData.ColorScheme);
+
+        // Validate color scheme
+        var filteredColorSchemes = OnboardingData.ColorScheme?
+            .Where(cs => OnboardingEnumValidator.ColorSchemes.Contains(cs))
+            .ToList();
+        AddIfNotEmpty("colorScheme", filteredColorSchemes);
+
         AddIfNotEmpty("homeSharingWith", OnboardingData.HomeSharingWith);
         if (OnboardingData.BudgetMin > 0) payload["minBudget"] = OnboardingData.BudgetMin;
         if (OnboardingData.BudgetMax > 0) payload["maxBudget"] = OnboardingData.BudgetMax;
 
+        // Validate and add design inspirations
         if (OnboardingData.DesignInspoScreen1?.Count > 0 || OnboardingData.DesignInspoScreen2?.Count > 0)
         {
             var designMap = new Dictionary<string, List<string>>();
-            if (OnboardingData.DesignInspoScreen1?.Count > 0)
-                designMap["CREATIVE_AND_CHARACTERFUL"] = OnboardingData.DesignInspoScreen1;
-            if (OnboardingData.DesignInspoScreen2?.Count > 0)
-                designMap["MODERN_AND_MINIMAL"] = OnboardingData.DesignInspoScreen2;
 
-            payload["designInspirations"] = designMap;
+            if (OnboardingData.DesignInspoScreen1?.Count > 0)
+            {
+                var filteredCreative = OnboardingData.DesignInspoScreen1
+                    .Where(style => OnboardingEnumValidator.CreativeStyles.Contains(style))
+                    .ToList();
+
+                if (filteredCreative.Count > 0)
+                    designMap["CREATIVE_AND_CHARACTERFUL"] = filteredCreative;
+            }
+
+            if (OnboardingData.DesignInspoScreen2?.Count > 0)
+            {
+                var filteredModern = OnboardingData.DesignInspoScreen2
+                    .Where(style => OnboardingEnumValidator.ModernStyles.Contains(style))
+                    .ToList();
+
+                if (filteredModern.Count > 0)
+                    designMap["MODERN_AND_MINIMAL"] = filteredModern;
+            }
+
+            if (designMap.Count > 0)
+                payload["designInspirations"] = designMap;
         }
 
         string json = JSON.Serialize(payload);
-
         Debug.Log("Submitting onboarding payload: " + json);
 
         using (UnityWebRequest request = new UnityWebRequest(baseURL + onboardingEndpoint, "POST"))

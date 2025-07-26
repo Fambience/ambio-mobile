@@ -65,7 +65,7 @@ public class SetNewPasswordScreenController : MonoBehaviour
         string endpoint = "/api/v1/auth/password/reset";
         string fullUrl = baseUrl + endpoint;
 
-        string resetToken = PasswordResetSession.ResetToken;
+        string resetToken = UserData.ResetToken;
         if (string.IsNullOrEmpty(resetToken))
         {
             globalWarningLabel.text = "Missing token. Please restart.";
