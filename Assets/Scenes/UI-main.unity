@@ -1147,6 +1147,9 @@ MonoBehaviour:
   totalRows: 10
   postsPerRow: 3
   filterPopupVisualTree: {fileID: 9197481963319205126, guid: e83d6bbbfb53948fd891c911ab9dd22a, type: 3}
+  pullThreshold: 100
+  refreshIndicatorSize: 50
+  refreshDuration: 3
 --- !u!1 &1119881444
 GameObject:
   m_ObjectHideFlags: 0
