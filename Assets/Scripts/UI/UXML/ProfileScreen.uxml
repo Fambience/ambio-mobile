@@ -1,94 +1,66 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/USS/ProfileScreen.uss?fileID=7433441132597879392&amp;guid=07ce4fa39b1da4ae48f3756b2392cf7a&amp;type=3#ProfileScreen" />
-
     <ui:VisualElement name="profileScreen" class="profile-container">
         <ui:VisualElement name="profileHeader" class="profile-header">
             <ui:TextElement text="Profile" class="title" />
             <ui:Image name="settings" class="setting-icon" />
         </ui:VisualElement>
-
         <ui:ScrollView name="scroll-container" class="scrollView">
             <ui:VisualElement name="profileSection" class="profile-section">
-
                 <ui:VisualElement name="profilePhoto" class="profile-photo">
                     <ui:VisualElement name="profilePhotoBG" class="profile-photoBG">
                         <ui:Image name="profilePic" class="profile-pic" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-
-                <!-- Updated to match controller expectations -->
-                <ui:Label text="Krishna Yadav" name="fullName" class="userName" />
-                <ui:Label text="Location" name="location" class="location" />
-                <ui:Label text="Stats" name="stats" class="stats" />
-
-                <!-- Designer Fields -->
-                <ui:VisualElement name="designerFields" class="profile-fields">
-                    <ui:VisualElement name="designerTag" class="interiorDesignerTag">
-                        <ui:TextElement text="Interior Designer" name="profileTag" class="creatorTitle" />
+                <ui:TextElement text="Krishna Yadav" name="userName" class="userName" />
+                <ui:VisualElement name="designerTag" class="interiorDesignerTag">
+                    <ui:TextElement text="Interior Designer" name="profileTag" class="creatorTitle" />
+                </ui:VisualElement>
+                <ui:TextElement text="Creating beautiful spaces that inspire and delight" name="profileTag" class="creator-tag-line" />
+                <ui:VisualElement name="profile-stats" class="profile-stats">
+                    <ui:VisualElement name="profile-following" class="profile-overview">
+                        <ui:TextElement text="69" name="followingCount" class="profile-overview-count" />
+                        <ui:TextElement text="Following" class="profile-stats-title" />
                     </ui:VisualElement>
-
-                    <!-- Creator-specific labels -->
-                    <ui:Label text="Creating beautiful spaces that inspire and delight" name="creatorTagline" class="creator-tag-line" />
-                    <ui:Label text="Interior Designer" name="creatorType" class="creator-type" />
-                    <ui:Label text="www.example.com" name="creatorWebsite" class="creator-website" />
-                    <ui:Label text="Region" name="creatorRegion" class="creator-region" />
-                    <ui:Label text="Socials" name="creatorSocials" class="creator-socials" />
-
-                    <ui:VisualElement name="profile-stats" class="profile-stats">
-                        <ui:VisualElement name="profile-following" class="profile-overview">
-                            <ui:TextElement text="69" name="followingCount" class="profile-overview-count" />
-                            <ui:TextElement text="Following" class="profile-stats-title" />
-                        </ui:VisualElement>
-
-                        <ui:VisualElement name="profile-follower" class="profile-overview">
-                            <ui:TextElement text="69" name="followerCount" class="profile-overview-count" />
-                            <ui:TextElement text="Followers" class="profile-stats-title" />
-                        </ui:VisualElement>
-
-                        <ui:VisualElement name="profile-post" class="profile-overview">
-                            <ui:TextElement text="69" name="postCount" class="profile-overview-count" />
-                            <ui:TextElement text="Posts" class="profile-stats-title" />
-                        </ui:VisualElement>
+                    <ui:VisualElement name="profile-follower" class="profile-overview">
+                        <ui:TextElement text="69" name="followerCount" class="profile-overview-count" />
+                        <ui:TextElement text="Followers" class="profile-stats-title" />
                     </ui:VisualElement>
-
-                    <ui:VisualElement name="tabBar" class="tab-bar">
-                        <ui:VisualElement class="tab-button selected">
-                            <ui:Button name="designsTab" class="button" text="Designs" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="tab-button">
-                            <ui:Button name="savedTab" class="button" text="Saved" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="tab-button">
-                            <ui:Button name="aboutTab" class="button" text="About" />
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-
-                    <ui:VisualElement name="aboutContent" class="about-content" style="display: none;">
-                        <ui:VisualElement name="aboutCard" class="about-card">
-                            <ui:TextElement text="About Me" class="about-title" />
-                            <ui:TextElement text="Interior designer with over 5 years of experience creating beautiful, functional spaces. Specializing in minimalist and Scandinavian design aesthetics with a focus on sustainability and natural materials." class="about-description" />
-                        </ui:VisualElement>
-
-                        <ui:VisualElement name="experienceCard" class="experience-card">
-                            <ui:TextElement text="Experience" class="about-title" />
-                            <ui:TextElement text="5 years" class="total-experience" />
-                        </ui:VisualElement>
-
-                        <ui:VisualElement name="contactCard" class="contact-card">
-                            <ui:TextElement text="Contact" class="about-title" />
-                            <ui:TextElement text="www.google.com" class="contact-links" />
-                        </ui:VisualElement>
+                    <ui:VisualElement name="profile-post" class="profile-overview">
+                        <ui:TextElement text="69" name="postCount" class="profile-overview-count" />
+                        <ui:TextElement text="Posts" class="profile-stats-title" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-
-                <!-- User Fields -->
-                <ui:VisualElement name="userFields" class="profile-fields" style="display: none;">
-                    <ui:Label text="Budget" name="userBudget" class="user-budget" />
-                    <ui:Label text="Color Scheme" name="userColorScheme" class="user-color-scheme" />
-                    <ui:Label text="Home Sharing" name="userSharing" class="user-sharing" />
-                    <ui:Label text="Design Inspiration" name="userDesignInspiration" class="user-design-inspiration" />
+                <ui:VisualElement name="tabBar" class="tab-bar">
+                    <ui:VisualElement class="tab-button selected">
+                        <!-- <ui:Image class="gridIcon" /> -->
+                        <ui:Button name="designsTab" class="button" text="Designs"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tab-button">
+                        <!-- <ui:Image class="savedIcon" /> -->
+                        <ui:Button name="savedTab" class="button" text="Saved"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tab-button">
+                        <!-- <ui:Image class="aboutIcon" /> -->
+                        <ui:Button name="aboutTab" class="button" text="About"/>
+                    </ui:VisualElement>
                 </ui:VisualElement>
-
+                
+                <!-- About section -->
+                <ui:VisualElement name="aboutContent" class="about-content" style="display: none;">
+                    <ui:VisualElement name="aboutCard" class="about-card">
+                        <ui:TextElement text="About Me" class="about-title" />
+                        <ui:TextElement text="Interior designer with over 5 years of experience creating beautiful, functional spaces. Specializing in minimalist and Scandinavian design aesthetics with a focus on sustainability and natural materials." class="about-description" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="experienceCard" class="experience-card">
+                        <ui:TextElement text="Experience" class="about-title" />
+                        <ui:TextElement text="5 yeards" class="total-experience" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="contactCard" class="contact-card">
+                        <ui:TextElement text="Contact" class="about-title" />
+                        <ui:TextElement text="www.google.com" class="contact-links" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:ScrollView>
     </ui:VisualElement>

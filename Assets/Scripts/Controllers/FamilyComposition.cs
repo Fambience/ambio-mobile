@@ -27,6 +27,16 @@ public class FamilyComposition : MonoBehaviour
         InitializeUI();
         SetupEventListeners();
         UpdateCompleteButtonState();
+        Debug.Log("📥 Entered FamilyComposition screen");
+
+        if (OnboardingData.ColorScheme == null)
+        {
+            Debug.LogError("❌ ColorScheme is null on FamilyComposition!");
+        }
+        else
+        {
+            Debug.Log($"✅ ColorScheme received in FamilyComposition: {string.Join(",", OnboardingData.ColorScheme)}");
+        }
     }
 
     void InitializeUI()

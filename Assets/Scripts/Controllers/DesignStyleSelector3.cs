@@ -98,22 +98,24 @@ public class DesignStyleSelector3 : MonoBehaviour
 
     void OnStyleButtonClicked(Button clickedButton)
     {
+        Debug.Log($"🎯 Style button clicked: {clickedButton.name}");
+
         bool isCurrentlySelected = buttonSelectionState[clickedButton];
 
         if (isCurrentlySelected)
         {
-            // Deselect if clicking the same button
+            Debug.Log("🔁 Re-clicked same button: Deselecting");
             DeselectButton(clickedButton);
         }
         else
         {
-            // Deselect previously selected button if any
             if (selectedButton != null)
             {
+                Debug.Log($"🔄 Deselecting previously selected: {selectedButton.name}");
                 DeselectButton(selectedButton);
             }
-            
-            // Select the new button
+
+            Debug.Log($"✅ Selecting new button: {clickedButton.name}");
             SelectButton(clickedButton);
         }
 
@@ -176,14 +178,21 @@ public class DesignStyleSelector3 : MonoBehaviour
 
     void OnNextButtonClicked()
     {
+        Debug.Log("✅ OnNextButtonClicked called");
+
         if (selectedButton == null)
         {
+            Debug.LogWarning("⚠️ No button selected when Next was clicked");
             warningLabel.text = "Please select a color scheme!";
             ShowWarning();
             return;
         }
 
+        Debug.Log($"📌 SelectedButton: {selectedButton.name}");
         StoreSelectedStyle();
+
+        Debug.Log($"➡️ Navigating to Family screen with ColorScheme: {string.Join(",", OnboardingData.ColorScheme ?? new List<string> { "null" })}");
+
         UIManager.Instance.OpenScreen(UIScreenType.Family);
     }
     
@@ -203,11 +212,16 @@ public class DesignStyleSelector3 : MonoBehaviour
 
     void StoreSelectedStyle()
     {
+        Debug.Log("🧠 StoreSelectedStyle called");
+
         if (selectedButton != null && buttonStyleNames.TryGetValue(selectedButton, out string selectedStyleName))
         {
-            // Normalize the style name for backend format: CALM, WARM, etc.
             OnboardingData.ColorScheme = new List<string> { selectedStyleName.ToUpper() };
-            Debug.Log($"Color scheme saved to OnboardingData: {OnboardingData.ColorScheme}");
+            Debug.Log($"✅ Color scheme saved to OnboardingData: {string.Join(",", OnboardingData.ColorScheme)}");
+        }
+        else
+        {
+            Debug.LogError("❌ Failed to store color scheme: selectedButton or mapping missing");
         }
     }
 
