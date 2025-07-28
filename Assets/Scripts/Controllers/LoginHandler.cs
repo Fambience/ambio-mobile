@@ -288,6 +288,22 @@ public class LoginHandler : MonoBehaviour
                    Debug.LogError("Unknown onboarding state.");
                    break;
             }
+        }else if (response.data.role == "DEFAULT")
+        {
+            switch (response.data.onboardingState)
+            {
+                case "BASIC_DETAILS":
+                    UIManager.Instance.OpenScreen(UIScreenType.BasicDetails);
+                    break;
+                
+                case "VERIFY_EMAIL":
+                    sendOTPFunc(userEmail);
+                    break;
+
+                default:
+                    Debug.LogError("Unknown onboarding state.");
+                    break;   
+            }
         }
     }
 
