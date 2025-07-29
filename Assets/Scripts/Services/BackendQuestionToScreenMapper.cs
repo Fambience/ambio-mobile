@@ -20,6 +20,7 @@ public static class BackendQuestionToScreenMapper
     {
         { BackendQuestion.Q_FIRST_NAME, UIScreenType.CreatorBasicDetails },
         { BackendQuestion.Q_LAST_NAME, UIScreenType.CreatorBasicDetails },
+        {BackendQuestion.Q_NAME, UIScreenType.CreatorBasicDetails},
         { BackendQuestion.Q_REGION, UIScreenType.CreatorLocation },
         { BackendQuestion.Q_CREATOR_TYPE, UIScreenType.CreatorType },
         { BackendQuestion.Q_YEARS_OF_EXPERIENCE, UIScreenType.CeatorExperience },

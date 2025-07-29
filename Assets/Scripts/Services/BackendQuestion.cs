@@ -15,6 +15,7 @@
         Q_YEARS_OF_EXPERIENCE,
         Q_TAGLINE,
         Q_SOCIALS,
-        Q_WEBSITE
+        Q_WEBSITE,
+        Q_NAME
     }
 }
