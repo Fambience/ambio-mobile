@@ -110,7 +110,6 @@ public class SocialLinksController : MonoBehaviour
             {  "yearsOfExperience", OnboardingData.YearsOfExperience > 0 ? OnboardingData.YearsOfExperience : null },
             { "tagline", string.IsNullOrWhiteSpace(OnboardingData.Tagline) ? null : OnboardingData.Tagline },
             { "socials", OnboardingData.SocialLinks?.Values?.ToList() ?? new List<string>() },
-            { "occupation", string.IsNullOrWhiteSpace(OnboardingData.Occupation) ? null : OnboardingData.Occupation },
             { "website", string.IsNullOrWhiteSpace(OnboardingData.Website) ? null : OnboardingData.Website }
         };
 
