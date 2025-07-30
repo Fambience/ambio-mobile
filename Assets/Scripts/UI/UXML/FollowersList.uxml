@@ -1,0 +1,13 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/FollowersList.uss?fileID=7433441132597879392&amp;guid=51a5cc08316d84c50926a0a89c50810e&amp;type=3#FollowersList" />
+    <ui:VisualElement name="main-container" class="main-container">
+        <ui:VisualElement name="tabBar" class="tab-bar">
+            <ui:VisualElement class="tab-button selected">
+                <ui:Button name="followersTab" class="button" text="Followers"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="tab-button">
+                <ui:Button name="followingTab" class="button" text="Following"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

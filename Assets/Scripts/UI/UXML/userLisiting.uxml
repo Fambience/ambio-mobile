@@ -1,0 +1,15 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/userListing.uss?fileID=7433441132597879392&amp;guid=6424540ccb1f14acaaf06e892017a26e&amp;type=3#userListing" />
+    <ui:VisualElement name="main-container" class="main-container">
+        <ui:VisualElement name="sub-container" class="sub-container">
+            <ui:Image name="designerIcon" class="designer-icon" />
+            <ui:VisualElement name="userDetails" class="user-details">
+                <ui:TextElement name="designerUID" class="designer-uid" text="pixelperfectstudio"/>
+                <ui:VisualElement name="userBasicDetail" class="user-basic-details">
+                    <ui:TextElement name="designerName" class="designer-name" text="Himanshu Mahto"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="followStatus" class="follow-status" text="Follow"/>
+    </ui:VisualElement>
+</ui:UXML>
