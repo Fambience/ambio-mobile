@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 using MiniJSON;
 using Services;
 
-public class ProfileDataHandlers : MonoBehaviour
+public partial class ProfileDataHandlers : MonoBehaviour
 {
     public static ProfileDataHandlers Instance { get; private set; }
 
@@ -41,6 +41,8 @@ public class ProfileDataHandlers : MonoBehaviour
                 Debug.LogWarning("[ProfileDataHandlers] Failed to fetch profile data.");
             }
         }));
+        StartCoroutine(FetchMyFollowersList());
+        StartCoroutine(FetchMyFollowingList());
     }
 
     public IEnumerator FetchProfileData(string authToken, Action<bool> onComplete)
@@ -440,5 +442,117 @@ public class ProfileCache
             {"followingCount", followingCount},
             {"postCount", postCount}
         };
+    }
+}
+public class ProfileUserLite
+{
+    public string userId;
+    public string firstName;
+    public string lastName;
+    public string userName;
+    public string avatar;
+}
+
+public partial class ProfileDataHandlers : MonoBehaviour
+{
+    public static List<ProfileUserLite> FollowersList = new();
+    public static List<ProfileUserLite> FollowingList = new();
+
+    public string baseURL = baseScript.baseURL;
+
+    public IEnumerator FetchMyFollowersList(Action onComplete = null)
+    {
+        string token = AuthTokenManager.GetToken();
+        if (string.IsNullOrEmpty(token))
+        {
+            Debug.LogError("[Followers] Token missing.");
+            yield break;
+        }
+
+        string followersURL = $"{baseURL}/api/v1/profile/{UserData.userName}/followers";
+        UnityWebRequest req = UnityWebRequest.Get(followersURL);
+        req.SetRequestHeader("Authorization", $"Bearer {token}");
+        yield return req.SendWebRequest();
+
+        if (req.result == UnityWebRequest.Result.Success)
+        {
+            FollowersList.Clear();
+
+            var json = req.downloadHandler.text;
+            var parsed = JSON.Deserialize(json) as Dictionary<string, object>;
+            if (parsed != null && parsed.TryGetValue("data", out var dataObj))
+            {
+                var list = dataObj as List<object>;
+                foreach (var item in list)
+                {
+                    var dict = item as Dictionary<string, object>;
+                    var u = new ProfileUserLite
+                    {
+                        userId = dict.ContainsKey("userId") ? dict["userId"].ToString() : "",
+                        firstName = dict.ContainsKey("firstName") ? dict["firstName"].ToString() : "",
+                        lastName = dict.ContainsKey("lastName") ? dict["lastName"].ToString() : "",
+                        userName = dict.ContainsKey("userName") ? dict["userName"].ToString() : "",
+                        avatar = dict.ContainsKey("avatar") && dict["avatar"] != null ? dict["avatar"].ToString() : ""
+                    };
+
+                    FollowersList.Add(u);
+                }
+                Debug.Log($"[Followers] Cached {FollowersList.Count} users.");
+            }
+        }
+        else
+        {
+            Debug.LogError("[Followers] Error: " + req.error);
+        }
+
+        onComplete?.Invoke();
+    }
+
+    public IEnumerator FetchMyFollowingList(Action onComplete = null)
+    {
+        string token = AuthTokenManager.GetToken();
+        if (string.IsNullOrEmpty(token))
+        {
+            Debug.LogError("[Following] Token missing.");
+            yield break;
+        }
+
+        string followingURL = $"{baseURL}/api/v1/profile/{UserData.userName}/following";
+        UnityWebRequest req = UnityWebRequest.Get(followingURL);
+        req.SetRequestHeader("Authorization", $"Bearer {token}");
+        yield return req.SendWebRequest();
+
+        if (req.result == UnityWebRequest.Result.Success)
+        {
+            FollowingList.Clear();
+
+            var json = req.downloadHandler.text;
+            var parsed = JSON.Deserialize(json) as Dictionary<string, object>;
+            if (parsed != null && parsed.TryGetValue("data", out var dataObj))
+            {
+                var list = dataObj as List<object>;
+                foreach (var item in list)
+                {
+                    var dict = item as Dictionary<string, object>;
+                    var u = new ProfileUserLite
+                    {
+                        userId = dict.ContainsKey("userId") ? dict["userId"].ToString() : "",
+                        firstName = dict.ContainsKey("firstName") ? dict["firstName"].ToString() : "",
+                        lastName = dict.ContainsKey("lastName") ? dict["lastName"].ToString() : "",
+                        userName = dict.ContainsKey("userName") ? dict["userName"].ToString() : "",
+                        avatar = dict.ContainsKey("avatar") && dict["avatar"] != null ? dict["avatar"].ToString() : ""
+                    };
+
+                    FollowingList.Add(u);
+                }
+                Debug.Log($"[Following] Cached {FollowingList.Count} users.");
+            }
+        }
+        else
+        {
+            Debug.LogError("[Following] Error: " + req.error);
+        }
+
+        onComplete?.Invoke();
     }
 }
