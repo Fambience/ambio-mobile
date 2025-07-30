@@ -606,6 +606,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35304e3d6165a4746bbd98b8b5529b0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseURL: https://ambiobackend-stage.onrender.com
 --- !u!1 &601782149
 GameObject:
   m_ObjectHideFlags: 0
