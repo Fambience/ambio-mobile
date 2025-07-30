@@ -5,4 +5,6 @@ public static class baseScript
     
     public static string baseURL ="https://ambiobackend-stage.onrender.com";
     public static string profileEndpoint = "/api/v1/profile/me";
+    public static string followersEndpoint = "/api/v1/profile/followers";
+    public static string followingEndpoint = "/api/v1/profile/following";
 }
