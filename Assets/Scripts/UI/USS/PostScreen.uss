@@ -1,0 +1,222 @@
+.main-container {
+    flex-direction: column;
+    background-color: #F5F0ED;
+    height: 100%;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.header {
+    width: 100%;
+    margin-bottom: 32px;
+}
+
+.back-button {
+    width: 55px;
+    height: 55px;
+    background-color: transparent;
+    border-width: 0;
+    font-size: 18px;
+    color: #333333;
+    padding: 0;
+    justify-content: center;
+    margin-top: 13%;
+    align-items: center;
+    margin-left: 5%;
+}
+
+.back-icon {
+    width: 45px;
+    height: 45px;
+    background-image: resource("back-icon");
+    background-repeat: no-repeat;
+    background-size: contain;
+    scale: 2.5;
+}
+
+.content {
+    margin-top: 100px;
+}
+
+.card-header {
+    margin-left: 5%;
+    flex-direction: row;
+    align-self: auto;
+    align-content: auto;
+    align-items: center;
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
+
+.user-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-image: resource("userImage");
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.user-name {
+    font-size: 50px;
+    margin-left: 40px;
+    -unity-font-style: bold;
+    align-self: auto;
+    align-items: flex-start;
+}
+
+.card-body {
+    flex-direction: column;
+    align-self: center;
+    align-content: auto;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.description {
+    width: 90%;
+    font-size: 35px;
+    margin-bottom: 20px;
+}
+
+.card-image {
+    width: 100%;
+    height: 700px;
+    margin-top: 10px;
+    background-image: resource("Contemporary");
+}
+
+
+.icon-section {
+    width: 90%;
+    align-self: center;
+    margin-bottom: 30px;
+    margin-top: 40px;
+    flex-direction: row;
+}
+
+.inner-card-footer {
+    width: 80%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: auto;
+    align-content: center;
+}
+
+.inner-card-footer-2 {
+    width: 20%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    align-self: auto;
+    align-content: center;
+}
+
+.footer-icon{
+    width: 60px;
+    height: 60px;
+}
+
+.like{
+    background-image: resource("favourite");
+    margin-right: 50px;
+}
+
+.share{
+    background-image: resource("Share");
+}
+
+.bookmark{
+    background-image: resource("Bookmark");
+}
+
+.footer{
+    width: 100%;
+    background-color: #F5F0ED;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 100px;
+}
+
+.add-comment {
+    width: 95%;
+    height: 100px;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.comment {
+    flex-grow: 1;
+    height: 100%;
+    font-size: 35px;
+    align-items: center;
+}
+
+.comment .unity-base-text-field__input {
+    border-width: 0;
+    background-color: transparent;
+    font-size: 35px;
+}
+
+.upload-comment {
+    width: 100px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 25px;
+    background-color: #986047;
+}
+
+.uploadButton {
+    width: 55px;
+    height: 55px;
+    background-image: resource("UploadIcon");
+}
+
+.line {
+    width: 100%;
+    height: 2px;
+    background-color: #000000;
+    margin-top: 25px;
+}
+
+.comments-section {
+    width: 90%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 40px;
+}
+
+.comment-item {
+    width: 100%;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.user-details{
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.comment-user-image{
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-image: resource("userImage");
+    margin-right: 20px;
+}
+
+.comment-user-name {
+    font-size: 35px;
+    -unity-font-style: bold;
+}
+
+.comment-text {
+    font-size: 35px;
+    padding-left: 90px;
+    width: 100%;
+}
