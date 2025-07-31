@@ -30,7 +30,7 @@
 }
 
 .user-name {
-    font-size: 45px;
+    font-size: 35px;
     margin-left: 25px;
     width: 600px;
     -unity-font-style: bold;

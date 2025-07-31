@@ -55,23 +55,23 @@ public class Pagination
 [System.Serializable]
 public class Post
 {
-    public string postId;
-    public string caption;
-    public string description;
-    public string designStyle;
-    public string roomType;
-    public string status;
-    public string createdAt;
-    public string category;
-    public int likesCount;
-    public int commentsCount;
-    public int bookmarksCount;
-    public List<string> tags;
-    public List<Media> media;
-    public List<PostMedia> postMedia;
-    public User user;
-    public bool liked;
-    public bool bookmarked;
+    [SerializeField] public string postId;
+    [SerializeField] public string caption;
+    [SerializeField] public string description;
+    [SerializeField] public string designStyle;
+    [SerializeField] public string roomType;
+    [SerializeField] public string status;
+    [SerializeField] public string createdAt;
+    [SerializeField] public string category;
+    [SerializeField] public int likesCount;
+    [SerializeField] public int commentsCount;
+    [SerializeField] public int bookmarksCount;
+    [SerializeField] public List<string> tags;
+    [SerializeField] public List<Media> media;
+    [SerializeField] public List<PostMedia> postMedia;
+    [SerializeField] public User creator; // Changed from 'user' to 'creator'
+    [SerializeField] public bool liked;
+    [SerializeField] public bool bookmarked;
     
     // Helper method to get first image URL only
     public string GetFirstImageUrl()
@@ -105,14 +105,14 @@ public class PostMedia
 [System.Serializable]
 public class User
 {
-    public string userId;
-    public string userName;
-    public string firstName;
-    public string lastName;
-    public string email;
-    public string avatar;
-    public string bio;
-    public int followersCount;
+    [SerializeField] public string userId;
+    [SerializeField] public string userName;
+    [SerializeField] public string firstName;
+    [SerializeField] public string lastName;
+    [SerializeField] public string email;
+    [SerializeField] public string avatar;
+    [SerializeField] public string bio;
+    [SerializeField] public int followersCount;
 }
 
 public class HomeScreenController : MonoBehaviour
@@ -397,6 +397,8 @@ public class HomeScreenController : MonoBehaviour
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string jsonResponse = request.downloadHandler.text;
+                Debug.Log($"Home Feed Raw Response: {jsonResponse}");
+                
                 try
                 {
                     ApiResponse<HomeApiResponse> response = JsonUtility.FromJson<ApiResponse<HomeApiResponse>>(jsonResponse);
@@ -405,7 +407,7 @@ public class HomeScreenController : MonoBehaviour
                     {
                         if (page == 1)
                         {
-                            Debug.Log(" REFRESH: Clearing home posts for page 1");
+                            Debug.Log("REFRESH: Clearing home posts for page 1");
                             homePosts.Clear();
                             totalHomePagesLoaded = 0;
                         }
@@ -414,38 +416,66 @@ public class HomeScreenController : MonoBehaviour
                         if (page > totalHomePagesLoaded)
                         {
                             int postsBeforeAdd = homePosts.Count;
+                            
+                            // Debug JSON parsing for each post
+                            Debug.Log($"=== HOME FEED DEBUG - Page {page} ===");
+                            Debug.Log($"Raw JSON subset: {jsonResponse.Substring(0, Math.Min(500, jsonResponse.Length))}...");
+                            
+                            foreach (var post in response.data.posts)
+                            {
+                                Debug.Log($"--- Home Post Debug ---");
+                                Debug.Log($"Post ID: {post.postId}");
+                                Debug.Log($"Description: {post.description}");
+                                Debug.Log($"Creator object exists: {post.creator != null}");
+                                
+                                if (post.creator != null)
+                                {
+                                    Debug.Log($"  Creator ID: '{post.creator.userId}'");
+                                    Debug.Log($"  Creator Name: '{post.creator.userName}'");
+                                    Debug.Log($"  First Name: '{post.creator.firstName}'");
+                                    Debug.Log($"  Last Name: '{post.creator.lastName}'");
+                                    Debug.Log($"  Email: '{post.creator.email}'");
+                                    Debug.Log($"  Avatar: '{post.creator.avatar}'");
+                                }
+                                else
+                                {
+                                    Debug.LogError("Creator object is NULL!");
+                                }
+                                Debug.Log($"--- End Home Post Debug ---");
+                            }
+                            
                             homePosts.AddRange(response.data.posts);
                             totalHomePagesLoaded = page;
                             hasMoreHomePosts = response.data.posts.Count >= postsPerPage;
                             
-                            Debug.Log($" SUCCESS: Added {response.data.posts.Count} posts. Total: {homePosts.Count} (was {postsBeforeAdd})");
-                            Debug.Log($" PAGINATION: Page {page} loaded, hasMore: {hasMoreHomePosts}");
+                            Debug.Log($"SUCCESS: Added {response.data.posts.Count} posts. Total: {homePosts.Count} (was {postsBeforeAdd})");
+                            Debug.Log($"PAGINATION: Page {page} loaded, hasMore: {hasMoreHomePosts}");
                         }
                         else
                         {
-                            Debug.Log($" SKIP: Page {page} already loaded (totalLoaded: {totalHomePagesLoaded})");
+                            Debug.Log($"SKIP: Page {page} already loaded (totalLoaded: {totalHomePagesLoaded})");
                         }
                     }
                     else
                     {
-                        Debug.LogWarning($" NO DATA: {response.message}");
+                        Debug.LogWarning($"NO DATA: {response.message}");
                         hasMoreHomePosts = false;
                     }
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogError($" PARSE ERROR: {e.Message}");
+                    Debug.LogError($"PARSE ERROR: {e.Message}");
                     hasMoreHomePosts = false;
                 }
             }
             else
             {
-                Debug.LogError($" NETWORK ERROR: {request.error}");
+                Debug.LogError($"NETWORK ERROR: {request.error}");
                 hasMoreHomePosts = false;
             }
         }
     }
-    
+
     private IEnumerator LoadExploreFeed(int page)
     {
         string url = $"{baseURL}{exploreFeedUrl}?page={page}&limit={postsPerPage}";
@@ -459,10 +489,13 @@ public class HomeScreenController : MonoBehaviour
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string jsonResponse = request.downloadHandler.text;
+                Debug.Log($"Explore Feed Raw Response: {jsonResponse}");
                 
                 try
                 {
+                    // Parse the explore feed response which has posts directly in data array
                     ApiResponse<List<Post>> response = JsonUtility.FromJson<ApiResponse<List<Post>>>(jsonResponse);
+                    Debug.Log("Himanshu" + response);
                     
                     if (response.success && response.data != null)
                     {
@@ -476,27 +509,56 @@ public class HomeScreenController : MonoBehaviour
                         if (page > totalExplorePagesLoaded)
                         {
                             int postsBeforeAdd = explorePosts.Count;
+                            
+                            // Debug JSON parsing for each post
+                            Debug.Log($"=== EXPLORE FEED DEBUG - Page {page} ===");
+                            Debug.Log($"Raw JSON subset: {jsonResponse.Substring(0, Math.Min(500, jsonResponse.Length))}...");
+                            
+                            foreach (var post in response.data)
+                            {
+                                Debug.Log($"--- Post Debug ---");
+                                Debug.Log($"Post ID: {post.postId}");
+                                Debug.Log($"Description: {post.description}");
+                                Debug.Log($"Creator object exists: {post.creator != null}");
+                                
+                                if (post.creator != null)
+                                {
+                                    Debug.Log($"  Creator ID: '{post.creator.userId}'");
+                                    Debug.Log($"  Creator Name: '{post.creator.userName}'");
+                                    Debug.Log($"  First Name: '{post.creator.firstName}'");
+                                    Debug.Log($"  Last Name: '{post.creator.lastName}'");
+                                    Debug.Log($"  Email: '{post.creator.email}'");
+                                    Debug.Log($"  Avatar: '{post.creator.avatar}'");
+                                }
+                                else
+                                {
+                                    Debug.LogError("Creator object is NULL!");
+                                }
+                                Debug.Log($"--- End Post Debug ---");
+                            }
+                            
                             explorePosts.AddRange(response.data);
                             totalExplorePagesLoaded = page;
                             hasMoreExplorePosts = response.data.Count >= postsPerPage;
                             
-                            Debug.Log($" SUCCESS: Added {response.data.Count} posts. Total: {explorePosts.Count} (was {postsBeforeAdd})");
-                            Debug.Log($" PAGINATION: Page {page} loaded, hasMore: {hasMoreExplorePosts}");
+                            Debug.Log($"SUCCESS: Added {response.data.Count} posts. Total: {explorePosts.Count} (was {postsBeforeAdd})");
+                            Debug.Log($"PAGINATION: Page {page} loaded, hasMore: {hasMoreExplorePosts}");
                         }
                         else
                         {
-                            Debug.Log($" SKIP: Page {page} already loaded (totalLoaded: {totalExplorePagesLoaded})");
+                            Debug.Log($"SKIP: Page {page} already loaded (totalLoaded: {totalExplorePagesLoaded})");
                         }
                     }
                     else
                     {
-                        Debug.LogError($" NO DATA: {response.message}");
+                        Debug.LogError($"NO DATA: {response.message}");
                         hasMoreExplorePosts = false;
                     }
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogError($" PARSE ERROR: {e.Message}");
+                    Debug.LogError($"PARSE ERROR: {e.Message}");
+                    Debug.LogError($"JSON Response: {jsonResponse}");
                     hasMoreExplorePosts = false;
                 }
             }
@@ -805,21 +867,49 @@ public class HomeScreenController : MonoBehaviour
     {
         VisualElement verticalCard = verticalCardTemplate.CloneTree();
         
-        // Set user name
-        string displayName = !string.IsNullOrEmpty(post.user.firstName) 
-            ? $"{post.user.firstName} {post.user.lastName}" 
-            : post.user.userName;
+        // Set creator name with multiple fallback options
+        string displayName = "Unknown User"; // Default fallback
+        
+        if (post.creator != null)
+        {
+            if (!string.IsNullOrEmpty(post.creator.firstName) && !string.IsNullOrEmpty(post.creator.lastName))
+            {
+                displayName = $"{post.creator.firstName} {post.creator.lastName}";
+                Debug.Log($"Using firstName + lastName: {displayName}");
+            }
+            else if (!string.IsNullOrEmpty(post.creator.firstName))
+            {
+                displayName = post.creator.firstName;
+                Debug.Log($"Using firstName only: {displayName}");
+            }
+            else if (!string.IsNullOrEmpty(post.creator.userName))
+            {
+                displayName = post.creator.userName;
+                Debug.Log($"Using userName: {displayName}");
+            }
+            else if (!string.IsNullOrEmpty(post.creator.email))
+            {
+                displayName = post.creator.email.Split('@')[0]; // Use email prefix as fallback
+                Debug.Log($"Using email prefix: {displayName}");
+            }
+        }
+        
+        Debug.Log($"Final displayName: '{displayName}'");
         verticalCard.Q<TextElement>("userName").text = displayName;
         
         // Set description (use caption if description is null)
         string description = !string.IsNullOrEmpty(post.description) ? post.description : post.caption;
+        if (!string.IsNullOrEmpty(description) && description.Length > 90)
+        {
+            description = description.Substring(0, 90) + "...";
+        }
         verticalCard.Q<TextElement>("description").text = description;
         
-        // Set user image
+        // Set creator image
         Image userImage = verticalCard.Q<Image>("userImage");
-        if (!string.IsNullOrEmpty(post.user.avatar))
+        if (post.creator != null && !string.IsNullOrEmpty(post.creator.avatar))
         {
-            StartCoroutine(LoadImageFromURL(post.user.avatar, userImage));
+            StartCoroutine(LoadImageFromURL(post.creator.avatar, userImage));
         }
         else
         {
