@@ -1,7 +1,9 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/USS/designerCard.uss?fileID=7433441132597879392&amp;guid=68b7ddb66c2ec41d3b96b19dac0c137f&amp;type=3#designerCard" />
     <ui:VisualElement class="card">
-        <ui:Image name="userImage" class="user-image" />
+        <ui:VisualElement class="user-image-container">
+            <ui:Image name="userImage" class="user-image-inner" />
+        </ui:VisualElement>
         <ui:Label name="userName" class="user-name" text="Arvind Rao" />
         <ui:Button name="followButton" class="primary-button">
             <ui:Label name="followText" text="Follow" class="button-text" />

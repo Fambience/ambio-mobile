@@ -7,7 +7,9 @@
         </ui:VisualElement>
         <ui:VisualElement class="card-body">
             <ui:TextElement name="description" text="This contemporary living room features a warm, minimalist design with a calming neutral..." class="description" />
-            <ui:Image name="card-image" class="card-image" />
+            <ui:VisualElement name="image-container" class="image-container">
+                <ui:Image name="card-image" class="card-image" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement class="card-footer">
             <ui:VisualElement name="VisualElement" class="inner-card-footer">

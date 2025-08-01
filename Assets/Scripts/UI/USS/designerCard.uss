@@ -10,12 +10,19 @@
     margin-right: 30px;
 }
 
-.user-image {
+.user-image-container {
+    width: 250px;
+    height: 250px;
+    border-radius: 125px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    margin-top: 80px;
+}
+
+.user-image-inner {
     width: 250px;
     height: 250px;
     background-image: resource("userImage");
-    margin-bottom: 10px;
-    margin-top: 80px;
 }
 
 .user-name {

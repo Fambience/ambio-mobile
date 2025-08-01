@@ -2,19 +2,12 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections;
 
-public class HomeScreenCardHandler : MonoBehaviour
+public class HomeScreenPullToRefresh : MonoBehaviour
 {
-    public VisualTreeAsset verticalCardTemplate;
-    public VisualTreeAsset horizontalCardTemplate;
-
-    public int totalVerticalCards = 50;
-    public int horizontalCardsPerGroup = 5;
-
-    // Pull-to-refresh settings
     [Header("Pull to Refresh Settings")]
-    public float pullThreshold = 100f;  // Distance needed to trigger refresh
-    public float refreshIndicatorSize = 50f;  // Size of the refresh indicator
-    public float refreshDuration = 2f;  // How long the refresh animation lasts
+    public float pullThreshold = 100f;
+    public float refreshIndicatorSize = 50f;
+    public float refreshDuration = 2f;
     
     private ScrollView container;
     private VisualElement refreshIndicator;
@@ -23,14 +16,13 @@ public class HomeScreenCardHandler : MonoBehaviour
     private bool isRefreshing = false;
     private bool isPulling = false;
     private float pullDistance = 0f;
-    
-    private void OnEnable()
+
+    public System.Action OnRefreshRequested;
+
+    public void Initialize(ScrollView scrollView)
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
-        container = root.Q<ScrollView>("main-container");
-        
+        container = scrollView;
         SetupPullToRefresh();
-        LoadInitialContent();
     }
     
     private void SetupPullToRefresh()
@@ -135,14 +127,10 @@ public class HomeScreenCardHandler : MonoBehaviour
     private void StartRefresh()
     {
         if (isRefreshing) return;
-        
         isRefreshing = true;
-        
         refreshContainer.style.height = refreshIndicatorSize + 20f;
         refreshIndicator.style.opacity = 1f;
-        
         StartCoroutine(RotateRefreshIcon());
-        
         StartCoroutine(RefreshContent());
     }
     
@@ -161,9 +149,8 @@ public class HomeScreenCardHandler : MonoBehaviour
     
     private IEnumerator RefreshContent()
     {
-        yield return new WaitForSeconds(refreshDuration);
-        ClearContent();
-        LoadInitialContent();
+        OnRefreshRequested?.Invoke();
+        yield return new WaitForSeconds(0.5f);
         ResetPullIndicator();
         isRefreshing = false;
     }
@@ -197,95 +184,13 @@ public class HomeScreenCardHandler : MonoBehaviour
         refreshIndicator.style.opacity = 0;
         refreshIcon.transform.rotation = Quaternion.identity;
     }
-    
-    private void ClearContent()
+
+    public bool IsRefreshing()
     {
-        for (int i = container.childCount - 1; i > 0; i--)
-        {
-            container.RemoveAt(i);
-        }
-    }
-    
-    private void LoadInitialContent()
-    {
-        int verticalCount = 0;
-        int horizontalGroupCount = 0;
-
-        while (verticalCount < totalVerticalCards)
-        {
-            int groupSize = (verticalCount == 0) ? 5 : 10;
-
-            // Add vertical cards
-            for (int i = 0; i < groupSize && verticalCount < totalVerticalCards; i++, verticalCount++)
-            {
-                VisualElement verticalCard = verticalCardTemplate.CloneTree();
-                // verticalCard.Q<TextElement>("userName").text = $"User {verticalCount + 1}";
-                verticalCard.Q<Image>("userImage").image = LoadImage("user_placeholder");
-                verticalCard.Q<Image>("card-image").image = LoadImage("room_placeholder");
-
-                container.Add(verticalCard);
-            }
-
-            // Add heading for horizontal scroll section
-            Label sectionHeading = new Label("Trending Designers");
-            sectionHeading.style.fontSize = 45;
-            sectionHeading.style.color = new StyleColor(Color.black);
-            sectionHeading.style.marginBottom = 20;
-            sectionHeading.style.marginLeft = 40;
-            sectionHeading.style.unityFontStyleAndWeight = FontStyle.Bold;
-            
-            container.Add(sectionHeading);
-
-            // Add horizontal scroll section
-            VisualElement horizontalScroll = new ScrollView(ScrollViewMode.Horizontal);
-            horizontalScroll.style.flexDirection = FlexDirection.Row;
-            horizontalScroll.style.marginBottom = 100;
-            horizontalScroll.style.paddingLeft = 30;
-
-            for (int j = 0; j < horizontalCardsPerGroup; j++)
-            {
-                VisualElement horizontalCard = horizontalCardTemplate.CloneTree();
-                horizontalCard.Q<Label>("userName").text = $"Designer {horizontalGroupCount * horizontalCardsPerGroup + j + 1}";
-                horizontalCard.Q<Image>("userImage").image = LoadImage("designer_placeholder");
-                Label followText = horizontalCard.Q<Label>("followText");
-                followText.text = "Follow";
-
-                Button followButton = horizontalCard.Q<Button>("followButton");
-                followButton.clicked += () => ToggleFollow(followText);
-
-                horizontalScroll.Add(horizontalCard);
-            }
-
-            container.Add(horizontalScroll);
-            horizontalGroupCount++;
-        }
+        return isRefreshing;
     }
 
-    private Texture2D LoadImage(string imageName)
-    {
-        return Resources.Load<Texture2D>($"Images/{imageName}");
-    }
-
-    // Toggle logic for "Follow"/"Following" of designer card
-    private void ToggleFollow(Label followText)
-    {
-        Button followButton = followText.parent as Button;
-
-        if (followText.text == "Follow")
-        {
-            followText.text = "Following";
-            followButton.style.backgroundColor = new StyleColor(new Color32(139, 76, 57, 255));
-            followText.style.color = new StyleColor(Color.white);
-        }
-        else
-        {
-            followText.text = "Follow";
-            followButton.style.backgroundColor = StyleKeyword.Null;
-            followText.style.color = StyleKeyword.Null;
-        }
-    }
-    
-    private void OnDisable()
+    private void OnDestroy()
     {
         // Unregister events to prevent memory leaks
         if (container != null)

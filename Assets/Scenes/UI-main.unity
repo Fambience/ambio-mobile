@@ -2111,10 +2111,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9e560c44bdd14acd9d6b941da965328, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  verticalCardTemplate: {fileID: 0}
-  horizontalCardTemplate: {fileID: 0}
-  totalVerticalCards: 50
-  horizontalCardsPerGroup: 5
+  verticalCardTemplate: {fileID: 9197481963319205126, guid: 3fca1bac0f8d944ae934d8efaf2ae40a, type: 3}
+  horizontalCardTemplate: {fileID: 9197481963319205126, guid: 2c9618c52dbe54cb2a0bce26183b1c98, type: 3}
+  baseURL: 
+  exploreFeedUrl: /api/v1/post/explore-feed
+  homeFeedUrl: /api/v1/post/user-feed
+  trendingDesignersUrl: /api/v1/post/trending-designers
+  authToken: 
+  postsPerPage: 10
+  designersPerPage: 10
+  homeCheckInterval: 10
   pullThreshold: 100
   refreshIndicatorSize: 50
   refreshDuration: 2
