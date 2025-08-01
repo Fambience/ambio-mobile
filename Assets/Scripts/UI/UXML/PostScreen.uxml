@@ -1,0 +1,47 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/PostScreen.uss?fileID=7433441132597879392&amp;guid=dc8f4cb794cea4a1f9ef884ec07c5687&amp;type=3#PostScreen" />
+    <ui:VisualElement name="mainContainer" class="main-container">
+        <ui:VisualElement name="header" class="header">
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="content" class="content">
+            <ui:VisualElement class="card-header">
+                <ui:Image name="userImage" class="user-image" />
+                <ui:TextElement name="userName" text="Arvind Rao" class="user-name" />
+            </ui:VisualElement>
+            <ui:VisualElement class="card-body">
+                <ui:TextElement name="description" text="This contemporary living room features a warm, minimalist design with a calming neutral..." class="description" />
+                <ui:Image name="card-image" class="card-image" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement class="icon-section">
+            <ui:VisualElement name="VisualElement" class="inner-card-footer">
+                <ui:Image name="favourite" class="footer-icon like" />
+                <ui:Image name="share" class="footer-icon share" />
+            </ui:VisualElement>
+            <ui:VisualElement name="VisualElement" class="inner-card-footer-2">
+                <ui:Image name="bookmark" class="footer-icon bookmark" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="footer" class="footer">
+            <ui:VisualElement class="add-comment">
+                <ui:TextField name="addCommentField" placeholder-text="Add your comment..." class="comment" />
+                <ui:Button name="uploadComment" class="upload-comment">
+                    <ui:Image class="uploadButton" />
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:TextElement name="line" class="line"/>
+            <ui:VisualElement name="commentsSection" class="comments-section">
+                <ui:VisualElement name="comment" class="comment-item">
+                    <ui:VisualElement name="userDetails" class="user-details">
+                        <ui:Image name="commentUserImage" class="comment-user-image" />
+                        <ui:TextElement name="commentUserName" text="Arvind Rao" class="comment-user-name" />
+                    </ui:VisualElement>
+                    <ui:TextElement name="commentText" text="This is a sample comment." class="comment-text" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
