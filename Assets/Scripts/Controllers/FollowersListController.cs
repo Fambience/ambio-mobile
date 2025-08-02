@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,15 +27,40 @@ public class FollowersListController : MonoBehaviour
 
     private void Start()
     {
-        InitializeDummyData();
+        StartCoroutine(WaitForFollowerData());
+    }
+    
+    private IEnumerator WaitForFollowerData()
+    {
+        while (ProfileDataHandlers.FollowersList.Count == 0 && ProfileDataHandlers.FollowingList.Count == 0)
+        {
+            yield return null;
+        }
+
+        InitializeData();
         SetupUI();
         SetupEventListeners();
         DisplayUsers();
     }
 
-    private void InitializeDummyData()
+    private void InitializeData()
     {
+        // Convert FollowersList from DataHandler to FollowingUserData
+        followersData = ProfileDataHandlers.FollowersList
+            .Select(u => new FollowingUserData(
+                u.userName,
+                $"{u.firstName} {u.lastName}".Trim(),
+                "Following"
+            )).ToList();
+
+        followingData = ProfileDataHandlers.FollowingList
+            .Select(u => new FollowingUserData(
+                u.userName,
+                $"{u.firstName} {u.lastName}".Trim(),
+                "Following"
+            )).ToList();
         // Dummy followers data
+        /*
         followersData = new List<FollowingUserData>
         {
             new FollowingUserData("designstudio_pro", "Sarah Johnson", "Following"),
@@ -54,9 +80,10 @@ public class FollowersListController : MonoBehaviour
             new FollowingUserData("minimal_design_co", "Ryan Martinez", "Follow"),
             new FollowingUserData("brand_identity_pro", "Lisa Anderson", "Following")
         };
+        */
 
         // Dummy following data  
-        followingData = new List<FollowingUserData>
+        /*followingData = new List<FollowingUserData>
         {
             new FollowingUserData("pixelperfectstudio", "Himanshu Mahto", "Following"),
             new FollowingUserData("creative_director_x", "Michael Thompson", "Following"),
@@ -72,7 +99,7 @@ public class FollowersListController : MonoBehaviour
             new FollowingUserData("color_theory_expert", "Jessica Brown", "Following"),
             new FollowingUserData("minimal_design_co", "Ryan Martinez", "Follow"),
             new FollowingUserData("brand_identity_pro", "Lisa Anderson", "Following")
-        };
+        };*/
     }
 
     private void SetupUI()
