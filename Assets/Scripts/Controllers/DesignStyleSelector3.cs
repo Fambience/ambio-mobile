@@ -60,7 +60,7 @@ public class DesignStyleSelector3 : MonoBehaviour
     string GetStyleNameFromButton(Button button, int index)
     {
         // Updated for color schemes instead of design styles
-        string[] styleNames = { "WARM_PALATTE", "CALM_PALATTE", "NEUTRAL_PALATTE", "BOLD_PALATTE" };
+        string[] styleNames = { "WARM_PALETTE", "CALM_PALETTE", "NEUTRAL_PALETTE", "BOLD_PALETTE" };
         return index < styleNames.Length ? styleNames[index] : $"Style-{index + 1}";
     }
 

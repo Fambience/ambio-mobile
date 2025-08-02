@@ -516,8 +516,14 @@ public partial class ProfileDataHandlers : MonoBehaviour
             Debug.LogError("[Following] Token missing.");
             yield break;
         }
+        if (string.IsNullOrEmpty(UserData.userName))
+        {
+            Debug.LogError("[Followers] Username missing. Cannot fetch followers.");
+            yield break;
+        }
 
         string followingURL = $"{baseURL}/api/v1/profile/{UserData.userName}/following";
+        Debug.Log("Following URL " + followingURL);
         UnityWebRequest req = UnityWebRequest.Get(followingURL);
         req.SetRequestHeader("Authorization", $"Bearer {token}");
         yield return req.SendWebRequest();

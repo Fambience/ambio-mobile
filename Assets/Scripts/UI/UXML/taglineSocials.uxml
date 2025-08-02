@@ -25,7 +25,7 @@
             </ui:VisualElement>
 
             <!-- Website input -->
-            <ui:VisualElement class="input-group">
+            <!--<ui:VisualElement class="input-group">
                 <ui:Label text="Website (optional)" class="input-label" />
                 <ui:VisualElement class="input-wrappers" style="margin-top: 20px;">
                     <ui:Image class="input-icon website-icon" />
@@ -33,6 +33,7 @@
                 </ui:VisualElement>
                 <ui:Label name="WarningWebsite" class="warning-text" style="align-self: flex-start;" />
             </ui:VisualElement>
+            -->
 
             <!-- Socials dynamic input -->
             <ui:VisualElement class="input-group">

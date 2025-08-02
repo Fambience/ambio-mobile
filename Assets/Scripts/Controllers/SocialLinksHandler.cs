@@ -23,6 +23,8 @@ public class SocialLinksController : MonoBehaviour
     private Dictionary<string, string> socialsData = new();
     private string token = "";
 
+    [SerializeField] private GameObject dataHandler;
+
     private void OnEnable()
     {
         token = AuthTokenManager.GetToken();
@@ -142,6 +144,7 @@ public class SocialLinksController : MonoBehaviour
         {
             Debug.Log("Onboarding submission successful: " + request.downloadHandler.text);
             UIManager.Instance.OpenScreen(UIScreenType.Home);
+            dataHandler.SetActive(true);
         }
         else
         {

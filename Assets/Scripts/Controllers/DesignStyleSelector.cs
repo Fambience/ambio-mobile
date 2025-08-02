@@ -61,7 +61,7 @@ public class DesignStyleSelector : MonoBehaviour
 
     string GetStyleNameFromButton(Button button, int index)
     {
-        string[] styleNames = { "ARTDECO", "BOHEMIAN", "COASTAL", "ECLACTIC", "SCANDINAVIAN", "RUSTIC" };
+        string[] styleNames = { "ARTDECO", "BOHEMIAN", "COASTAL", "ECLECTIC", "SCANDINAVIAN", "RUSTIC" };
         return index < styleNames.Length ? styleNames[index] : $"Style-{index + 1}";
     }
 

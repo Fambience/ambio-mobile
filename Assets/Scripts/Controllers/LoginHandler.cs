@@ -211,7 +211,7 @@ public class LoginHandler : MonoBehaviour
             string userName = response.data.userName;
             Debug.Log("[LOGIN] Remaining Questions (" + response.data.remainingQuestions.Count + "): " + string.Join(", ", response.data.remainingQuestions));
             UserData.userName = userName;
-            Debug.Log(userName);
+            Debug.Log("[USERNAME] user name of the user : " + userName);
             UserData.Email = email;
             UserData.Role = response.data.role;
             HandleLoginStage(response);

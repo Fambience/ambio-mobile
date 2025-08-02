@@ -371,7 +371,7 @@ public class BasicDetailsController : MonoBehaviour
 
         BasicDetailsPayload data = new BasicDetailsPayload
         {
-            username = username,
+            userName = username,
             age = age,
             gender = gender,
             role = role
@@ -413,7 +413,7 @@ public class BasicDetailsController : MonoBehaviour
     [System.Serializable]
     private class BasicDetailsPayload
     {
-        public string username;
+        public string userName;
         public int age;
         public string gender;
         public string role;
