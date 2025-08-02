@@ -1023,6 +1023,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8923b9dc06ce542da8401e933366c4f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dataHandler: {fileID: 1831942536}
 --- !u!1 &1631665318
 GameObject:
   m_ObjectHideFlags: 0
@@ -1789,6 +1790,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiDocument: {fileID: 1957634426}
   socialInputTemplate: {fileID: 9197481963319205126, guid: 0cb7cdeb9edbfb941a5217d2d6c04db5, type: 3}
+  dataHandler: {fileID: 1831942536}
 --- !u!114 &1957634426
 MonoBehaviour:
   m_ObjectHideFlags: 0
