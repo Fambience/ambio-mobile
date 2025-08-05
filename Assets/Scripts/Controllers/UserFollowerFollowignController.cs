@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.Networking;
 using System.Collections;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MiniJSON;
 
-public class FollowersListController : MonoBehaviour
+public class UserFollowerFollowingController : MonoBehaviour
 {
     [Header("UI Documents")]
     [SerializeField] private UIDocument uiDocument;
@@ -495,4 +495,4 @@ public class FollowingUserData
         this.name = name;
         this.followStatus = followStatus;
     }
-}
+}*/

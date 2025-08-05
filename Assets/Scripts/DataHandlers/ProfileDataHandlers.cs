@@ -105,7 +105,7 @@ public partial class ProfileDataHandlers : MonoBehaviour
         string url = baseScript.baseURL + baseScript.profileEndpoint;
         Debug.Log("[ProfileDataHandlers] API url: " + url);
         UnityWebRequest request = UnityWebRequest.Get(url);
-        request.SetRequestHeader("Authorization", $"{authToken}");
+        request.SetRequestHeader("Authorization", authToken);
         request.SetRequestHeader("Content-Type", "application/json");
 
         yield return request.SendWebRequest();
@@ -215,7 +215,7 @@ public partial class ProfileDataHandlers : MonoBehaviour
         Debug.Log($"[Followers] Request URL: {followersURL}");
         
         UnityWebRequest req = UnityWebRequest.Get(followersURL);
-        req.SetRequestHeader("Authorization", $"Bearer {token}");
+        req.SetRequestHeader("Authorization", token);
         
         Debug.Log("[Followers] Sending web request...");
         yield return req.SendWebRequest();
@@ -378,7 +378,7 @@ public partial class ProfileDataHandlers : MonoBehaviour
         Debug.Log($"[Following] Request URL: {followingURL}");
         
         UnityWebRequest req = UnityWebRequest.Get(followingURL);
-        req.SetRequestHeader("Authorization", $"Bearer {token}");
+        req.SetRequestHeader("Authorization", token);
         
         Debug.Log("[Following] Sending web request...");
         yield return req.SendWebRequest();
