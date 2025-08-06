@@ -24,4 +24,10 @@ public enum UIScreenType
     PasswordOTP,
     PasswordReset,
     PasswordChanged,
+    LoggedInProfileScreen,
+    UserProfileScreen,
+    CreatorProfileScreen,
+    LoggedInFollowing,
+    CreatorFollowing,
+    UserFollowing,
 }

@@ -178,6 +178,8 @@ public class FollowersListController : MonoBehaviour
         
         // Designer icon
         var designerIcon = new VisualElement();
+        designerIcon.userData = userData;
+        designerIcon.RegisterCallback<ClickEvent>(OnUserIconClicked);
         designerIcon.AddToClassList("designer-icon");
         ApplyDesignerIconStyles(designerIcon);
 
@@ -190,6 +192,8 @@ public class FollowersListController : MonoBehaviour
         string displayUsername = TruncateUsername(userData.username, 15);
         var designerUID = new Label(displayUsername);
         designerUID.AddToClassList("designer-uid");
+        designerUID.userData = userData;
+        designerUID.RegisterCallback<ClickEvent>(OnUserNameClicked);
         ApplyDesignerUIDStyles(designerUID);
 
         // User basic details container
@@ -219,6 +223,43 @@ public class FollowersListController : MonoBehaviour
         return mainContainer;
     }
 
+    public void OnUserNameClicked(ClickEvent evt)
+    {
+        var element = evt.target as VisualElement;
+        if (element?.userData is FollowingUserData data)
+        {
+            Debug.Log($"Username clicked: {data.username} (UUID: {data.userId})");
+            OpenUserProfile(data.userId);
+        }
+    }
+
+    public void OnUserIconClicked(ClickEvent evt)
+    {
+        var element = evt.target as VisualElement;
+        if (element?.userData is FollowingUserData data)
+        {
+            Debug.Log($"Avatar clicked: {data.username} (UUID: {data.userId})");
+            OpenUserProfile(data.userId);
+        }
+    }
+    
+    private void OpenUserProfile(string userId)
+    {
+        Debug.Log($"Navigate to profile of userId: {userId}");
+
+        StartCoroutine(UserProfileDataFetcher.Instance.FetchUserProfile(userId, (profileData) =>
+        {
+            if (profileData != null)
+            {
+                Debug.Log("[OpenUserProfile] Loaded profile for: " + profileData.userName);
+                // UIManager.Instance.OpenScreen(...) is already called internally inside FetchUserProfile
+            }
+            else
+            {
+                Debug.LogWarning("[OpenUserProfile] Failed to load user profile");
+            }
+        }));
+    }
     // NEW: API Integration for Follow/Unfollow
     private void OnFollowButtonClicked(FollowingUserData userData)
     {
