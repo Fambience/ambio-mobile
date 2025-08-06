@@ -1,0 +1,58 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/filterPopUp.uss?fileID=7433441132597879392&amp;guid=88072ea22b4b54949baaeef27d4a3d6a&amp;type=3#filterPopUp" />
+    <ui:VisualElement name="popupOverlay" class="popup-overlay">
+        <ui:VisualElement name="filterPopup" class="filter-popup">
+            <ui:VisualElement name="popupHeader" class="popup-header">
+                <ui:Label name="popupTitle" text="Filter &amp; Sort" class="popup-title" />
+                <ui:Button name="closeButton" text="×" class="close-button" />
+            </ui:VisualElement>
+            <ui:VisualElement name="popupContent" class="popup-content">
+                <ui:Label name="title" text="Room Type" class="title" />
+                <ui:VisualElement name="roomTypeDropdown" class="filter-dropdown" style="justify-content: flex-start;">
+                    <ui:VisualElement name="roomTypeDropdownTrigger" class="dropdown-trigger">
+                        <ui:Label name="roomTypeSelectedText" text="All Rooms" class="selected-text" style="justify-content: flex-start; align-content: flex-start;" />
+                        <ui:Label text="▼" class="dropdown-arrow" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="roomTypeDropdownContent" class="dropdown-content" style="display: none;">
+                        <ui:VisualElement class="search-wrapper">
+                            <ui:TextField name="roomTypeSearchField" placeholder-text="Search Room Type" class="search-field" />
+                        </ui:VisualElement>
+                        <ui:ScrollView name="roomTypeOptionsList" class="options-list" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Label name="title" text="Design Style" class="title" />
+                <ui:VisualElement name="designStyleDropdown" class="filter-dropdown" style="justify-content: flex-start;">
+                    <ui:VisualElement name="designStyleDropdownTrigger" class="dropdown-trigger">
+                        <ui:Label name="designStyleSelectedText" text="All Styles" class="selected-text" style="justify-content: flex-start; align-content: flex-start;" />
+                        <ui:Label text="▼" class="dropdown-arrow" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="designStyleDropdownContent" class="dropdown-content" style="display: none;">
+                        <ui:VisualElement class="search-wrapper">
+                            <ui:TextField name="designStyleSearchField" placeholder-text="Search design style" class="search-field" />
+                        </ui:VisualElement>
+                        <ui:ScrollView name="designStyleOptionsList" class="options-list" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Label name="title" text="Budget Level" class="title" />
+                <ui:VisualElement name="budgetLevelGroup" class="budget-level-group">
+                    <ui:Button name="budgetButton" text="Budget" class="budget-option" />
+                    <ui:Button name="midRangeButton" text="Mid-range" class="budget-option" />
+                    <ui:Button name="luxuryButton" text="Luxury" class="budget-option" />
+                </ui:VisualElement>
+                <ui:Label name="title" text="Sort By" class="title" />
+                <ui:VisualElement name="sortByDropdown" class="filter-dropdown" style="justify-content: flex-start;">
+                    <ui:VisualElement name="sortByDropdownTrigger" class="dropdown-trigger">
+                        <ui:Label name="sortBySelectedText" text="Most Popular" class="selected-text" style="justify-content: flex-start; align-content: flex-start;" />
+                        <ui:Label text="▼" class="dropdown-arrow" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="sortByDropdownContent" class="dropdown-content" style="display: none;">
+                        <ui:ScrollView name="sortByOptionsList" class="options-list" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="popupFooter" class="popup-footer">
+                <ui:Button name="applyButton" text="Apply Filters" class="primary-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

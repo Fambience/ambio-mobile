@@ -1,0 +1,45 @@
+.main-container {
+    margin-top: 100px;
+    background-color: #F5F0ED;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.designer-icon {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100px;
+    height: 100px;
+    background-color: black;
+    border-radius: 50%;
+}
+
+.user-details {
+    margin-left: 20px;
+    flex-direction: column;
+}
+
+.designer-uid {
+    font-size: 35px;
+}
+
+.user-basic-details {
+    flex-direction: row;
+    margin-top: 10px;
+}
+
+.designer-name {
+    font-size: 30px;
+}
+
+.designer-divider {
+    font-size: 30px;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.designer-follow {
+    font-size: 30px;
+}
