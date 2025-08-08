@@ -43,6 +43,7 @@ public class ProfileScreenController : MonoBehaviour
     void OnEnable()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
+        
 
         // Get elements that actually exist in UXML
         scrollView = root.Q<ScrollView>("scroll-container");
@@ -129,6 +130,7 @@ public class ProfileScreenController : MonoBehaviour
 
     private void TryPopulateFromProfile()
     {
+
         if (hasTriedToPopulate) return;
         hasTriedToPopulate = true;
 
@@ -590,6 +592,7 @@ public class ProfileScreenController : MonoBehaviour
     // Public method to manually refresh profile data
     public void RefreshProfile()
     {
+
         hasTriedToPopulate = false;
         StartCoroutine(WaitForProfileData());
     }

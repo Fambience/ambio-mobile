@@ -1,0 +1,13 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/NavigationBar.uss?fileID=7433441132597879392&amp;guid=0b4ae03581d20481393b4824d4ff1d4f&amp;type=3#navigationBar" />
+    <ui:VisualElement name="navigationContainer" class="navigation-container">
+        <ui:VisualElement name="navigationBar" class="navigation-bar">
+            <ui:VisualElement name="navigationBarBg" class="navigation-bar-bg">
+                <ui:Image name="home" class="home-icon-selected"/>
+                <ui:Image name="explore" class="explore-icon-unselected"/>
+                <ui:Image name="create" class="create-icon-unselected"/>
+                <ui:Image name="profile" class="profile-icon-unselected"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

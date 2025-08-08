@@ -1,0 +1,80 @@
+.navigation-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 150px;
+}
+
+.navigation-bar {
+    background-color: #986047;
+    width: 1000px;
+    height: 150px;
+    align-self: center;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    position: absolute;
+    bottom: 0;
+}
+
+.navigation-bar-bg {
+    width: 100%;
+    margin-left: 10%;
+    margin-right: 10%;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+}
+
+/* Home Icon States */
+.home-icon-selected {
+    width: 90px;
+    height: 90px;
+    background-image: resource('home_selected');
+}
+
+.home-icon-unselected {
+    width: 70px;
+    height: 70px;
+    background-image: resource('home_unselected');
+}
+
+/* Explore Icon States */
+.explore-icon-selected {
+    width: 90px;
+    height: 90px;
+    background-image: resource('search_selected');
+}
+
+.explore-icon-unselected {
+    width: 70px;
+    height: 70px;
+    background-image: resource('search_unselected');
+}
+
+/* Bookmark Icon States */
+.create-icon-selected {
+    width: 90px;
+    height: 90px;
+    background-image: resource('create_selected');
+}
+
+.create-icon-unselected {
+    width: 70px;
+    height: 70px;
+    background-image: resource('create_unselected');
+}
+
+/* Profile Icon States */
+.profile-icon-selected {
+    width: 90px;
+    height: 90px;
+    background-image: resource('profile_selected');
+}
+
+.profile-icon-unselected {
+    width: 70px;
+    height: 70px;
+    background-image: resource('profile_unselected');
+}

@@ -207,7 +207,7 @@ public class LoginHandler : MonoBehaviour
             var response = JsonUtility.FromJson<LoginResponse>(request.downloadHandler.text);
             string token = response.token;
 
-                AuthTokenManager.SetToken(token);
+            AuthTokenManager.SetToken(token);
             userEmail = email;
             scriptHandler.SetActive(true);
             UserData.Email = email;
@@ -307,6 +307,7 @@ public class LoginHandler : MonoBehaviour
             }
         }
     }
+
 
     private void HandleDynamicOnboardingFromQuestions(string role, List<string> questions)
     {

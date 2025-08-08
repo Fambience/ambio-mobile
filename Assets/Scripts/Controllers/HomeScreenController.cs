@@ -182,9 +182,23 @@ public class HomeScreenController : MonoBehaviour
         authToken = AuthTokenManager.GetToken();
         var root = GetComponent<UIDocument>().rootVisualElement;
         container = root.Q<ScrollView>("main-container");
-        
+        StartCoroutine(ShowNavigationAfterDelay());   
         SetupPullToRefresh();
         StartCoroutine(LoadInitialData());
+    }
+    private IEnumerator ShowNavigationAfterDelay()
+    {
+        yield return new WaitForSeconds(0.1f); // Small delay to ensure UI is ready
+        
+        Debug.Log("Showing navigation bar for Home screen");
+        
+        // Show navigation bar and set Home as selected
+        NavigationManager.ToggleNavigationBar(true);
+        NavigationManager.UpdateSelectedIcon(NavScreen.Home);
+        
+        // Debug confirmation
+        yield return new WaitForSeconds(0.1f);
+        Debug.Log($"Navigation bar visible: {NavigationManager.IsNavigationBarVisible()}");
     }
     
     private void SetupPullToRefresh()
