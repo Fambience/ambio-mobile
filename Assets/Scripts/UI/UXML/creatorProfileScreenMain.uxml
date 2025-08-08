@@ -1,0 +1,65 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/ProfileScreen.uss?fileID=7433441132597879392&amp;guid=07ce4fa39b1da4ae48f3756b2392cf7a&amp;type=3#ProfileScreen" />
+    <ui:VisualElement name="creator-profileScreen" class="profile-container">
+        <ui:VisualElement name="creator-profileHeader" class="profile-header">
+            <ui:TextElement text="Profile" class="title" />
+            <ui:Image name="creator-settings" class="setting-icon" />
+        </ui:VisualElement>
+        <ui:ScrollView name="creator-scroll-container" class="scrollView">
+            <ui:VisualElement name="creator-designerFields">
+            <ui:VisualElement name="creator-profileSection" class="profile-section">
+                <ui:VisualElement name="creator-profilePhoto" class="profile-photo">
+                    <ui:VisualElement name="creator-profilePhotoBG" class="profile-photoBG">
+                        <ui:Image name="creator-profilePic" class="profile-pic" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:TextElement text="Krishna Yadav" name="creator-userName" class="userName" />
+                <ui:VisualElement name="creator-designerTag" class="interiorDesignerTag">
+                    <ui:TextElement text="Interior Designer" name="creator-profileTag" class="creatorTitle" />
+                </ui:VisualElement>
+                <ui:TextElement text="Creating beautiful spaces that inspire and delight" name="creator-profileTag" class="creator-tag-line" />
+                <ui:VisualElement name="creator-profile-stats" class="profile-stats">
+                    <ui:VisualElement name="creator-profile-following" class="profile-overview">
+                        <ui:TextElement text="69" name="creator-followingCount" class="profile-overview-count" />
+                        <ui:TextElement text="Following" class="profile-stats-title" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="creator-profile-follower" class="profile-overview">
+                        <ui:TextElement text="69" name="creator-followerCount" class="profile-overview-count" />
+                        <ui:TextElement text="Followers" class="profile-stats-title" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="creator-profile-post" class="profile-overview">
+                        <ui:TextElement text="69" name="creator-postCount" class="profile-overview-count" />
+                        <ui:TextElement text="Posts" class="profile-stats-title" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="creator-tabBar" class="tab-bar">
+                    <ui:VisualElement class="tab-button selected">
+                        <ui:Button name="creator-designsTab" class="button" text="Designs"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tab-button">
+                        <ui:Button name="creator-savedTab" class="button" text="Saved"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tab-button">
+                        <ui:Button name="creator-aboutTab" class="button" text="About"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <ui:VisualElement name="creator-aboutContent" class="about-content" style="display: none;">
+                    <ui:VisualElement name="creator-aboutCard" class="about-card">
+                        <ui:TextElement text="About Me" class="about-title" />
+                        <ui:TextElement text="Interior designer with over 5 years of experience creating beautiful, functional spaces. Specializing in minimalist and Scandinavian design aesthetics with a focus on sustainability and natural materials." class="about-description" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="creator-experienceCard" class="experience-card">
+                        <ui:TextElement text="Experience" class="about-title" />
+                        <ui:TextElement text="5 yeards" class="total-experience" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="creator-contactCard" class="contact-card">
+                        <ui:TextElement text="Contact" class="about-title" />
+                        <ui:TextElement text="www.google.com" class="contact-links" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

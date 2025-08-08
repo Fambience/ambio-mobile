@@ -1,63 +1,70 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/USS/ProfileScreen.uss?fileID=7433441132597879392&amp;guid=07ce4fa39b1da4ae48f3756b2392cf7a&amp;type=3#ProfileScreen" />
-    <ui:VisualElement name="profileScreen" class="profile-container">
-        <ui:VisualElement name="profileHeader" class="profile-header">
-            <ui:TextElement text="Profile" class="title" />
-            <ui:Image name="settings" class="setting-icon" />
+    <ui:VisualElement name="creator-view-profileScreen" class="profile-container">
+        <ui:VisualElement name="creator-view-profileHeader" class="profile-header">
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
         </ui:VisualElement>
-        <ui:ScrollView name="scroll-container" class="scrollView">
-            <ui:VisualElement name="designerFields">
-            <ui:VisualElement name="profileSection" class="profile-section">
-                <ui:VisualElement name="profilePhoto" class="profile-photo">
-                    <ui:VisualElement name="profilePhotoBG" class="profile-photoBG">
-                        <ui:Image name="profilePic" class="profile-pic" />
+        <ui:ScrollView name="creator-view-scroll-container" class="scrollView">
+            <ui:VisualElement name="creator-view-designerFields">
+            <ui:VisualElement name="creator-view-profileSection" class="profile-section">
+                <ui:VisualElement name="creator-view-profilePhoto" class="profile-photo">
+                    <ui:VisualElement name="creator-view-profilePhotoBG" class="profile-photoBG">
+                        <ui:Image name="creator-view-profilePic" class="profile-pic" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:TextElement text="Krishna Yadav" name="userName" class="userName" />
-                <ui:VisualElement name="designerTag" class="interiorDesignerTag">
-                    <ui:TextElement text="Interior Designer" name="profileTag" class="creatorTitle" />
+                <ui:TextElement text="Krishna Yadav" name="creator-view-userName" class="userName" />
+                <ui:VisualElement name="creator-view-designerTag" class="interiorDesignerTag">
+                    <ui:TextElement text="Interior Designer" name="creator-view-profileTag" class="creatorTitle" />
                 </ui:VisualElement>
-                <ui:TextElement text="Creating beautiful spaces that inspire and delight" name="profileTag" class="creator-tag-line" />
-                <ui:VisualElement name="profile-stats" class="profile-stats">
-                    <ui:VisualElement name="profile-following" class="profile-overview">
-                        <ui:TextElement text="69" name="followingCount" class="profile-overview-count" />
+                <ui:TextElement text="Creating beautiful spaces that inspire and delight" name="creator-view-profileTag" class="creator-tag-line" />
+                <ui:VisualElement class="profile-buttons">
+                    <ui:Button name="creator-view-followingButton" class="follow-button">
+                        <ui:VisualElement class="button-content">
+                            <ui:TextElement style="padding:10px;" text="Follow" name="creator-view-follow-button-text" />
+                        </ui:VisualElement>
+                    </ui:Button>
+                    <ui:Button name="creator-view-messageButton" class="message-button">
+                        <ui:VisualElement class="button-content">
+                            <ui:TextElement style="padding:10px;" text="Message" name="creator-view-message-button-text" />
+                        </ui:VisualElement>
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement name="creator-view-profile-stats" class="profile-stats">
+                    <ui:VisualElement name="creator-view-profile-following" class="profile-overview">
+                        <ui:TextElement text="69" name="creator-view-followingCount" class="profile-overview-count" />
                         <ui:TextElement text="Following" class="profile-stats-title" />
                     </ui:VisualElement>
-                    <ui:VisualElement name="profile-follower" class="profile-overview">
-                        <ui:TextElement text="69" name="followerCount" class="profile-overview-count" />
+                    <ui:VisualElement name="creator-view-profile-follower" class="profile-overview">
+                        <ui:TextElement text="69" name="creator-view-followerCount" class="profile-overview-count" />
                         <ui:TextElement text="Followers" class="profile-stats-title" />
                     </ui:VisualElement>
-                    <ui:VisualElement name="profile-post" class="profile-overview">
-                        <ui:TextElement text="69" name="postCount" class="profile-overview-count" />
+                    <ui:VisualElement name="creator-view-profile-post" class="profile-overview">
+                        <ui:TextElement text="69" name="creator-view-postCount" class="profile-overview-count" />
                         <ui:TextElement text="Posts" class="profile-stats-title" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="tabBar" class="tab-bar">
+                <ui:VisualElement name="creator-view-tabBar" class="tab-bar">
                     <ui:VisualElement class="tab-button selected">
-                        <!-- <ui:Image class="gridIcon" /> -->
-                        <ui:Button name="designsTab" class="button" text="Designs"/>
+                        <ui:Button name="creator-view-designsTab" class="button" text="Designs"/>
                     </ui:VisualElement>
                     <ui:VisualElement class="tab-button">
-                        <!-- <ui:Image class="savedIcon" /> -->
-                        <ui:Button name="savedTab" class="button" text="Saved"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement class="tab-button">
-                        <!-- <ui:Image class="aboutIcon" /> -->
-                        <ui:Button name="aboutTab" class="button" text="About"/>
+                        <ui:Button name="creator-view-aboutTab" class="button" text="About"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 
                 <!-- About section -->
-                <ui:VisualElement name="aboutContent" class="about-content" style="display: none;">
-                    <ui:VisualElement name="aboutCard" class="about-card">
+                <ui:VisualElement name="creator-view-aboutContent" class="about-content" style="display: none;">
+                    <ui:VisualElement name="creator-view-aboutCard" class="about-card">
                         <ui:TextElement text="About Me" class="about-title" />
                         <ui:TextElement text="Interior designer with over 5 years of experience creating beautiful, functional spaces. Specializing in minimalist and Scandinavian design aesthetics with a focus on sustainability and natural materials." class="about-description" />
                     </ui:VisualElement>
-                    <ui:VisualElement name="experienceCard" class="experience-card">
+                    <ui:VisualElement name="creator-view-experienceCard" class="experience-card">
                         <ui:TextElement text="Experience" class="about-title" />
                         <ui:TextElement text="5 yeards" class="total-experience" />
                     </ui:VisualElement>
-                    <ui:VisualElement name="contactCard" class="contact-card">
+                    <ui:VisualElement name="creator-view-contactCard" class="contact-card">
                         <ui:TextElement text="Contact" class="about-title" />
                         <ui:TextElement text="www.google.com" class="contact-links" />
                     </ui:VisualElement>

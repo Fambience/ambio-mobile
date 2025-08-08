@@ -294,3 +294,68 @@
     font-size: 35px;
     color: #4b5563;
 }
+
+.design-preference-item {
+    margin-left: 50px;
+    margin-top: 10px;
+    font-size: 40px;
+    color: #444;
+}
+
+.profile-buttons {
+    margin-top: 50px;
+    width: 600px;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.follow-button {
+    -unity-font-style: bold;
+    width: 270px;
+    font-size: 40px;
+    border-width: 5px;
+    border-color: rgb(139, 76, 57);
+    border-radius: 20px;
+    color: #f5f0ed;
+    background-color: rgb(139, 76, 57);
+}
+
+.message-button {
+    background-color: transparent;
+    border-color: rgb(139, 76, 57);
+    width: 270px;
+    border-width: 5px;
+    color: rgb(139, 76, 57);
+    border-radius: 20px;
+    -unity-font-style: bold;
+    font-size: 40px;
+}
+
+.button-content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.back-button {
+    width: 60px;
+    height: 60px;
+    background-color: transparent;
+    border-width: 0;
+    font-size: 18px;
+    color: rgb(51, 51, 51);
+    padding: 0;
+    margin-left: 3%;
+    justify-content: center;
+    align-items: center;
+}
+
+.back-icon {
+    width: 60px;
+    height: 60px;
+    background-image: resource('back-icon');
+    background-repeat: no-repeat;
+    background-size: contain;
+    scale: 2.5;
+}

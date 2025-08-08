@@ -14,11 +14,7 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:TextElement text="Krishna Yadav" name="userName" class="userName" />
-                <ui:VisualElement name="designerTag" class="interiorDesignerTag">
-                    <ui:TextElement text="Interior Designer" name="profileTag" class="creatorTitle" />
-                </ui:VisualElement>
-                <ui:TextElement text="Creating beautiful spaces that inspire and delight" name="profileTag" class="creator-tag-line" />
-                <ui:VisualElement name="profile-stats" class="profile-stats">
+                <ui:VisualElement name="profile-stats" class="profile-stats" style="width: 800px">
                     <ui:VisualElement name="profile-following" class="profile-overview">
                         <ui:TextElement text="69" name="followingCount" class="profile-overview-count" />
                         <ui:TextElement text="Following" class="profile-stats-title" />
@@ -32,17 +28,11 @@
                         <ui:TextElement text="Posts" class="profile-stats-title" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="tabBar" class="tab-bar">
+                <ui:VisualElement name="tabBar" class="tab-bar" style="margin-top: 100px;">
                     <ui:VisualElement class="tab-button selected">
-                        <!-- <ui:Image class="gridIcon" /> -->
-                        <ui:Button name="designsTab" class="button" text="Designs"/>
-                    </ui:VisualElement>
-                    <ui:VisualElement class="tab-button">
-                        <!-- <ui:Image class="savedIcon" /> -->
                         <ui:Button name="savedTab" class="button" text="Saved"/>
                     </ui:VisualElement>
                     <ui:VisualElement class="tab-button">
-                        <!-- <ui:Image class="aboutIcon" /> -->
                         <ui:Button name="aboutTab" class="button" text="About"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
