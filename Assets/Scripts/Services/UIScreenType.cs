@@ -5,6 +5,7 @@ public enum UIScreenType
     Login,
     Register,
     Home,
+    Explore,
     OTP,
     Create,
     BasicDetails,
