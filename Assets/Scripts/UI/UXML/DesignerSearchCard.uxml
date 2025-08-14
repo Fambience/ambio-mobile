@@ -1,13 +1,15 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/USS/DesignerSearchCard.uss?fileID=7433441132597879392&amp;guid=a276551ffe9c4419f9660d5be0ec817a&amp;type=3#DesignerSearchCard" />
     <ui:VisualElement name="main-container" class="main-container">
-        <ui:Image name="designerIcon" class="designer-icon" />
+        <ui:VisualElement name="iconContainer" class="icon-container">
+            <ui:Image name="designerIcon" class="designer-icon" />
+        </ui:VisualElement>
         <ui:VisualElement name="userDetails" class="user-details">
-            <ui:TextElement name="designerUID" class="designer-uid" text="pixelperfectstudio"/>
+            <ui:TextElement name="designerUID" text="pixelperfectstudio" class="designer-uid" />
             <ui:VisualElement name="userBasicDetail" class="user-basic-details">
-                <ui:TextElement name="designerName" class="designer-name" text="Himanshu Mahto"/>
-                <ui:TextElement name="designerName" class="designer-divider" text="|"/>
-                <ui:TextElement name="designerFollow" class="designer-follow" text="1.5K Followers"/>
+                <ui:TextElement name="designerName" text="Himanshu Mahto" class="designer-name" />
+                <ui:TextElement name="designerName" text="|" class="designer-divider" />
+                <ui:TextElement name="designerFollow" text="1.5K Followers" class="designer-follow" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

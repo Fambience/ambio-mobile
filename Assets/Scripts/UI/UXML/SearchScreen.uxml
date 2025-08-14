@@ -1,0 +1,6 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/SearchScreen.uss?fileID=7433441132597879392&amp;guid=2af75c72671074ca3832db6dd16967e3&amp;type=3#SearchScreen" />
+    <ui:VisualElement class="container" style="justify-content: flex-start;">
+
+    </ui:VisualElement>
+</ui:UXML>

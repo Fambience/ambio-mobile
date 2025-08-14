@@ -6,17 +6,32 @@ using System.Collections.Generic;
 
 public static class ExploreHeaderUIBuilder
 {
+    public delegate void SearchClickedDelegate();
+    public static event SearchClickedDelegate OnSearchClicked;
+    
+    
     private static string baseURL;
     private static string authToken;
     private static VisualElement tagsContainer;
+    
+    public delegate void TagSelectedDelegate(string tagName, int tagId);
+    public static event TagSelectedDelegate OnTagSelected;
+    
+    private static VisualElement currentlyLoadingTag;
+    private static bool isLoadingData = false;
+    private static bool isInitialLoad = true;
 
     // Track the currently selected tag (visual element)
     private static VisualElement currentlySelectedTag;
 
-    public static VisualElement CreateHeaderSection(Action onFilterClicked)
+    public static VisualElement CreateHeaderSection(Action onFilterClicked, TagSelectedDelegate onTagSelected = null, SearchClickedDelegate onSearchClicked = null)
     {
         baseURL = baseScript.baseURL;
         authToken = AuthTokenManager.GetToken();
+
+        // Store the callback for use in tag clicks
+        OnTagSelected = onTagSelected;
+        OnSearchClicked = onSearchClicked;
 
         VisualElement headerSection = new VisualElement();
         headerSection.name = "headerSection";
@@ -88,6 +103,7 @@ public static class ExploreHeaderUIBuilder
         searchField.AddToClassList("search-field");
         searchField.value = "";
         searchField.SetValueWithoutNotify("");
+        searchField.isReadOnly = true; // Make it read-only since it's just a button now
 
         // Styling
         searchField.style.width = Length.Percent(100);
@@ -110,6 +126,9 @@ public static class ExploreHeaderUIBuilder
 
         // Placeholder
         SetupSearchFieldPlaceholder(searchField);
+    
+        // Add click event to open search screen
+        searchField.RegisterCallback<ClickEvent>(evt => OnSearchClicked?.Invoke());
 
         return searchField;
     }
@@ -321,17 +340,153 @@ public static class ExploreHeaderUIBuilder
 
     private static void OnTagClicked(int tagId, string tagName, VisualElement clickedTag)
     {
+        // Prevent clicking while another tag is loading
+        if (isLoadingData)
+        {
+            Debug.Log("Another tag is still loading, ignoring click");
+            return;
+        }
+
+        // Don't do anything if clicking the already selected tag
+        if (clickedTag == currentlySelectedTag)
+        {
+            Debug.Log("Tag already selected, ignoring click");
+            return;
+        }
+
         Debug.Log($"Tag clicked: {tagName} (ID: {tagId})");
 
-        // Deselect previous
+        // Set loading state (this only applies to manual clicks, not initial load)
+        isLoadingData = true;
+        currentlyLoadingTag = clickedTag;
+
+        // Apply loading visual state to the clicked tag
+        ApplyLoadingStyle(clickedTag);
+
+        // Determine the API type parameter based on tag
+        string apiType = GetAPITypeFromTag(tagName, tagId);
+    
+        // Call the API with the selected tag type
+        OnTagSelected?.Invoke(apiType, tagId);
+    }
+    
+    public static bool IsInitialLoad()
+    {
+        return isInitialLoad;
+    }
+    
+    private static void ApplyLoadingStyle(VisualElement tag)
+    {
+        if (tag == null) return;
+    
+        var label = tag.Q<Label>("tagLabel");
+        if (label != null)
+        {
+            // Make text slightly dimmer to show loading state
+            label.style.color = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+        }
+    
+        // Apply a subtle loading background
+        tag.style.backgroundColor = new Color(0.9f, 0.9f, 0.9f, 0.3f);
+    
+        // Optional: Add a subtle pulsing effect
+        tag.style.opacity = 0.7f;
+    }
+    
+    public static void OnDataLoadSuccess(int tagId)
+    {
+        if (!isLoadingData || currentlyLoadingTag == null) return;
+
+        Debug.Log($"Data loaded successfully for tag ID: {tagId}");
+
+        // Remove previous selection
         RemoveSelectedStyle(currentlySelectedTag);
 
-        // Select new
-        ApplySelectedStyle(clickedTag);
+        // Apply selected style to the loading tag
+        ApplySelectedStyle(currentlyLoadingTag);
 
-        // Update reference
-        currentlySelectedTag = clickedTag;
+        // Update current selection
+        currentlySelectedTag = currentlyLoadingTag;
+
+        // Clear loading state
+        ResetLoadingState();
     }
+    
+    public static void OnDataLoadError(int tagId)
+    {
+        if (!isLoadingData || currentlyLoadingTag == null) return;
+
+        Debug.Log($"Data load failed for tag ID: {tagId}");
+
+        // Remove loading style and revert to normal
+        RemoveLoadingStyle(currentlyLoadingTag);
+
+        // Clear loading state
+        ResetLoadingState();
+
+        // Optionally show error feedback (you could add a brief red border or something)
+        ShowTagErrorFeedback(currentlyLoadingTag);
+    }
+    
+    private static void RemoveLoadingStyle(VisualElement tag)
+    {
+        if (tag == null) return;
+    
+        var label = tag.Q<Label>("tagLabel");
+        if (label != null)
+        {
+            var grey = new Color(129f / 255f, 129f / 255f, 129f / 255f, 0.84f);
+            label.style.color = grey;
+        }
+    
+        tag.style.backgroundColor = Color.clear;
+        tag.style.opacity = 1f;
+    }
+
+    private static void ResetLoadingState()
+    {
+        isLoadingData = false;
+        currentlyLoadingTag = null;
+    }
+    
+    private static void ShowTagErrorFeedback(VisualElement tag)
+    {
+        if (tag == null) return;
+    
+        // Brief red border to indicate error
+        tag.style.borderBottomColor = Color.red;
+        tag.style.borderTopColor = Color.red;
+        tag.style.borderLeftColor = Color.red;
+        tag.style.borderRightColor = Color.red;
+    
+        // Revert back to normal after a short delay
+        CoroutineRunner.Instance.StartRoutine(RevertErrorFeedback(tag));
+    }
+    
+    private static IEnumerator RevertErrorFeedback(VisualElement tag)
+    {
+        yield return new WaitForSeconds(1.5f);
+    
+        if (tag != null)
+        {
+            var grey = new Color(129f / 255f, 129f / 255f, 129f / 255f, 0.84f);
+            tag.style.borderBottomColor = grey;
+            tag.style.borderTopColor = grey;
+            tag.style.borderLeftColor = grey;
+            tag.style.borderRightColor = grey;
+        }
+    }
+    
+    private static string GetAPITypeFromTag(string tagName, int tagId)
+    {
+        if (tagId == 0 || tagName.ToLower() == "trending")
+        {
+            return "trending";
+        }
+    
+        return tagName.ToLower().Replace(" ", "-");
+    }
+
     
     private static void UpdateTagsWithData(List<PostDataGetter.TagItem> tags)
     {
@@ -340,8 +495,21 @@ public static class ExploreHeaderUIBuilder
         // Always add and preselect "Trending"
         VisualElement defaultTag = CreateDesignTag("Trending", 0);
         tagsContainer.Add(defaultTag);
-        ApplySelectedStyle(defaultTag);
-        currentlySelectedTag = defaultTag;
+    
+        // For initial load, directly apply selected style without loading state
+        if (isInitialLoad)
+        {
+            ApplySelectedStyle(defaultTag);
+            currentlySelectedTag = defaultTag;
+            isInitialLoad = false; // Mark that initial load is done
+        }
+        else
+        {
+            // For subsequent loads (like refresh), use loading state
+            isLoadingData = true;
+            currentlyLoadingTag = defaultTag;
+            ApplyLoadingStyle(defaultTag);
+        }
 
         // Add others from API
         if (tags != null)
@@ -353,6 +521,9 @@ public static class ExploreHeaderUIBuilder
                 tagsContainer.Add(designTag);
             }
         }
+
+        // Automatically trigger trending API call
+        OnTagSelected?.Invoke("trending", 0);
     }
 
     private static void UpdateTagsWithError()
@@ -367,11 +538,31 @@ public static class ExploreHeaderUIBuilder
         VisualElement fallbackTrending = CreateDesignTag("Trending", 0);
         fallbackTrending.style.marginLeft = 15;
         tagsContainer.Add(fallbackTrending);
-        ApplySelectedStyle(fallbackTrending);
-        currentlySelectedTag = fallbackTrending;
-    }
+    
+        // For initial load, directly apply selected style
+        if (isInitialLoad)
+        {
+            ApplySelectedStyle(fallbackTrending);
+            currentlySelectedTag = fallbackTrending;
+            isInitialLoad = false;
+        }
+        else
+        {
+            // For subsequent loads, use loading state
+            isLoadingData = true;
+            currentlyLoadingTag = fallbackTrending;
+            ApplyLoadingStyle(fallbackTrending);
+        }
 
-    // === Selection style helpers ===
+        // Automatically trigger trending API call
+        OnTagSelected?.Invoke("trending", 0);
+    }
+    
+    public static void ResetInitialLoadFlag()
+    {
+        isInitialLoad = true;
+    }
+    
     private static void ApplySelectedStyle(VisualElement tag)
     {
         if (tag == null) return;

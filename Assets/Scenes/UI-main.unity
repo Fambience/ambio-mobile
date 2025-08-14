@@ -1210,10 +1210,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalRows: 10
   postsPerRow: 3
+  useDummyData: 0
   filterPopupVisualTree: {fileID: 9197481963319205126, guid: e83d6bbbfb53948fd891c911ab9dd22a, type: 3}
   pullThreshold: 100
   refreshIndicatorSize: 50
-  refreshDuration: 3
+  searchScreenVisualTree: {fileID: 9197481963319205126, guid: b2b11446d8b924d7ea7684a997da3519, type: 3}
+  designerCardVisualTree: {fileID: 9197481963319205126, guid: 9a7f23bb613004796a5706996b7610b3, type: 3}
 --- !u!1 &1119881444
 GameObject:
   m_ObjectHideFlags: 0

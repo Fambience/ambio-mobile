@@ -23,6 +23,12 @@ public class ExploreScreenController : MonoBehaviour
     public float pullThreshold = 100f;
     public float refreshIndicatorSize = 50f;
     
+    [Header("Search Configuration")]
+    [SerializeField] private VisualTreeAsset searchScreenVisualTree;
+    private VisualElement searchScreen;
+    private bool isSearchScreenActive = false;
+    [SerializeField] private VisualTreeAsset designerCardVisualTree; 
+    
     private UIDocument uiDocument;
     private ScrollView mainScrollView;
     private VisualElement exploreScreen;
@@ -42,6 +48,11 @@ public class ExploreScreenController : MonoBehaviour
     {
         baseURL = baseScript.baseURL;
         authToken = AuthTokenManager.GetToken();
+        // If search screen was active, hide it when returning to this screen
+        if (isSearchScreenActive)
+        {
+            HideSearchScreen();
+        }
         StartCoroutine(ShowNavigationAfterDelay());   
         Invoke("InitializeExploreScreen", 0.1f);
     }
@@ -174,12 +185,11 @@ public class ExploreScreenController : MonoBehaviour
         {
             Debug.Log("Using dummy data for testing...");
             int totalPosts = totalRows * postsPerRow;
-            allPosts = PostDataGetter.GenerateDummyPosts(totalPosts);
+            // allPosts = PostDataGetter.GenerateDummyPosts(totalPosts);
         }
         else
         {
-            Debug.Log("Loading trending posts from API...");
-            StartCoroutine(FetchTrendingPostsCoroutine());
+            Debug.Log("Trending posts will be loaded when trending tag is selected...");
         }
     }
     
@@ -226,7 +236,7 @@ public class ExploreScreenController : MonoBehaviour
             // Fallback to dummy data
             Debug.Log("Falling back to dummy data...");
             int totalPosts = totalRows * postsPerRow;
-            allPosts = PostDataGetter.GenerateDummyPosts(totalPosts);
+            // allPosts = PostDataGetter.GenerateDummyPosts(totalPosts);
             
             if (mainScrollView != null)
             {
@@ -242,25 +252,29 @@ public class ExploreScreenController : MonoBehaviour
             Debug.LogError("MainScrollView is null!");
             return;
         }
-        
+
         Debug.Log("Creating scrollable content...");
-        
+
         // Clear existing content
         mainScrollView.Clear();
-        
+
         // Create main container for all content
         VisualElement mainContainer = new VisualElement();
         mainContainer.style.flexDirection = FlexDirection.Column;
         mainContainer.style.alignItems = Align.Stretch;
         mainContainer.style.width = Length.Percent(100);
-        
-        // Create and add header section
-        VisualElement headerSection = ExploreHeaderUIBuilder.CreateHeaderSection(OnFilterClicked);
+
+        // Create and add header section with tag selection callback AND search callback
+        VisualElement headerSection = ExploreHeaderUIBuilder.CreateHeaderSection(
+            OnFilterClicked, 
+            OnTagSelected, 
+            OnSearchClicked  // Add this new callback
+        );
         mainContainer.Add(headerSection);
-        
+
         // Insert refresh container after header section (just above posts)
         mainContainer.Add(refreshContainer);
-        
+
         // Create and add posts section
         VisualElement postsContainer = ExplorePostUIBuilder.CreatePostsContainer(
             allPosts, 
@@ -268,13 +282,144 @@ public class ExploreScreenController : MonoBehaviour
             OnPostClicked
         );
         mainContainer.Add(postsContainer);
-        
+
         mainScrollView.Add(mainContainer);
-        
+
         // Register pull to refresh events after content is created
         RegisterPullToRefreshEvents();
-        
+
         Debug.Log($"Created scrollable content with header and {allPosts.Count} posts");
+    }
+    
+    //search bar functions
+    private void OnSearchClicked()
+    {
+        Debug.Log("Search field clicked - showing search screen");
+        ShowSearchScreen();
+    }
+
+    private void ShowSearchScreen()
+    {
+        if (searchScreen == null)
+        {
+            // Set the designer card template before creating search screen
+            SearchScreenUIBuilder.SetDesignerCardTemplate(designerCardVisualTree);
+        
+            // Create the search screen using your UXML template
+            searchScreen = SearchScreenUIBuilder.CreateSearchScreen(
+                OnSearchBackClicked, 
+                searchScreenVisualTree
+            );
+    
+            // Add to the root element (same level as exploreScreen)
+            var rootElement = uiDocument.rootVisualElement;
+            rootElement.Add(searchScreen);
+    
+            Debug.Log("Search screen created from UXML template and added to root");
+        }
+
+        // Show the search screen
+        searchScreen.style.display = DisplayStyle.Flex;
+        isSearchScreenActive = true;
+
+        // Hide navigation bar when search is active
+        NavigationManager.ToggleNavigationBar(false);
+
+        // Focus the search field
+        SearchScreenUIBuilder.FocusSearchField();
+
+        Debug.Log("Search screen displayed");
+    }
+
+    private void OnSearchBackClicked()
+    {
+        Debug.Log("Search back button clicked");
+        HideSearchScreen();
+    }
+
+    private void HideSearchScreen()
+    {
+        if (searchScreen != null)
+        {
+            searchScreen.style.display = DisplayStyle.None;
+            isSearchScreenActive = false;
+        
+            // Show navigation bar again
+            NavigationManager.ToggleNavigationBar(true);
+            NavigationManager.UpdateSelectedIcon(NavScreen.Explore);
+        
+            Debug.Log("Search screen hidden");
+        }
+    }
+    
+    private void OnTagSelected(string tagType, int tagId)
+    {
+        Debug.Log($"Tag selected: {tagType} (ID: {tagId})");
+        // Check if this is initial trending load
+        bool isInitialTrending = (tagId == 0 && ExploreHeaderUIBuilder.IsInitialLoad());
+        // Start coroutine to fetch posts for the selected tag
+        StartCoroutine(FetchPostsByTagCoroutine(tagType, tagId, isInitialTrending));
+    }
+    
+    private IEnumerator FetchPostsByTagCoroutine(string tagType, int tagId, bool isInitialLoad = false)
+    {
+        Debug.Log($"Fetching posts for tag type: {tagType} (Initial: {isInitialLoad})");
+        
+        bool apiCallCompleted = false;
+        List<PostData> fetchedPosts = null;
+        string errorMessage = null;
+
+        // Use the modified FetchFeedByType method
+        yield return PostDataGetter.FetchFeedByType(
+            baseURL,
+            authToken,
+            tagType,
+            onSuccess: (posts) => 
+            {
+                fetchedPosts = posts;
+                apiCallCompleted = true;
+            },
+            onError: (error) => 
+            {
+                errorMessage = error;
+                apiCallCompleted = true;
+            }
+        );
+
+        // Wait for API call to complete
+        yield return new WaitUntil(() => apiCallCompleted);
+
+        if (fetchedPosts != null && fetchedPosts.Count >= 0)
+        {
+            allPosts = fetchedPosts;
+            totalRows = Mathf.CeilToInt((float)allPosts.Count / postsPerRow);
+            Debug.Log($"Successfully loaded {allPosts.Count} posts for tag: {tagType}");
+            
+            // Update the posts display
+            UpdatePostsDisplay(allPosts);
+            
+            // Only notify header about loading completion for non-initial loads
+            if (!isInitialLoad)
+            {
+                ExploreHeaderUIBuilder.OnDataLoadSuccess(tagId);
+            }
+        }
+        else
+        {
+            Debug.LogError($"Failed to fetch posts for tag {tagType}: {errorMessage}");
+            
+            // Show error state only for non-initial loads
+            if (!isInitialLoad)
+            {
+                // ShowPostsErrorState(errorMessage);
+                ExploreHeaderUIBuilder.OnDataLoadError(tagId);
+            }
+            else
+            {
+                // For initial load failure, just log and continue
+                Debug.LogWarning("Initial trending load failed, continuing with empty state");
+            }
+        }
     }
     
     #region Pull to Refresh Event Handlers
@@ -372,7 +517,7 @@ public class ExploreScreenController : MonoBehaviour
             // For dummy data, simulate a quick load
             yield return new WaitForSeconds(0.5f);
             int totalPosts = totalRows * postsPerRow;
-            allPosts = PostDataGetter.GenerateDummyPosts(totalPosts);
+            // allPosts = PostDataGetter.GenerateDummyPosts(totalPosts);
             apiCallCompleted = true;
             apiCallSuccessful = true;
         }
@@ -520,69 +665,71 @@ public class ExploreScreenController : MonoBehaviour
     void OnFiltersApplied()
     {
         Debug.Log("Filters applied, refreshing content...");
-        
+    
         // Get current filter data
         FilterData filterData = filterPopupHandler.GetCurrentFilterData();
+    
+        // Start coroutine to fetch filtered posts from API
+        StartCoroutine(FetchFilteredPostsCoroutine(filterData));
+    }
+    
+    private IEnumerator FetchFilteredPostsCoroutine(FilterData filterData)
+    {
+        Debug.Log($"Fetching filtered posts - Room Type: {filterData.RoomType}, Design Style: {filterData.DesignStyle}, Sort By: {filterData.SortBy}");
+    
+        bool apiCallCompleted = false;
+        List<PostData> fetchedPosts = null;
+        string errorMessage = null;
+
+        // Use the new FetchFilteredPosts method
+        yield return PostDataGetter.FetchFilteredPosts(
+            baseURL,
+            authToken,
+            roomType: filterData.RoomType,
+            designStyle: filterData.DesignStyle,
+            sortBy: filterData.SortBy,
+            onSuccess: (posts) => 
+            {
+                fetchedPosts = posts;
+                apiCallCompleted = true;
+            },
+            onError: (error) => 
+            {
+                errorMessage = error;
+                apiCallCompleted = true;
+            }
+        );
+
+        // Wait for API call to complete
+        yield return new WaitUntil(() => apiCallCompleted);
+
+        if (fetchedPosts != null)
+        {
+            allPosts = fetchedPosts;
+            totalRows = Mathf.CeilToInt((float)allPosts.Count / postsPerRow);
+            Debug.Log($"Successfully loaded {allPosts.Count} filtered posts from API");
         
-        // Apply filters to posts (implement your filtering logic here)
-        List<PostData> filteredPosts = ApplyFiltersToPostData(allPosts, filterData);
+            // Update the posts display with filtered results
+            UpdatePostsDisplay(allPosts);
+        }
+        else
+        {
+            Debug.LogError($"Failed to fetch filtered posts: {errorMessage}");
         
-        // Update the display with filtered posts
-        UpdatePostsDisplay(filteredPosts);
+            // Show error message to user or keep existing posts
+            if (allPosts.Count == 0)
+            {
+                // If no posts currently shown, could show empty state
+                UpdatePostsDisplay(new List<PostData>());
+            }
+            // Otherwise keep existing posts displayed
+        }
     }
     
     List<PostData> ApplyFiltersToPostData(List<PostData> posts, FilterData filterData)
     {
-        // Enhanced filtering logic using the new API data
-        List<PostData> filteredPosts = new List<PostData>(posts);
-        
-        // Example filtering based on design style
-        /*
-        if (filterData.MinimalEnabled)
-        {
-            filteredPosts = filteredPosts.FindAll(post => 
-                post.designStyle.ToLower().Contains("minimal") ||
-                post.designStyle.ToLower().Contains("modern"));
-        }
-        
-        if (filterData.ContemporaryEnabled)
-        {
-            filteredPosts = filteredPosts.FindAll(post => 
-                post.designStyle.ToLower().Contains("contemporary"));
-        }
-        
-        // Filter by room type
-        if (!string.IsNullOrEmpty(filterData.SelectedRoomType))
-        {
-            filteredPosts = filteredPosts.FindAll(post => 
-                post.roomType.ToLower().Contains(filterData.SelectedRoomType.ToLower()));
-        }
-        
-        // Filter by user role (Creators vs Users)
-        if (filterData.CreatorsOnly)
-        {
-            filteredPosts = filteredPosts.FindAll(post => 
-                post.userRole == "CREATOR");
-        }
-        */
-        
-        // Apply sorting based on API data
-        /*
-        switch (filterData.SortBy)
-        {
-            case SortOption.MostPopular:
-                filteredPosts = filteredPosts.OrderByDescending(post => post.likesCount).ToList();
-                break;
-            case SortOption.MostCommented:
-                filteredPosts = filteredPosts.OrderByDescending(post => post.commentsCount).ToList();
-                break;
-            case SortOption.MostBookmarked:
-                filteredPosts = filteredPosts.OrderByDescending(post => post.bookmarksCount).ToList();
-                break;
-        }
-        */
-        
-        return filteredPosts;
+        Debug.Log("Using API-filtered posts, no additional client-side filtering needed");
+        return posts;
     }
     
     void UpdatePostsDisplay(List<PostData> filteredPosts)
@@ -657,11 +804,18 @@ public class ExploreScreenController : MonoBehaviour
             mainScrollView.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
             mainScrollView.UnregisterCallback<PointerUpEvent>(OnPointerUp);
         }
-        
+    
         // Unsubscribe from events to prevent memory leaks
         if (filterPopupHandler != null)
         {
             filterPopupHandler.OnFiltersApplied -= OnFiltersApplied;
+        }
+    
+        // Clean up search screen
+        if (searchScreen != null && searchScreen.parent != null)
+        {
+            searchScreen.parent.Remove(searchScreen);
+            searchScreen = null;
         }
     }
 }
