@@ -325,7 +325,6 @@ public class CreatePostController : MonoBehaviour
         string createPostUrl = $"{baseURL}/api/v1/post/create-post";
         using (UnityWebRequest www = UnityWebRequest.Post(createPostUrl, formData))
         {
-            Debug.Log("Himanshu kumar mahto");
             www.SetRequestHeader("Authorization", authToken);
             yield return www.SendWebRequest();
             

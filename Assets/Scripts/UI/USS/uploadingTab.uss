@@ -1,0 +1,72 @@
+.main-container {
+    margin-top: 100px;
+    background-color: #F5F0ED;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.upload-icon {
+    width: 80px;
+    height: 80px;
+    background-image: resource("uploading");
+    background-size: cover;
+    margin-right: 20px;
+}
+
+.upload-section {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    width: 500px;
+}
+
+.upload-title {
+    width: 100%;
+    font-size: 35px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 20px;
+    background-color: #E0E0E0;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    border: 2px solid #CCC;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #2196F3;
+    border-radius: 8px;
+    transition-property: width, background-color;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-out;
+    width: 10%;
+}
+
+.progress-bar-fill.completed {
+    background-color: #4CAF50;
+}
+
+.progress-bar-fill.error {
+    background-color: #F44336;
+}
+
+.percentage-section {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.percentage {
+    color: #333;
+    font-size: 30px;
+}
