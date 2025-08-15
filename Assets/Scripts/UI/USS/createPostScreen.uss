@@ -29,8 +29,8 @@
 .image-icon{
     margin-top: 50px;
     margin-left: 50px;
-    width: 350;
-    height: 300;
+    width: 350px;
+    height: 300px;
     align-self: flex-start;
     background-image: resource("addImage");
 }
@@ -255,7 +255,7 @@
 
 /* Options List */
 .options-list {
-    max-height: 250px;
+    max-height: 350px;
 }
 
 .option-item {
@@ -330,63 +330,19 @@
     overflow: hidden;
 }
 
-/*!* Hide all scroll indicators completely *!*/
-/*.scrollView .unity-scroll-view__vertical-scroller,*/
-/*.scrollView .unity-scroll-view__horizontal-scroller {*/
-/*    display: none;*/
-/*    width: 0;*/
-/*    height: 0;*/
-/*    flex-grow: 0;*/
-/*}*/
-
-/*!* Hide vertical scroller components *!*/
-/*.scrollView .unity-scroller--vertical,*/
-/*.scrollView .unity-scroller--vertical > .unity-scroller__low-button,*/
-/*.scrollView .unity-scroller--vertical > .unity-scroller__high-button,*/
-/*.scrollView .unity-scroller--vertical > .unity-scroller__slider {*/
-/*    display: none;*/
-/*    width: 0;*/
-/*    height: 0;*/
-/*}*/
-
-/*!* Hide horizontal scroller components *!*/
-/*.scrollView .unity-scroller--horizontal,*/
-/*.scrollView .unity-scroller--horizontal > .unity-scroller__low-button,*/
-/*.scrollView .unity-scroller--horizontal > .unity-scroller__high-button,*/
-/*.scrollView .unity-scroller--horizontal > .unity-scroller__slider {*/
-/*    display: none;*/
-/*    width: 0;*/
-/*    height: 0;*/
-/*}*/
-
-/*!* Alternative approach - set scroller visibility to hidden *!*/
-/*.scrollView {*/
-/*    --unity-scroll-view-vertical-scroller-visibility: hidden;*/
-/*    --unity-scroll-view-horizontal-scroller-visibility: hidden;*/
-/*}*/
-
-/*!* More specific targeting for stubborn scrollbars *!*/
-/*.scrollView > .unity-scroll-view__vertical-scroller,*/
-/*.scrollView > .unity-scroll-view__horizontal-scroller {*/
-/*    visibility: hidden;*/
-/*    display: none;*/
-/*    width: 0;*/
-/*    height: 0;*/
-/*    opacity: 0;*/
-/*}*/
-
-/*!* Target the content viewport to ensure full width *!*/
-/*.scrollView > .unity-scroll-view__content-viewport {*/
-/*    width: 100%;*/
-/*    height: 100%;*/
-/*}*/
-
-/*!* Hide any remaining scroll elements *!*/
-/*.scrollView .unity-base-slider,*/
-/*.scrollView .unity-base-slider__tracker,*/
-/*.scrollView .unity-base-slider__dragger {*/
-/*    display: none;*/
-/*    width: 0;*/
-/*    height: 0;*/
-/*    visibility: hidden;*/
-/*}*/
+.warning-text {
+    font-size: 35px;
+    -unity-text-align: middle-center;
+    color: rgb(255, 0, 0);
+    margin-left: 80px;
+    justify-content: flex-end;
+    align-content: flex-end;
+    height: 80px; 
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.warning-text.show {
+    visibility: visible;
+    opacity: 1;
+}
