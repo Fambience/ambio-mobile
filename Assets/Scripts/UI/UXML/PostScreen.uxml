@@ -13,7 +13,17 @@
             </ui:VisualElement>
             <ui:VisualElement class="card-body">
                 <ui:TextElement name="description" text="This contemporary living room features a warm, minimalist design with a calming neutral..." class="description" />
-                <ui:Image name="card-image" class="card-image" />
+                <ui:VisualElement name="imageSliderContainer" class="image-slider-container">
+                    <ui:TextElement name="imageCounter" text="1/1" class="image-counter" />
+                    <ui:VisualElement name="imageContainer" class="image-container"/>
+                    <!-- <ui:Button name="previousButton" class="nav-button prev-button"> -->
+                    <!--     <ui:Image class="nav-icon prev-icon" /> -->
+                    <!-- </ui:Button> -->
+                    <!-- <ui:Button name="nextButton" class="nav-button next-button"> -->
+                    <!--     <ui:Image class="nav-icon next-icon" /> -->
+                    <!-- </ui:Button> -->
+                    <ui:VisualElement name="dotsContainer" class="dots-container"/>
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement class="icon-section">
@@ -37,9 +47,9 @@
                 <ui:VisualElement name="comment" class="comment-item">
                     <ui:VisualElement name="userDetails" class="user-details">
                         <ui:Image name="commentUserImage" class="comment-user-image" />
-                        <ui:TextElement name="commentUserName" text="Arvind Rao" class="comment-user-name" />
+                        <ui:TextElement name="commentUserName" text="Loading..." class="comment-user-name" />
                     </ui:VisualElement>
-                    <ui:TextElement name="commentText" text="This is a sample comment." class="comment-text" />
+                    <ui:TextElement name="commentText" text="Loading comments..." class="comment-text" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

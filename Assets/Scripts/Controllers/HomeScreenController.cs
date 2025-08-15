@@ -69,7 +69,7 @@ public class Post
     [SerializeField] public List<string> tags;
     [SerializeField] public List<Media> media;
     [SerializeField] public List<PostMedia> postMedia;
-    [SerializeField] public User creator; // Changed from 'user' to 'creator'
+    [SerializeField] public User author;
     [SerializeField] public bool liked;
     [SerializeField] public bool bookmarked;
     
@@ -278,7 +278,6 @@ public class HomeScreenController : MonoBehaviour
     private IEnumerator LikePost(string postId, Image likeIcon, Post post)
     {
         string url = $"{baseURL}/api/v1/post/like/{postId}";
-        Debug.Log($"Liking post {postId}");
         
         using (UnityWebRequest request = UnityWebRequest.PostWwwForm(url, ""))
         {
@@ -306,7 +305,6 @@ public class HomeScreenController : MonoBehaviour
                                 post.likesCount--;
                                 post.liked = false;
                             }
-                            Debug.Log($"Post unliked. New count: {post.likesCount}");
                         }
                         else
                         {
@@ -318,7 +316,6 @@ public class HomeScreenController : MonoBehaviour
                                 post.likesCount++;
                                 post.liked = true;
                             }
-                            Debug.Log($"Post liked. New count: {post.likesCount}");
                         }
                     }
                     else
@@ -341,8 +338,6 @@ public class HomeScreenController : MonoBehaviour
     private IEnumerator BookmarkPost(string postId, Image bookmarkIcon, Post post)
     {
         string url = $"{baseURL}/api/v1/post/bookmark/{postId}";
-        Debug.Log($"Bookmarking post {postId}");
-        Debug.Log($"Bookmark URL: {url}");
         
         using (UnityWebRequest request = UnityWebRequest.PostWwwForm(url, ""))
         {
@@ -367,7 +362,6 @@ public class HomeScreenController : MonoBehaviour
                                 bookmarkIcon.image = outlineBookmark;
                                 post.bookmarked = false;
                             }
-                            Debug.Log("Bookmark removed successfully");
                         }
                         else
                         {
@@ -378,7 +372,6 @@ public class HomeScreenController : MonoBehaviour
                                 bookmarkIcon.image = filledBookmark;
                                 post.bookmarked = true;
                             }
-                            Debug.Log("Post bookmarked successfully");
                         }
                     }
                     else
@@ -411,7 +404,6 @@ public class HomeScreenController : MonoBehaviour
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string jsonResponse = request.downloadHandler.text;
-                Debug.Log($"Home Feed Raw Response: {jsonResponse}");
                 
                 try
                 {
@@ -421,71 +413,45 @@ public class HomeScreenController : MonoBehaviour
                     {
                         if (page == 1)
                         {
-                            Debug.Log("REFRESH: Clearing home posts for page 1");
+                            // Page 1 = fresh start, clear previous data
                             homePosts.Clear();
                             totalHomePagesLoaded = 0;
+                            currentHomePostIndex = 0; // Reset index when clearing
+                            Debug.Log("HOME FEED: Cleared previous data for fresh start");
                         }
                         
-                        // Only add if we haven't loaded this page before
+                        // Only add if we haven't loaded this page before (for pagination)
                         if (page > totalHomePagesLoaded)
                         {
                             int postsBeforeAdd = homePosts.Count;
-                            
-                            // Debug JSON parsing for each post
-                            Debug.Log($"=== HOME FEED DEBUG - Page {page} ===");
-                            Debug.Log($"Raw JSON subset: {jsonResponse.Substring(0, Math.Min(500, jsonResponse.Length))}...");
-                            
-                            foreach (var post in response.data.posts)
-                            {
-                                Debug.Log($"--- Home Post Debug ---");
-                                Debug.Log($"Post ID: {post.postId}");
-                                Debug.Log($"Description: {post.description}");
-                                Debug.Log($"Creator object exists: {post.creator != null}");
-                                
-                                if (post.creator != null)
-                                {
-                                    Debug.Log($"  Creator ID: '{post.creator.userId}'");
-                                    Debug.Log($"  Creator Name: '{post.creator.userName}'");
-                                    Debug.Log($"  First Name: '{post.creator.firstName}'");
-                                    Debug.Log($"  Last Name: '{post.creator.lastName}'");
-                                    Debug.Log($"  Email: '{post.creator.email}'");
-                                    Debug.Log($"  Avatar: '{post.creator.avatar}'");
-                                }
-                                else
-                                {
-                                    Debug.LogError("Creator object is NULL!");
-                                }
-                                Debug.Log($"--- End Home Post Debug ---");
-                            }
                             
                             homePosts.AddRange(response.data.posts);
                             totalHomePagesLoaded = page;
                             hasMoreHomePosts = response.data.posts.Count >= postsPerPage;
                             
-                            Debug.Log($"SUCCESS: Added {response.data.posts.Count} posts. Total: {homePosts.Count} (was {postsBeforeAdd})");
-                            Debug.Log($"PAGINATION: Page {page} loaded, hasMore: {hasMoreHomePosts}");
+                            Debug.Log($"HOME FEED: Added {response.data.posts.Count} posts. Total now: {homePosts.Count}");
                         }
                         else
                         {
-                            Debug.Log($"SKIP: Page {page} already loaded (totalLoaded: {totalHomePagesLoaded})");
+                            Debug.Log($"HOME FEED: Page {page} already loaded (totalLoaded: {totalHomePagesLoaded})");
                         }
                     }
                     else
                     {
-                        Debug.LogWarning($"NO DATA: {response.message}");
                         hasMoreHomePosts = false;
+                        Debug.Log("HOME FEED: No data received, marking as no more posts");
                     }
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogError($"PARSE ERROR: {e.Message}");
                     hasMoreHomePosts = false;
+                    Debug.LogError($"HOME FEED: Parse error - {e.Message}");
                 }
             }
             else
             {
-                Debug.LogError($"NETWORK ERROR: {request.error}");
                 hasMoreHomePosts = false;
+                Debug.LogError($"HOME FEED: Network error - {request.error}");
             }
         }
     }
@@ -503,13 +469,11 @@ public class HomeScreenController : MonoBehaviour
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string jsonResponse = request.downloadHandler.text;
-                Debug.Log($"Explore Feed Raw Response: {jsonResponse}");
                 
                 try
                 {
                     // Parse the explore feed response which has posts directly in data array
                     ApiResponse<List<Post>> response = JsonUtility.FromJson<ApiResponse<List<Post>>>(jsonResponse);
-                    Debug.Log("Himanshu" + response);
                     
                     if (response.success && response.data != null)
                     {
@@ -524,39 +488,9 @@ public class HomeScreenController : MonoBehaviour
                         {
                             int postsBeforeAdd = explorePosts.Count;
                             
-                            // Debug JSON parsing for each post
-                            Debug.Log($"=== EXPLORE FEED DEBUG - Page {page} ===");
-                            Debug.Log($"Raw JSON subset: {jsonResponse.Substring(0, Math.Min(500, jsonResponse.Length))}...");
-                            
-                            foreach (var post in response.data)
-                            {
-                                Debug.Log($"--- Post Debug ---");
-                                Debug.Log($"Post ID: {post.postId}");
-                                Debug.Log($"Description: {post.description}");
-                                Debug.Log($"Creator object exists: {post.creator != null}");
-                                
-                                if (post.creator != null)
-                                {
-                                    Debug.Log($"  Creator ID: '{post.creator.userId}'");
-                                    Debug.Log($"  Creator Name: '{post.creator.userName}'");
-                                    Debug.Log($"  First Name: '{post.creator.firstName}'");
-                                    Debug.Log($"  Last Name: '{post.creator.lastName}'");
-                                    Debug.Log($"  Email: '{post.creator.email}'");
-                                    Debug.Log($"  Avatar: '{post.creator.avatar}'");
-                                }
-                                else
-                                {
-                                    Debug.LogError("Creator object is NULL!");
-                                }
-                                Debug.Log($"--- End Post Debug ---");
-                            }
-                            
                             explorePosts.AddRange(response.data);
                             totalExplorePagesLoaded = page;
                             hasMoreExplorePosts = response.data.Count >= postsPerPage;
-                            
-                            Debug.Log($"SUCCESS: Added {response.data.Count} posts. Total: {explorePosts.Count} (was {postsBeforeAdd})");
-                            Debug.Log($"PAGINATION: Page {page} loaded, hasMore: {hasMoreExplorePosts}");
                         }
                         else
                         {
@@ -565,20 +499,16 @@ public class HomeScreenController : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogError($"NO DATA: {response.message}");
                         hasMoreExplorePosts = false;
                     }
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogError($"PARSE ERROR: {e.Message}");
-                    Debug.LogError($"JSON Response: {jsonResponse}");
                     hasMoreExplorePosts = false;
                 }
             }
             else
             {
-                Debug.LogError($"NETWORK ERROR: {request.error}");
                 hasMoreExplorePosts = false;
             }
         }
@@ -604,12 +534,10 @@ public class HomeScreenController : MonoBehaviour
                     var response = JsonUtility.FromJson<FollowResponse>(jsonResponse);
                     if (response.followed)
                     {
-                        Debug.Log($"Successfully followed user: {response.message}");
                         StartCoroutine(HideCardAfterDelay(horizontalCard, 10f));
                     }
                     else
                     {
-                        Debug.Log($"Successfully unfollowed user: {response.message}");
                         followText.text = "Follow";
                         followButton.style.backgroundColor = StyleKeyword.Null;
                         followText.style.color = StyleKeyword.Null;
@@ -617,13 +545,11 @@ public class HomeScreenController : MonoBehaviour
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogError($"Error parsing follow response: {e.Message}");
                     RevertFollowButton(followText, followButton, originalText, originalBackgroundColor, originalTextColor);
                 }
             }
             else
             {
-                Debug.LogError($"Follow Network Error: {request.error}");
                 RevertFollowButton(followText, followButton, originalText, originalBackgroundColor, originalTextColor);
             }
         }
@@ -635,7 +561,6 @@ public class HomeScreenController : MonoBehaviour
         followText.text = originalText;
         followButton.style.backgroundColor = originalBackgroundColor;
         followText.style.color = originalTextColor;
-        Debug.Log("Reverted follow button state due to error");
     }
     
     private IEnumerator HideCardAfterDelay(VisualElement card, float delay)
@@ -663,7 +588,6 @@ public class HomeScreenController : MonoBehaviour
     
         // Remove the card from its parent
         card.parent.Remove(card);
-        Debug.Log("Designer card hidden after successful follow");
     }
     
     private IEnumerator LoadTrendingDesigners(int page)
@@ -679,7 +603,6 @@ public class HomeScreenController : MonoBehaviour
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string jsonResponse = request.downloadHandler.text;
-                Debug.Log($"Trending Designers API Response (Page {page}): {jsonResponse}");
                 
                 try
                 {
@@ -699,8 +622,6 @@ public class HomeScreenController : MonoBehaviour
                             trendingDesigners.AddRange(response.data);
                             totalDesignerPagesLoaded = page;
                             hasMoreDesigners = response.data.Count >= designersPerPage;
-                            
-                            Debug.Log($"Loaded {response.data.Count} trending designers from page {page}. Total: {trendingDesigners.Count}");
                         }
                         else
                         {
@@ -709,19 +630,16 @@ public class HomeScreenController : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogError($"Trending Designers API Error: {response.message}");
                         hasMoreDesigners = false;
                     }
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogError($"Error parsing trending designers response: {e.Message}");
                     hasMoreDesigners = false;
                 }
             }
             else
             {
-                Debug.LogError($"Trending Designers Network Error: {request.error}");
                 hasMoreDesigners = false;
             }
         }
@@ -740,49 +658,84 @@ public class HomeScreenController : MonoBehaviour
         // Determine initial feed type
         isShowingHomeFeed = homePosts.Count > 0;
         
-        Debug.Log($"Initial feed type: {(isShowingHomeFeed ? "Home" : "Explore")}");
-        Debug.Log($"Home posts available: {homePosts.Count}, Explore posts available: {explorePosts.Count}");
-        
         // Start building UI
         StartCoroutine(BuildUIGradually());
     }
     
     private IEnumerator BuildUIGradually()
     {
-        while (HasMorePostsToShow())
+        while (true) // Changed from HasMorePostsToShow() to infinite loop with manual breaks
         {
-            // Add posts in groups
-            int groupSize = (cardsDisplayed == 0) ? 5 : 10;
-            int postsAddedInGroup = 0;
-            
-            for (int i = 0; i < groupSize && HasMorePostsToShow(); i++)
+            // Check if we need to switch feeds or load more data
+            if (cardsDisplayed > 0 && cardsDisplayed % homeCheckInterval == 0)
             {
-                // Check if we need to switch feeds or load more data
-                if (cardsDisplayed > 0 && cardsDisplayed % homeCheckInterval == 0)
-                {
-                    yield return StartCoroutine(CheckAndSwitchFeed());
-                }
+                yield return StartCoroutine(CheckAndSwitchFeed());
+            }
+            
+            // Try to get the next post
+            Post postToShow = GetNextPost();
+            
+            if (postToShow != null)
+            {
+                // We have a post to show
+                VisualElement verticalCard = CreateVerticalCard(postToShow);
+                container.Add(verticalCard);
+                cardsDisplayed++;
                 
-                Post postToShow = GetNextPost();
-                if (postToShow != null)
+                Debug.Log($"Added card {cardsDisplayed} from {(isShowingHomeFeed ? "Home" : "Explore")} feed");
+                
+                // Add trending designers section after every 5 cards
+                if (cardsDisplayed % 5 == 0)
                 {
-                    VisualElement verticalCard = CreateVerticalCard(postToShow);
-                    container.Add(verticalCard);
-                    cardsDisplayed++;
-                    postsAddedInGroup++;
-                    
-                    Debug.Log($"Added card {cardsDisplayed} from {(isShowingHomeFeed ? "Home" : "Explore")} feed");
+                    yield return StartCoroutine(AddTrendingDesignersSection());
+                }
+            }
+            else
+            {
+                // No post available, try to handle the situation
+                if (isShowingHomeFeed)
+                {
+                    // We're showing home feed but no posts available
+                    if (!hasMoreHomePosts)
+                    {
+                        // Home feed is completely exhausted, switch to explore
+                        Debug.Log("HOME FEED EXHAUSTED - Forcing switch to Explore");
+                        isShowingHomeFeed = false;
+                        
+                        // Ensure we have explore posts loaded
+                        if (explorePosts.Count == 0)
+                        {
+                            yield return StartCoroutine(LoadExploreFeed(1));
+                        }
+                        
+                        // Try again with explore feed
+                        continue;
+                    }
+                    else
+                    {
+                        // Try to load more home posts
+                        currentHomePage++;
+                        yield return StartCoroutine(LoadHomeFeed(currentHomePage));
+                        continue;
+                    }
                 }
                 else
                 {
-                    break; // No more posts available
+                    // We're showing explore feed but no posts available
+                    if (hasMoreExplorePosts)
+                    {
+                        // Try to load more explore posts
+                        currentExplorePage++;
+                        yield return StartCoroutine(LoadExploreFeed(currentExplorePage));
+                        continue;
+                    }
+                    else
+                    {
+                        // Both feeds are exhausted
+                        Debug.Log("Both Home and Explore feeds are exhausted");
+                        break;
+                    }
                 }
-            }
-            
-            // Add trending designers section after every 5 cards (multiples of 5)
-            if (postsAddedInGroup > 0 && cardsDisplayed % 5 == 0)
-            {
-                yield return StartCoroutine(AddTrendingDesignersSection());
             }
             
             yield return null; // Allow UI to update
@@ -791,53 +744,61 @@ public class HomeScreenController : MonoBehaviour
     
     private IEnumerator CheckAndSwitchFeed()
     {
-        Debug.Log($"Checking feed switch at card {cardsDisplayed}");
-        Debug.Log($"Current state - Home: page {currentHomePage}, index {currentHomePostIndex}/{homePosts.Count}");
-        Debug.Log($"Current state - Explore: page {currentExplorePage}, index {currentExplorePostIndex}/{explorePosts.Count}");
         if (isShowingHomeFeed)
         {
             // If showing home feed and we're running low, try to load more
             if (currentHomePostIndex >= homePosts.Count - 2 && hasMoreHomePosts)
             {
-                Debug.Log($"Loading more home posts - requesting page {currentHomePage + 1}");
                 currentHomePage++;
                 yield return StartCoroutine(LoadHomeFeed(currentHomePage));
             }
             
-            // If no more home posts available, switch to explore
-            if (currentHomePostIndex >= homePosts.Count && !hasMoreHomePosts)
+            // If no more home posts available OR we've shown all current posts, check for switch
+            if (currentHomePostIndex >= homePosts.Count)
             {
-                Debug.Log("No more home posts available, switching to Explore feed");
-                isShowingHomeFeed = false;
-                
-                // IMPORTANT: Don't reset explore index, continue where we left off
-                Debug.Log($"Continuing explore from index {currentExplorePostIndex}");
+                if (!hasMoreHomePosts)
+                {
+                    Debug.Log("HOME FEED EXHAUSTED - Switching to Explore Feed");
+                    isShowingHomeFeed = false;
+                    
+                    // Ensure we have explore posts loaded
+                    if (explorePosts.Count == 0 || currentExplorePostIndex >= explorePosts.Count)
+                    {
+                        currentExplorePage = (explorePosts.Count == 0) ? 1 : currentExplorePage + 1;
+                        yield return StartCoroutine(LoadExploreFeed(currentExplorePage));
+                    }
+                }
+                else
+                {
+                    // Try to load more home posts
+                    currentHomePage++;
+                    yield return StartCoroutine(LoadHomeFeed(currentHomePage));
+                }
             }
         }
         else
         {
-            // Check for new home posts (only check pages we haven't loaded yet)
-            int nextHomePageToCheck = totalHomePagesLoaded + 1;
+            // SHOWING EXPLORE FEED - Check for new home posts every 10 cards
+            Debug.Log("CHECKING for new Home posts while showing Explore feed...");
+            
             int previousHomeCount = homePosts.Count;
             
-            Debug.Log($"Checking for new home posts on page {nextHomePageToCheck}");
-            yield return StartCoroutine(LoadHomeFeed(nextHomePageToCheck));
+            // Always check from page 1 to see if user followed someone new
+            yield return StartCoroutine(LoadHomeFeed(1));
             
+            // If we got new home posts, switch back to home feed
             if (homePosts.Count > previousHomeCount)
             {
-                Debug.Log($"New home posts found ({homePosts.Count - previousHomeCount} new posts), switching to Home feed");
+                Debug.Log($"NEW HOME POSTS FOUND! Previous: {previousHomeCount}, Now: {homePosts.Count}");
                 isShowingHomeFeed = true;
-                
-                // CRITICAL: Continue from where we left off, not from 0
-                currentHomePostIndex = previousHomeCount;
-                Debug.Log($"Continuing home feed from index {currentHomePostIndex}");
+                currentHomePostIndex = 0; // Start from beginning of new home data
             }
             else
             {
-                // Continue with explore feed, load more if needed
+                // No new home posts, continue with explore feed
+                // Load more explore posts if running low
                 if (currentExplorePostIndex >= explorePosts.Count - 2 && hasMoreExplorePosts)
                 {
-                    Debug.Log($"Loading more explore posts - requesting page {currentExplorePage + 1}");
                     currentExplorePage++;
                     yield return StartCoroutine(LoadExploreFeed(currentExplorePage));
                 }
@@ -851,29 +812,49 @@ public class HomeScreenController : MonoBehaviour
         {
             if (currentHomePostIndex < homePosts.Count)
             {
+                Debug.Log($"Showing HOME post {currentHomePostIndex + 1}/{homePosts.Count}");
                 return homePosts[currentHomePostIndex++];
+            }
+            else
+            {
+                // No more home posts available at the moment
+                Debug.Log("No more HOME posts available, returning null");
+                return null;
             }
         }
         else
         {
             if (currentExplorePostIndex < explorePosts.Count)
             {
+                Debug.Log($"Showing EXPLORE post {currentExplorePostIndex + 1}/{explorePosts.Count}");
                 return explorePosts[currentExplorePostIndex++];
             }
+            else
+            {
+                // No more explore posts available at the moment
+                Debug.Log("No more EXPLORE posts available, returning null");
+                return null;
+            }
         }
-        
-        return null;
     }
     
     private bool HasMorePostsToShow()
     {
         if (isShowingHomeFeed)
         {
-            return currentHomePostIndex < homePosts.Count || hasMoreHomePosts;
+            bool hasCurrentPosts = currentHomePostIndex < homePosts.Count;
+            bool canLoadMore = hasMoreHomePosts;
+        
+            Debug.Log($"HOME FEED Check: hasCurrentPosts={hasCurrentPosts}, canLoadMore={canLoadMore}");
+            return hasCurrentPosts || canLoadMore;
         }
         else
         {
-            return currentExplorePostIndex < explorePosts.Count || hasMoreExplorePosts;
+            bool hasCurrentPosts = currentExplorePostIndex < explorePosts.Count;
+            bool canLoadMore = hasMoreExplorePosts;
+        
+            Debug.Log($"EXPLORE FEED Check: hasCurrentPosts={hasCurrentPosts}, canLoadMore={canLoadMore}");
+            return hasCurrentPosts || canLoadMore;
         }
     }
     
@@ -881,34 +862,28 @@ public class HomeScreenController : MonoBehaviour
     {
         VisualElement verticalCard = verticalCardTemplate.CloneTree();
         
-        // Set creator name with multiple fallback options
         string displayName = "Unknown User"; // Default fallback
         
-        if (post.creator != null)
+        if (post.author != null)
         {
-            if (!string.IsNullOrEmpty(post.creator.firstName) && !string.IsNullOrEmpty(post.creator.lastName))
+            if (!string.IsNullOrEmpty(post.author.firstName) && !string.IsNullOrEmpty(post.author.lastName))
             {
-                displayName = $"{post.creator.firstName} {post.creator.lastName}";
-                Debug.Log($"Using firstName + lastName: {displayName}");
+                displayName = $"{post.author.firstName} {post.author.lastName}";
             }
-            else if (!string.IsNullOrEmpty(post.creator.firstName))
+            else if (!string.IsNullOrEmpty(post.author.firstName))
             {
-                displayName = post.creator.firstName;
-                Debug.Log($"Using firstName only: {displayName}");
+                displayName = post.author.firstName;
             }
-            else if (!string.IsNullOrEmpty(post.creator.userName))
+            else if (!string.IsNullOrEmpty(post.author.userName))
             {
-                displayName = post.creator.userName;
-                Debug.Log($"Using userName: {displayName}");
+                displayName = post.author.userName;
             }
-            else if (!string.IsNullOrEmpty(post.creator.email))
+            else if (!string.IsNullOrEmpty(post.author.email))
             {
-                displayName = post.creator.email.Split('@')[0]; // Use email prefix as fallback
-                Debug.Log($"Using email prefix: {displayName}");
+                displayName = post.author.email.Split('@')[0]; // Use email prefix as fallback
             }
         }
         
-        Debug.Log($"Final displayName: '{displayName}'");
         verticalCard.Q<TextElement>("userName").text = displayName;
         
         // Set description (use caption if description is null)
@@ -919,11 +894,11 @@ public class HomeScreenController : MonoBehaviour
         }
         verticalCard.Q<TextElement>("description").text = description;
         
-        // Set creator image
+        // Set author image
         Image userImage = verticalCard.Q<Image>("userImage");
-        if (post.creator != null && !string.IsNullOrEmpty(post.creator.avatar))
+        if (post.author != null && !string.IsNullOrEmpty(post.author.avatar))
         {
-            StartCoroutine(LoadImageFromURL(post.creator.avatar, userImage));
+            StartCoroutine(LoadImageFromURL(post.author.avatar, userImage));
         }
         else
         {
@@ -932,6 +907,75 @@ public class HomeScreenController : MonoBehaviour
         
         // Handle single image only
         SetupSingleImage(verticalCard, post);
+        
+        // === NEW: ADD SPECIFIC CLICK HANDLERS ===
+    
+        // 1. Click handler for userName - Debug userName
+        TextElement userNameElement = verticalCard.Q<TextElement>("userName");
+        if (userNameElement != null)
+        {
+            userNameElement.pickingMode = PickingMode.Position;
+            userNameElement.RegisterCallback<PointerUpEvent>(evt => 
+            {
+                evt.StopPropagation(); // Prevent event bubbling
+            });
+            
+            // Add hover effect for userName
+            userNameElement.RegisterCallback<PointerEnterEvent>(evt => 
+            {
+                userNameElement.style.opacity = 0.7f;
+            });
+            userNameElement.RegisterCallback<PointerLeaveEvent>(evt => 
+            {
+                userNameElement.style.opacity = 1f;
+            });
+        }
+        
+        // 2. Click handler for userImage - Debug userName
+        if (userImage != null)
+        {
+            userImage.pickingMode = PickingMode.Position;
+            userImage.RegisterCallback<PointerUpEvent>(evt => 
+            {
+                evt.StopPropagation(); // Prevent event bubbling
+            });
+            
+            // Add hover effect for userImage
+            userImage.RegisterCallback<PointerEnterEvent>(evt => 
+            {
+                userImage.style.opacity = 0.8f;
+            });
+            userImage.RegisterCallback<PointerLeaveEvent>(evt => 
+            {
+                userImage.style.opacity = 1f;
+            });
+        }
+        
+        // 3. Click handler for card-image - Debug post images
+        Image cardImage = verticalCard.Q<Image>("card-image");
+        if (cardImage != null)
+        {
+            cardImage.pickingMode = PickingMode.Position;
+            cardImage.RegisterCallback<PointerUpEvent>(evt => 
+            {
+                PostScreenDataHandler.ShowPostStatic(post);
+                evt.StopPropagation();
+            });
+            // ... hover effects
+        }
+
+        // 4. Click handler for comment section
+        VisualElement commentSection = verticalCard.Q<VisualElement>("commentSection");
+        if (commentSection != null)
+        {
+            commentSection.pickingMode = PickingMode.Position;
+            commentSection.RegisterCallback<PointerUpEvent>(evt => 
+            {
+                PostScreenDataHandler.ShowPostStatic(post);
+                evt.StopPropagation();
+            });
+            // ... hover effects
+        }
         
         // Setting the like icon for each post based on liked status
         Image likeIcon = verticalCard.Q<Image>("favourite");
@@ -1025,7 +1069,6 @@ public class HomeScreenController : MonoBehaviour
             // If still no designers to show, return
             if (currentDesignerIndex >= trendingDesigners.Count)
             {
-                Debug.Log("No more trending designers to show");
                 yield break;
             }
         }
@@ -1053,7 +1096,6 @@ public class HomeScreenController : MonoBehaviour
         for (int i = currentDesignerIndex; i < endIndex; i++)
         {
             User designerPost = trendingDesigners[i];
-            Debug.Log($"[TRENDING DESIGNERS SECTION] Creating card for designer: {designerPost.userName} (Index: {i})");
             
             VisualElement horizontalCard = CreateHorizontalCard(designerPost);
             horizontalScroll.Add(horizontalCard);
@@ -1063,16 +1105,12 @@ public class HomeScreenController : MonoBehaviour
         currentDesignerIndex = endIndex;
         
         container.Add(horizontalScroll);
-        
-        Debug.Log($"Added {designersToShow} trending designers. Next index: {currentDesignerIndex}");
     }
     
     private VisualElement CreateHorizontalCard(User designerPost)
     {
         VisualElement horizontalCard = horizontalCardTemplate.CloneTree();
         string displayName = designerPost.userName;
-        
-        Debug.Log($"[HORIZONTAL CARD] Creating card for: {displayName}");
         
         horizontalCard.Q<Label>("userName").text = displayName;
         
@@ -1113,7 +1151,6 @@ public class HomeScreenController : MonoBehaviour
             else
             {
                 Debug.LogError($"Failed to load image from {url}: {request.error}");
-                // Keep placeholder image if loading fails
             }
         }
     }

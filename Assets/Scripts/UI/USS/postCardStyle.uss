@@ -20,13 +20,19 @@
     margin-bottom: 20px;
 }
 
-.user-image {
+.user-image-container {
     width: 80px;
     height: 80px;
-    border-radius: 50%;
-    background-image: resource("userImage");
+    border-radius: 40px;
+    overflow: hidden;
     margin-bottom: 10px;
     margin-top: 10px;
+}
+
+.user-image-inner {
+    width: 80px;
+    height: 80px;
+    background-image: resource("userImage");
 }
 
 .user-name {

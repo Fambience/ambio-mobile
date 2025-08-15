@@ -2,7 +2,9 @@
     <Style src="project://database/Assets/Scripts/UI/USS/postCardStyle.uss?fileID=7433441132597879392&amp;guid=09038cb125b024c38bf3cfc7e8936908&amp;type=3#postCardStyle" />
     <ui:VisualElement class="card">
         <ui:VisualElement class="card-header">
-            <ui:Image name="userImage" class="user-image" />
+            <ui:VisualElement class="user-image-container">
+                <ui:Image name="userImage" class="user-image-inner" />
+            </ui:VisualElement>
             <ui:TextElement name="userName" text="Arvind Rao" class="user-name" />
         </ui:VisualElement>
         <ui:VisualElement class="card-body">
