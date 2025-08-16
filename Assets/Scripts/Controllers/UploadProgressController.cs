@@ -14,8 +14,8 @@ public class UploadProgressController : MonoBehaviour
     [Header("Progress Settings")]
     [Range(0f, 100f)]
     public float currentProgress = 0f;
-    public float animationSpeed = 2f;
-    public bool autoSimulateProgress = true;
+    public float animationSpeed = 50f; // Increased for smoother animation
+    public bool autoSimulateProgress = false; // Changed to false by default
     public float simulationSpeed = 1f;
     
     [Header("Test Settings")]
@@ -37,12 +37,6 @@ public class UploadProgressController : MonoBehaviour
     void Start()
     {
         InitializeUI();
-        
-        // Start auto simulation if enabled
-        if (autoSimulateProgress)
-        {
-            StartUpload();
-        }
     }
 
     void InitializeUI()
@@ -51,22 +45,43 @@ public class UploadProgressController : MonoBehaviour
         UIDocument uiDocument = GetComponent<UIDocument>();
         if (uiDocument == null)
         {
-            Debug.LogError("UIDocument component not found!");
-            return;
+            // Try to get from HomeScreenController if not on this component
+            var homeController = GetComponent<HomeScreenController>();
+            if (homeController != null)
+            {
+                uiDocument = homeController.GetComponent<UIDocument>();
+            }
+            
+            if (uiDocument == null)
+            {
+                Debug.LogError("UIDocument component not found!");
+                return;
+            }
         }
 
         root = uiDocument.rootVisualElement;
-        
-        // Get references to UI elements
+    
+        // Get references to UI elements from the home screen UXML
         progressBarFill = root.Q<VisualElement>("progressBarFill");
         percentageText = root.Q<TextElement>("percentage");
         uploadTitle = root.Q<TextElement>("uploadTitle");
         uploadIcon = root.Q<Image>("uploadIcon");
 
-        if (progressBarFill == null || percentageText == null || uploadTitle == null || uploadIcon == null)
+        if (progressBarFill == null)
         {
-            Debug.LogError("Could not find required UI elements!");
-            return;
+            Debug.LogError("progressBarFill element not found! Check UXML structure.");
+        }
+        if (percentageText == null)
+        {
+            Debug.LogError("percentage element not found! Check UXML structure.");
+        }
+        if (uploadTitle == null)
+        {
+            Debug.LogError("uploadTitle element not found! Check UXML structure.");
+        }
+        if (uploadIcon == null)
+        {
+            Debug.LogError("uploadIcon element not found! Check UXML structure.");
         }
 
         // Initialize to ready state
@@ -81,44 +96,26 @@ public class UploadProgressController : MonoBehaviour
             currentProgress = Mathf.MoveTowards(currentProgress, targetProgress, animationSpeed * Time.deltaTime);
             UpdateProgressUI();
         }
-
-        // Auto simulate progress if enabled
-        if (autoSimulateProgress && isUploading && targetProgress < 100f && currentState == UploadState.Uploading)
-        {
-            float increment = simulationSpeed * Time.deltaTime;
-            
-            // Slow down as we approach 100%
-            if (targetProgress > 80f)
-                increment *= 0.3f;
-            else if (targetProgress > 60f)
-                increment *= 0.6f;
-                
-            SetProgress(targetProgress + increment);
-            
-            // Check for simulated error
-            if (simulateError && targetProgress >= errorAtPercentage)
-            {
-                TriggerError();
-                return;
-            }
-            
-            // Complete upload when reaching 100%
-            if (targetProgress >= 100f)
-            {
-                CompleteUpload();
-            }
-        }
     }
 
+    // UploadProgressController.cs
     public void SetProgress(float progress)
     {
-        if (currentState == UploadState.Error) return; // Don't update progress if in error state
-        
+        if (currentState == UploadState.Error) return;
+
         targetProgress = Mathf.Clamp(progress, 0f, 100f);
+
+        // NEW: ensure UI refs exist even if Start() hasn’t run yet
+        if (progressBarFill == null) InitializeUI();
+
+        // NEW: make the bar reflect the latest number immediately
+        currentProgress = targetProgress;
+        UpdateProgressUI();
     }
 
     public void StartUpload()
     {
+        Debug.Log("UploadProgressController: StartUpload called");
         isUploading = true;
         SetUploadState(UploadState.Uploading);
         SetProgress(0f);
@@ -126,6 +123,7 @@ public class UploadProgressController : MonoBehaviour
 
     public void CompleteUpload()
     {
+        Debug.Log("UploadProgressController: CompleteUpload called");
         isUploading = false;
         autoSimulateProgress = false;
         SetUploadState(UploadState.Completed);
@@ -137,6 +135,7 @@ public class UploadProgressController : MonoBehaviour
 
     public void TriggerError()
     {
+        Debug.Log("UploadProgressController: TriggerError called");
         isUploading = false;
         autoSimulateProgress = false;
         SetUploadState(UploadState.Error);
@@ -145,6 +144,7 @@ public class UploadProgressController : MonoBehaviour
 
     public void CancelUpload()
     {
+        Debug.Log("UploadProgressController: CancelUpload called");
         isUploading = false;
         autoSimulateProgress = false;
         SetUploadState(UploadState.Ready);
@@ -153,42 +153,48 @@ public class UploadProgressController : MonoBehaviour
 
     private void SetUploadState(UploadState newState)
     {
+        Debug.Log($"UploadProgressController: State changed from {currentState} to {newState}");
         currentState = newState;
-        
+    
+        if (progressBarFill == null)
+        {
+            Debug.LogError("progressBarFill is null, cannot update state");
+            return;
+        }
+    
         // Remove existing CSS classes
         progressBarFill.RemoveFromClassList("completed");
         progressBarFill.RemoveFromClassList("error");
-        
+    
         switch (newState)
         {
             case UploadState.Ready:
-                uploadTitle.text = "Ready to Upload";
-                uploadIcon.image = Resources.Load<Texture2D>("uploading");
-                percentageText.style.display = DisplayStyle.Flex;
+                if (uploadTitle != null) uploadTitle.text = "Ready to Upload";
+                if (uploadIcon != null) uploadIcon.image = Resources.Load<Texture2D>("uploading");
+                if (percentageText != null) percentageText.style.display = DisplayStyle.Flex;
                 break;
-                
+            
             case UploadState.Uploading:
-                uploadTitle.text = "Uploading...";
-                uploadIcon.image = Resources.Load<Texture2D>("uploading");
-                percentageText.style.display = DisplayStyle.Flex;
-                // Progress bar is blue by default (no additional class needed)
+                if (uploadTitle != null) uploadTitle.text = "Uploading...";
+                if (uploadIcon != null) uploadIcon.image = Resources.Load<Texture2D>("uploading");
+                if (percentageText != null) percentageText.style.display = DisplayStyle.Flex;
                 break;
-                
+            
             case UploadState.Completed:
-                uploadTitle.text = "Uploaded";
-                uploadIcon.image = Resources.Load<Texture2D>("uploaded");
-                percentageText.style.display = DisplayStyle.Flex;
+                if (uploadTitle != null) uploadTitle.text = "Uploaded Successfully";
+                if (uploadIcon != null) uploadIcon.image = Resources.Load<Texture2D>("uploaded");
+                if (percentageText != null) percentageText.style.display = DisplayStyle.Flex;
                 progressBarFill.AddToClassList("completed");
                 break;
-                
+            
             case UploadState.Error:
-                uploadTitle.text = "Failed to upload";
-                uploadIcon.image = Resources.Load<Texture2D>("uploadingError");
-                percentageText.style.display = DisplayStyle.None; // Hide percentage
+                if (uploadTitle != null) uploadTitle.text = "Upload Failed";
+                if (uploadIcon != null) uploadIcon.image = Resources.Load<Texture2D>("uploadingError");
+                if (percentageText != null) percentageText.style.display = DisplayStyle.None;
                 progressBarFill.AddToClassList("error");
                 break;
         }
-        
+    
         UpdateProgressUI();
     }
 
@@ -198,6 +204,11 @@ public class UploadProgressController : MonoBehaviour
         {
             // Update progress bar width
             progressBarFill.style.width = Length.Percent(currentProgress);
+            Debug.Log($"UploadProgressController: Progress bar updated to {currentProgress}%");
+        }
+        else
+        {
+            Debug.LogError("progressBarFill is null, cannot update progress UI");
         }
 
         if (percentageText != null && currentState != UploadState.Error)
@@ -213,7 +224,15 @@ public class UploadProgressController : MonoBehaviour
         
         if (root != null)
         {
-            root.style.display = DisplayStyle.None;
+            var uploadSection = root.Q<VisualElement>("uploadProgressSection");
+            if (uploadSection != null)
+            {
+                uploadSection.style.display = DisplayStyle.None;
+            }
+            else
+            {
+                root.style.display = DisplayStyle.None;
+            }
         }
     }
 

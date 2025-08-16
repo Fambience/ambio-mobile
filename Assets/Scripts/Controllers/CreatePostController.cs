@@ -257,38 +257,65 @@ public class CreatePostController : MonoBehaviour
             ShowValidationError();
             return;
         }
-
         string description = descriptionBox?.text ?? "";
         if (string.IsNullOrWhiteSpace(description))
         {
             ShowErrorMessage("Please add a description");
             return;
         }
-    
         if (string.IsNullOrWhiteSpace(dropdownHandler.GetSelectedRoomType()))
         {
             ShowErrorMessage("Please select a room type");
             return;
         }
-    
         if (string.IsNullOrWhiteSpace(dropdownHandler.GetSelectedDesignStyle()))
         {
             ShowErrorMessage("Please select a design style");
             return;
         }
-    
         var selectedMedia = mediaHandler.GetSelectedMedia();
         if (selectedMedia.Count == 0)
         {
             ShowErrorMessage("Please add at least one image or video");
             return;
         }
-    
+
         isValidationEnabled = false;
         completeButton.SetEnabled(false);
-    
-        StartCoroutine(UploadPostCoroutine(description, dropdownHandler.GetSelectedRoomType(), 
-            dropdownHandler.GetSelectedDesignStyle(), addedTags, selectedMedia));
+
+        // Navigate to Home screen first
+        UIManager.Instance.OpenScreen(UIScreenType.Home);
+        var uploadData = new UploadService.UploadData
+        {
+            description = description,
+            roomType = dropdownHandler.GetSelectedRoomType(),
+            designStyle = dropdownHandler.GetSelectedDesignStyle(),
+            tags = new List<string>(addedTags),
+            mediaItems = selectedMedia,
+            baseURL = baseURL,
+            authToken = authToken
+        };
+
+        // Get home controller and start upload
+        var homeController = FindObjectOfType<HomeScreenController>();
+        if (homeController != null)
+        {
+            homeController.StartUploadWithService(uploadData);
+        }
+
+        // Reset form
+        ResetForm();
+    }
+
+    private void ResetForm()
+    {
+        isValidationEnabled = true;
+        completeButton.SetEnabled(true);
+        ClearAllTags();
+        ClearAllMedia();
+        dropdownHandler?.ResetSelections();
+        descriptionBox?.ClearText();
+        ValidateForm();
     }
     
     private void ShowErrorMessage(string message)
@@ -299,88 +326,6 @@ public class CreatePostController : MonoBehaviour
     private void ShowSuccessMessage(string message)
     {
         Debug.Log(message);
-    }
-    
-    private IEnumerator UploadPostCoroutine(string description, string roomType, string designStyle, 
-        List<string> tags, List<CreatePostMediaHandler.MediaItem> mediaItems)
-    {
-        List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
-        formData.Add(new MultipartFormDataSection("description", description));
-        formData.Add(new MultipartFormDataSection("roomType", roomType));
-        formData.Add(new MultipartFormDataSection("designStyle", designStyle));
-        
-        string tagsJson = "[" + string.Join(",", tags.Select(tag => $"\"{tag}\"")) + "]";
-        formData.Add(new MultipartFormDataSection("hashtags", tagsJson));
-        
-        foreach (var mediaItem in mediaItems)
-        {
-            if (File.Exists(mediaItem.filePath))
-            {
-                byte[] fileData = File.ReadAllBytes(mediaItem.filePath);
-                formData.Add(new MultipartFormFileSection("media", fileData, mediaItem.fileName, 
-                    GetMimeType(mediaItem.filePath)));
-            }
-        }
-        
-        string createPostUrl = $"{baseURL}/api/v1/post/create-post";
-        using (UnityWebRequest www = UnityWebRequest.Post(createPostUrl, formData))
-        {
-            www.SetRequestHeader("Authorization", authToken);
-            yield return www.SendWebRequest();
-            
-            if (www.result == UnityWebRequest.Result.Success)
-            {
-                try
-                {
-                    var response = JsonUtility.FromJson<PostUploadResponse>(www.downloadHandler.text);
-                    OnPostUploadSuccess(response);
-                }
-                catch
-                {
-                    OnPostUploadSuccess(null);
-                }
-            }
-            else
-            {
-                OnPostUploadError(www.error);
-            }
-        }
-    }
-    
-    private string GetMimeType(string filePath)
-    {
-        string extension = Path.GetExtension(filePath).ToLower();
-        switch (extension)
-        {
-            case ".jpg":
-            case ".jpeg": return "image/jpeg";
-            case ".png": return "image/png";
-            case ".webp": return "image/webp";
-            case ".heic": return "image/heic";
-            case ".mp4": return "video/mp4";
-            case ".mov": return "video/quicktime";
-            default: return "application/octet-stream";
-        }
-    }
-    
-    private void OnPostUploadSuccess(PostUploadResponse response)
-    {
-        isValidationEnabled = true;
-        completeButton.SetEnabled(true);
-        ClearAllTags();
-        ClearAllMedia();
-        dropdownHandler?.ResetSelections();
-        descriptionBox?.ClearText();
-        ShowSuccessMessage("Post uploaded successfully!");
-        ValidateForm();
-    }
-
-    private void OnPostUploadError(string error)
-    {
-        isValidationEnabled = true;
-        completeButton.SetEnabled(true);
-        ShowErrorMessage($"Upload failed: {error}");
-        ValidateForm();
     }
     
     public List<string> GetAddedTags()

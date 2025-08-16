@@ -1,174 +1,21 @@
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityEngine.Networking;
 using System.Collections;
-using System.Collections.Generic;
-using System;
-
-[System.Serializable]
-public class ApiResponse<T>
-{
-    public bool success;
-    public string message;
-    public T data;
-    public Pagination pagination;
-}
-
-[System.Serializable]
-public class FollowResponse
-{
-    public string message;
-    public bool followed;
-}
-
-[System.Serializable]
-public class BookmarkResponse
-{
-    public string message;
-}
-
-[System.Serializable]
-public class LikeResponse
-{
-    public string message;
-    public string postId;
-    public string userId;
-    public int likeId;
-}
-
-[System.Serializable]
-public class HomeApiResponse
-{
-    public string type;
-    public List<Post> posts;
-    public Pagination pagination;
-}
-
-[System.Serializable]
-public class Pagination
-{
-    public int page;
-    public int limit;
-    public int total;
-}
-
-[System.Serializable]
-public class Post
-{
-    [SerializeField] public string postId;
-    [SerializeField] public string caption;
-    [SerializeField] public string description;
-    [SerializeField] public string designStyle;
-    [SerializeField] public string roomType;
-    [SerializeField] public string status;
-    [SerializeField] public string createdAt;
-    [SerializeField] public string category;
-    [SerializeField] public int likesCount;
-    [SerializeField] public int commentsCount;
-    [SerializeField] public int bookmarksCount;
-    [SerializeField] public List<string> tags;
-    [SerializeField] public List<Media> media;
-    [SerializeField] public List<PostMedia> postMedia;
-    [SerializeField] public User author;
-    [SerializeField] public bool liked;
-    [SerializeField] public bool bookmarked;
-    
-    // Helper method to get first image URL only
-    public string GetFirstImageUrl()
-    {
-        if (postMedia != null && postMedia.Count > 0 && !string.IsNullOrEmpty(postMedia[0].filePath))
-        {
-            return postMedia[0].filePath;
-        }
-        else if (media != null && media.Count > 0 && !string.IsNullOrEmpty(media[0].url))
-        {
-            return media[0].url;
-        }
-        
-        return null;
-    }
-}
-
-[System.Serializable]
-public class Media
-{
-    public string mediaId;
-    public string url;
-}
-
-[System.Serializable]
-public class PostMedia
-{
-    public string filePath;
-}
-
-[System.Serializable]
-public class User
-{
-    [SerializeField] public string userId;
-    [SerializeField] public string userName;
-    [SerializeField] public string firstName;
-    [SerializeField] public string lastName;
-    [SerializeField] public string email;
-    [SerializeField] public string avatar;
-    [SerializeField] public string bio;
-    [SerializeField] public int followersCount;
-}
 
 public class HomeScreenController : MonoBehaviour
 {
-    public VisualTreeAsset verticalCardTemplate;
-    public VisualTreeAsset horizontalCardTemplate;
+    [Header("Feed Settings")]
+    public int homeCheckInterval = 10;
 
-    [Header("API Settings")]
-    public string baseURL;
-    public string exploreFeedUrl = "/api/v1/post/explore-feed";
-    public string homeFeedUrl = "/api/v1/post/user-feed";
-    public string trendingDesignersUrl = "/api/v1/post/trending-designers";
-    public string authToken;
-
-    public int postsPerPage = 10;
-    public int designersPerPage = 10;
-    public int homeCheckInterval = 10; // Check home API every 10 cards
-
-    [Header("Pull to Refresh Settings")]
-    public float pullThreshold = 100f;
-    public float refreshIndicatorSize = 50f;
-    public float refreshDuration = 2f;
+    private HomeDataHandler dataHandler;
+    private HomeUIController uiController;
     
-    private ScrollView container;
-    private VisualElement refreshIndicator;
-    private VisualElement refreshContainer;
-    private Image refreshIcon;
-    private bool isRefreshing = false;
-    private bool isPulling = false;
-    private float pullDistance = 0f;
-    
-    // Data storage for different feed types
-    private List<Post> homePosts = new List<Post>();
-    private List<Post> explorePosts = new List<Post>();
-    private List<User> trendingDesigners = new List<User>();
-    
-    // Pagination tracking
-    private int currentHomePage = 1;
-    private int currentExplorePage = 1;
-    private int currentDesignerPage = 1;
-    
-    // Feed management
-    private bool isLoadingData = false;
     private int cardsDisplayed = 0;
     private int currentHomePostIndex = 0;
     private int currentExplorePostIndex = 0;
-    private int currentDesignerIndex = 0; // Track which designers have been shown
+    private int currentDesignerIndex = 0;
     private bool isShowingHomeFeed = false;
-    private bool hasMoreHomePosts = true;
-    private bool hasMoreExplorePosts = true;
-    private bool hasMoreDesigners = true;
-    
-    // Track total pages loaded to prevent duplicates
-    private int totalHomePagesLoaded = 0;
-    private int totalExplorePagesLoaded = 0;
-    private int totalDesignerPagesLoaded = 0;
+    private bool isLoadingData = false;
     
     private enum FeedType
     {
@@ -176,515 +23,92 @@ public class HomeScreenController : MonoBehaviour
         Explore
     }
     
+    private void Awake()
+    {
+        dataHandler = GetComponent<HomeDataHandler>();
+        if (dataHandler == null)
+        {
+            dataHandler = gameObject.AddComponent<HomeDataHandler>();
+        }
+
+        uiController = GetComponent<HomeUIController>();
+        if (uiController == null)
+        {
+            uiController = gameObject.AddComponent<HomeUIController>();
+        }
+    }
+
     private void OnEnable()
     {
-        baseURL = baseScript.baseURL;
-        authToken = AuthTokenManager.GetToken();
-        var root = GetComponent<UIDocument>().rootVisualElement;
-        container = root.Q<ScrollView>("main-container");
-        StartCoroutine(ShowNavigationAfterDelay());   
-        SetupPullToRefresh();
+        uiController.OnRefreshRequested += HandleRefresh;
         StartCoroutine(LoadInitialData());
     }
-    private IEnumerator ShowNavigationAfterDelay()
+
+    private void OnDisable()
     {
-        yield return new WaitForSeconds(0.1f); // Small delay to ensure UI is ready
-        
-        Debug.Log("Showing navigation bar for Home screen");
-        
-        // Show navigation bar and set Home as selected
-        NavigationManager.ToggleNavigationBar(true);
-        NavigationManager.UpdateSelectedIcon(NavScreen.Home);
-        
-        // Debug confirmation
-        yield return new WaitForSeconds(0.1f);
-        Debug.Log($"Navigation bar visible: {NavigationManager.IsNavigationBarVisible()}");
+        uiController.OnRefreshRequested -= HandleRefresh;
     }
-    
-    private void SetupPullToRefresh()
+
+    private void HandleRefresh()
     {
-        container.verticalScrollerVisibility = ScrollerVisibility.Hidden;
-        
-        // Create refresh indicator container
-        refreshContainer = new VisualElement();
-        refreshContainer.style.height = 0;
-        refreshContainer.style.flexDirection = FlexDirection.Row;
-        refreshContainer.style.justifyContent = Justify.Center;
-        refreshContainer.style.alignItems = Align.Center;
-        refreshContainer.style.overflow = Overflow.Hidden;
-        refreshContainer.style.marginTop = 0;
-        
-        // Create refresh indicator
-        refreshIndicator = new VisualElement();
-        refreshIndicator.style.width = refreshIndicatorSize;
-        refreshIndicator.style.height = refreshIndicatorSize;
-        refreshIndicator.style.justifyContent = Justify.Center;
-        refreshIndicator.style.alignItems = Align.Center;
-        refreshIndicator.style.opacity = 0;
-        
-        // Create refresh icon
-        refreshIcon = new Image();
-        refreshIcon.image = Resources.Load<Texture2D>("loader");
-        refreshIcon.style.width = refreshIndicatorSize;
-        refreshIcon.style.height = refreshIndicatorSize;
-        
-        refreshIndicator.Add(refreshIcon);
-        refreshContainer.Add(refreshIndicator);
-        
-        // Insert refresh container at the beginning
-        container.Insert(0, refreshContainer);
-        
-        // Register scroll event
-        container.RegisterCallback<WheelEvent>(OnScroll);
-        
-        // Register pointer events for touch/mouse
-        container.RegisterCallback<PointerDownEvent>(OnPointerDown);
-        container.RegisterCallback<PointerMoveEvent>(OnPointerMove);
-        container.RegisterCallback<PointerUpEvent>(OnPointerUp);
+        StartCoroutine(RefreshContent());
+    }
+
+    private IEnumerator RefreshContent()
+    {
+        dataHandler.ResetPaginationData();
+        yield return StartCoroutine(LoadInitialData());
+        uiController.CompleteRefresh();
     }
     
     private IEnumerator LoadInitialData()
     {
         isLoadingData = true;
-    
-        // Clear existing data
-        homePosts.Clear();
-        explorePosts.Clear();
-        trendingDesigners.Clear();
-    
-        // Reset pagination counters
-        currentHomePage = 1;
-        currentExplorePage = 1;
-        currentDesignerPage = 1;
-        totalHomePagesLoaded = 0;
-        totalExplorePagesLoaded = 0;
-        totalDesignerPagesLoaded = 0;
-    
-        // First check home feed
-        yield return StartCoroutine(LoadHomeFeed(currentHomePage));
-    
-        // Then load explore feed
-        yield return StartCoroutine(LoadExploreFeed(currentExplorePage));
-    
-        // Load trending designers
-        yield return StartCoroutine(LoadTrendingDesigners(currentDesignerPage));
-    
-        // Build initial UI
+
+        dataHandler.ResetPaginationData();
+
+        yield return StartCoroutine(dataHandler.LoadHomeFeed(1));
+        yield return StartCoroutine(dataHandler.LoadExploreFeed(1));
+        yield return StartCoroutine(dataHandler.LoadTrendingDesigners(1));
+
         BuildInitialUI();
-    
+
         isLoadingData = false;
-    }
-    
-    private IEnumerator LikePost(string postId, Image likeIcon, Post post)
-    {
-        string url = $"{baseURL}/api/v1/post/like/{postId}";
-        
-        using (UnityWebRequest request = UnityWebRequest.PostWwwForm(url, ""))
-        {
-            request.SetRequestHeader("Authorization", authToken);
-            
-            yield return request.SendWebRequest();
-            
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                string jsonResponse = request.downloadHandler.text;
-                try
-                {
-                    var response = JsonUtility.FromJson<ApiResponse<LikeResponse>>(jsonResponse);
-                    
-                    if (response.success)
-                    {
-                        // Toggle based on current state instead of message
-                        if (post.liked)
-                        {
-                            // Currently liked, so unlike it
-                            Texture2D outlineHeart = LoadImage("favourite");
-                            if (outlineHeart != null)
-                            {
-                                likeIcon.image = outlineHeart;
-                                post.likesCount--;
-                                post.liked = false;
-                            }
-                        }
-                        else
-                        {
-                            // Currently not liked, so like it
-                            Texture2D filledHeart = LoadImage("heart-filled");
-                            if (filledHeart != null)
-                            {
-                                likeIcon.image = filledHeart;
-                                post.likesCount++;
-                                post.liked = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"Like API Error: {response.message}");
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    Debug.LogError($"Error parsing like response: {e.Message}");
-                }
-            }
-            else
-            {
-                Debug.LogError($"Like Network Error: {request.error}");
-            }
-        }
-    }
-
-    private IEnumerator BookmarkPost(string postId, Image bookmarkIcon, Post post)
-    {
-        string url = $"{baseURL}/api/v1/post/bookmark/{postId}";
-        
-        using (UnityWebRequest request = UnityWebRequest.PostWwwForm(url, ""))
-        {
-            request.SetRequestHeader("Authorization", authToken);
-            yield return request.SendWebRequest();
-            
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                string jsonResponse = request.downloadHandler.text;
-                try
-                {
-                    var response = JsonUtility.FromJson<ApiResponse<BookmarkResponse>>(jsonResponse);
-                    if (response.success)
-                    {
-                        // Toggle based on current state instead of message
-                        if (post.bookmarked)
-                        {
-                            // Currently bookmarked, so remove bookmark
-                            Texture2D outlineBookmark = LoadImage("Bookmark");
-                            if (outlineBookmark != null)
-                            {
-                                bookmarkIcon.image = outlineBookmark;
-                                post.bookmarked = false;
-                            }
-                        }
-                        else
-                        {
-                            // Currently not bookmarked, so add bookmark
-                            Texture2D filledBookmark = LoadImage("bookmark-filled");
-                            if (filledBookmark != null)
-                            {
-                                bookmarkIcon.image = filledBookmark;
-                                post.bookmarked = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"Bookmark API Error: {response.message}");
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    Debug.LogError($"Error parsing bookmark response: {e.Message}");
-                }
-            }
-            else
-            {
-                Debug.LogError($"Bookmark Network Error: {request.error}");
-            }
-        }
-    }
-    
-    private IEnumerator LoadHomeFeed(int page)
-    {
-        string url = $"{baseURL}{homeFeedUrl}?page={page}&limit={postsPerPage}";
-        
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
-        {
-            request.SetRequestHeader("Authorization", authToken);
-            
-            yield return request.SendWebRequest();
-            
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                string jsonResponse = request.downloadHandler.text;
-                
-                try
-                {
-                    ApiResponse<HomeApiResponse> response = JsonUtility.FromJson<ApiResponse<HomeApiResponse>>(jsonResponse);
-                    
-                    if (response.success && response.data != null && response.data.posts != null)
-                    {
-                        if (page == 1)
-                        {
-                            // Page 1 = fresh start, clear previous data
-                            homePosts.Clear();
-                            totalHomePagesLoaded = 0;
-                            currentHomePostIndex = 0; // Reset index when clearing
-                            Debug.Log("HOME FEED: Cleared previous data for fresh start");
-                        }
-                        
-                        // Only add if we haven't loaded this page before (for pagination)
-                        if (page > totalHomePagesLoaded)
-                        {
-                            int postsBeforeAdd = homePosts.Count;
-                            
-                            homePosts.AddRange(response.data.posts);
-                            totalHomePagesLoaded = page;
-                            hasMoreHomePosts = response.data.posts.Count >= postsPerPage;
-                            
-                            Debug.Log($"HOME FEED: Added {response.data.posts.Count} posts. Total now: {homePosts.Count}");
-                        }
-                        else
-                        {
-                            Debug.Log($"HOME FEED: Page {page} already loaded (totalLoaded: {totalHomePagesLoaded})");
-                        }
-                    }
-                    else
-                    {
-                        hasMoreHomePosts = false;
-                        Debug.Log("HOME FEED: No data received, marking as no more posts");
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    hasMoreHomePosts = false;
-                    Debug.LogError($"HOME FEED: Parse error - {e.Message}");
-                }
-            }
-            else
-            {
-                hasMoreHomePosts = false;
-                Debug.LogError($"HOME FEED: Network error - {request.error}");
-            }
-        }
-    }
-
-    private IEnumerator LoadExploreFeed(int page)
-    {
-        string url = $"{baseURL}{exploreFeedUrl}?page={page}&limit={postsPerPage}";
-        
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
-        {
-            request.SetRequestHeader("Authorization", authToken);
-            
-            yield return request.SendWebRequest();
-            
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                string jsonResponse = request.downloadHandler.text;
-                
-                try
-                {
-                    // Parse the explore feed response which has posts directly in data array
-                    ApiResponse<List<Post>> response = JsonUtility.FromJson<ApiResponse<List<Post>>>(jsonResponse);
-                    
-                    if (response.success && response.data != null)
-                    {
-                        if (page == 1)
-                        {
-                            explorePosts.Clear();
-                            totalExplorePagesLoaded = 0;
-                        }
-                        
-                        // Only add if we haven't loaded this page before
-                        if (page > totalExplorePagesLoaded)
-                        {
-                            int postsBeforeAdd = explorePosts.Count;
-                            
-                            explorePosts.AddRange(response.data);
-                            totalExplorePagesLoaded = page;
-                            hasMoreExplorePosts = response.data.Count >= postsPerPage;
-                        }
-                        else
-                        {
-                            Debug.Log($"SKIP: Page {page} already loaded (totalLoaded: {totalExplorePagesLoaded})");
-                        }
-                    }
-                    else
-                    {
-                        hasMoreExplorePosts = false;
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    hasMoreExplorePosts = false;
-                }
-            }
-            else
-            {
-                hasMoreExplorePosts = false;
-            }
-        }
-    }
-    
-    private IEnumerator FollowUser(string userId, Label followText, Button followButton, VisualElement horizontalCard)
-    {
-        string url = $"{baseURL}/api/v1/profile/toggle-follow/{userId}";
-        string originalText = followText.text;
-        StyleColor originalBackgroundColor = followButton.resolvedStyle.backgroundColor;
-        StyleColor originalTextColor = followText.resolvedStyle.color;
-        
-        using (UnityWebRequest request = UnityWebRequest.PostWwwForm(url, ""))
-        {
-            request.SetRequestHeader("Authorization", authToken);
-            request.SetRequestHeader("Content-Type", "application/json");
-            yield return request.SendWebRequest();
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                string jsonResponse = request.downloadHandler.text;
-                try
-                {
-                    var response = JsonUtility.FromJson<FollowResponse>(jsonResponse);
-                    if (response.followed)
-                    {
-                        StartCoroutine(HideCardAfterDelay(horizontalCard, 10f));
-                    }
-                    else
-                    {
-                        followText.text = "Follow";
-                        followButton.style.backgroundColor = StyleKeyword.Null;
-                        followText.style.color = StyleKeyword.Null;
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    RevertFollowButton(followText, followButton, originalText, originalBackgroundColor, originalTextColor);
-                }
-            }
-            else
-            {
-                RevertFollowButton(followText, followButton, originalText, originalBackgroundColor, originalTextColor);
-            }
-        }
-    }
-    
-    private void RevertFollowButton(Label followText, Button followButton, string originalText, 
-        StyleColor originalBackgroundColor, StyleColor originalTextColor)
-    {
-        followText.text = originalText;
-        followButton.style.backgroundColor = originalBackgroundColor;
-        followText.style.color = originalTextColor;
-    }
-    
-    private IEnumerator HideCardAfterDelay(VisualElement card, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        if (card != null && card.parent != null)
-        {
-            StartCoroutine(FadeOutCard(card));
-        }
-    }
-    
-    private IEnumerator FadeOutCard(VisualElement card)
-    {
-        float fadeDuration = 0.2f;
-        float elapsedTime = 0f;
-        float startOpacity = card.resolvedStyle.opacity;
-    
-        while (elapsedTime < fadeDuration)
-        {
-            elapsedTime += Time.deltaTime;
-            float progress = elapsedTime / fadeDuration;
-            card.style.opacity = Mathf.Lerp(startOpacity, 0f, progress);
-            yield return null;
-        }
-    
-        // Remove the card from its parent
-        card.parent.Remove(card);
-    }
-    
-    private IEnumerator LoadTrendingDesigners(int page)
-    {
-        string url = $"{baseURL}{trendingDesignersUrl}?page={page}&limit={designersPerPage}";
-        
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
-        {
-            request.SetRequestHeader("Authorization", authToken);
-            
-            yield return request.SendWebRequest();
-            
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                string jsonResponse = request.downloadHandler.text;
-                
-                try
-                {
-                    ApiResponse<List<User>> response = JsonUtility.FromJson<ApiResponse<List<User>>>(jsonResponse);
-                    
-                    if (response.success && response.data != null)
-                    {
-                        if (page == 1)
-                        {
-                            trendingDesigners.Clear();
-                            totalDesignerPagesLoaded = 0;
-                        }
-                        
-                        // Only add if we haven't loaded this page before
-                        if (page > totalDesignerPagesLoaded)
-                        {
-                            trendingDesigners.AddRange(response.data);
-                            totalDesignerPagesLoaded = page;
-                            hasMoreDesigners = response.data.Count >= designersPerPage;
-                        }
-                        else
-                        {
-                            Debug.Log($"Designer page {page} already loaded, skipping");
-                        }
-                    }
-                    else
-                    {
-                        hasMoreDesigners = false;
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    hasMoreDesigners = false;
-                }
-            }
-            else
-            {
-                hasMoreDesigners = false;
-            }
-        }
     }
     
     private void BuildInitialUI()
     {
-        ClearContent();
+        uiController.ClearContent();
         
-        // Reset counters
         cardsDisplayed = 0;
         currentHomePostIndex = 0;
         currentExplorePostIndex = 0;
         currentDesignerIndex = 0;
         
-        // Determine initial feed type
-        isShowingHomeFeed = homePosts.Count > 0;
+        isShowingHomeFeed = dataHandler.HomePosts.Count > 0;
         
-        // Start building UI
         StartCoroutine(BuildUIGradually());
     }
     
     private IEnumerator BuildUIGradually()
     {
-        while (true) // Changed from HasMorePostsToShow() to infinite loop with manual breaks
+        while (true)
         {
-            // Check if we need to switch feeds or load more data
             if (cardsDisplayed > 0 && cardsDisplayed % homeCheckInterval == 0)
             {
                 yield return StartCoroutine(CheckAndSwitchFeed());
             }
             
-            // Try to get the next post
             Post postToShow = GetNextPost();
             
             if (postToShow != null)
             {
-                // We have a post to show
-                VisualElement verticalCard = CreateVerticalCard(postToShow);
-                container.Add(verticalCard);
+                VisualElement verticalCard = uiController.CreateVerticalCard(postToShow);
+                uiController.AddToContainer(verticalCard);
                 cardsDisplayed++;
                 
                 Debug.Log($"Added card {cardsDisplayed} from {(isShowingHomeFeed ? "Home" : "Explore")} feed");
                 
-                // Add trending designers section after every 5 cards
                 if (cardsDisplayed % 5 == 0)
                 {
                     yield return StartCoroutine(AddTrendingDesignersSection());
@@ -692,53 +116,42 @@ public class HomeScreenController : MonoBehaviour
             }
             else
             {
-                // No post available, try to handle the situation
                 if (isShowingHomeFeed)
                 {
-                    // We're showing home feed but no posts available
-                    if (!hasMoreHomePosts)
+                    if (!dataHandler.HasMoreHomePosts)
                     {
-                        // Home feed is completely exhausted, switch to explore
                         Debug.Log("HOME FEED EXHAUSTED - Forcing switch to Explore");
                         isShowingHomeFeed = false;
                         
-                        // Ensure we have explore posts loaded
-                        if (explorePosts.Count == 0)
+                        if (dataHandler.ExplorePosts.Count == 0)
                         {
-                            yield return StartCoroutine(LoadExploreFeed(1));
+                            yield return StartCoroutine(dataHandler.LoadExploreFeed(1));
                         }
                         
-                        // Try again with explore feed
                         continue;
                     }
                     else
                     {
-                        // Try to load more home posts
-                        currentHomePage++;
-                        yield return StartCoroutine(LoadHomeFeed(currentHomePage));
+                        yield return StartCoroutine(dataHandler.LoadHomeFeed(dataHandler.GetNextHomePage()));
                         continue;
                     }
                 }
                 else
                 {
-                    // We're showing explore feed but no posts available
-                    if (hasMoreExplorePosts)
+                    if (dataHandler.HasMoreExplorePosts)
                     {
-                        // Try to load more explore posts
-                        currentExplorePage++;
-                        yield return StartCoroutine(LoadExploreFeed(currentExplorePage));
+                        yield return StartCoroutine(dataHandler.LoadExploreFeed(dataHandler.GetNextExplorePage()));
                         continue;
                     }
                     else
                     {
-                        // Both feeds are exhausted
                         Debug.Log("Both Home and Explore feeds are exhausted");
                         break;
                     }
                 }
             }
             
-            yield return null; // Allow UI to update
+            yield return null;
         }
     }
     
@@ -746,61 +159,49 @@ public class HomeScreenController : MonoBehaviour
     {
         if (isShowingHomeFeed)
         {
-            // If showing home feed and we're running low, try to load more
-            if (currentHomePostIndex >= homePosts.Count - 2 && hasMoreHomePosts)
+            if (currentHomePostIndex >= dataHandler.HomePosts.Count - 2 && dataHandler.HasMoreHomePosts)
             {
-                currentHomePage++;
-                yield return StartCoroutine(LoadHomeFeed(currentHomePage));
+                yield return StartCoroutine(dataHandler.LoadHomeFeed(dataHandler.GetNextHomePage()));
             }
             
-            // If no more home posts available OR we've shown all current posts, check for switch
-            if (currentHomePostIndex >= homePosts.Count)
+            if (currentHomePostIndex >= dataHandler.HomePosts.Count)
             {
-                if (!hasMoreHomePosts)
+                if (!dataHandler.HasMoreHomePosts)
                 {
                     Debug.Log("HOME FEED EXHAUSTED - Switching to Explore Feed");
                     isShowingHomeFeed = false;
                     
-                    // Ensure we have explore posts loaded
-                    if (explorePosts.Count == 0 || currentExplorePostIndex >= explorePosts.Count)
+                    if (dataHandler.ExplorePosts.Count == 0 || currentExplorePostIndex >= dataHandler.ExplorePosts.Count)
                     {
-                        currentExplorePage = (explorePosts.Count == 0) ? 1 : currentExplorePage + 1;
-                        yield return StartCoroutine(LoadExploreFeed(currentExplorePage));
+                        int nextPage = (dataHandler.ExplorePosts.Count == 0) ? 1 : dataHandler.GetNextExplorePage();
+                        yield return StartCoroutine(dataHandler.LoadExploreFeed(nextPage));
                     }
                 }
                 else
                 {
-                    // Try to load more home posts
-                    currentHomePage++;
-                    yield return StartCoroutine(LoadHomeFeed(currentHomePage));
+                    yield return StartCoroutine(dataHandler.LoadHomeFeed(dataHandler.GetNextHomePage()));
                 }
             }
         }
         else
         {
-            // SHOWING EXPLORE FEED - Check for new home posts every 10 cards
             Debug.Log("CHECKING for new Home posts while showing Explore feed...");
             
-            int previousHomeCount = homePosts.Count;
+            int previousHomeCount = dataHandler.HomePosts.Count;
             
-            // Always check from page 1 to see if user followed someone new
-            yield return StartCoroutine(LoadHomeFeed(1));
+            yield return StartCoroutine(dataHandler.LoadHomeFeed(1));
             
-            // If we got new home posts, switch back to home feed
-            if (homePosts.Count > previousHomeCount)
+            if (dataHandler.HomePosts.Count > previousHomeCount)
             {
-                Debug.Log($"NEW HOME POSTS FOUND! Previous: {previousHomeCount}, Now: {homePosts.Count}");
+                Debug.Log($"NEW HOME POSTS FOUND! Previous: {previousHomeCount}, Now: {dataHandler.HomePosts.Count}");
                 isShowingHomeFeed = true;
-                currentHomePostIndex = 0; // Start from beginning of new home data
+                currentHomePostIndex = 0;
             }
             else
             {
-                // No new home posts, continue with explore feed
-                // Load more explore posts if running low
-                if (currentExplorePostIndex >= explorePosts.Count - 2 && hasMoreExplorePosts)
+                if (currentExplorePostIndex >= dataHandler.ExplorePosts.Count - 2 && dataHandler.HasMoreExplorePosts)
                 {
-                    currentExplorePage++;
-                    yield return StartCoroutine(LoadExploreFeed(currentExplorePage));
+                    yield return StartCoroutine(dataHandler.LoadExploreFeed(dataHandler.GetNextExplorePage()));
                 }
             }
         }
@@ -810,522 +211,81 @@ public class HomeScreenController : MonoBehaviour
     {
         if (isShowingHomeFeed)
         {
-            if (currentHomePostIndex < homePosts.Count)
+            if (currentHomePostIndex < dataHandler.HomePosts.Count)
             {
-                Debug.Log($"Showing HOME post {currentHomePostIndex + 1}/{homePosts.Count}");
-                return homePosts[currentHomePostIndex++];
+                Debug.Log($"Showing HOME post {currentHomePostIndex + 1}/{dataHandler.HomePosts.Count}");
+                return dataHandler.HomePosts[currentHomePostIndex++];
             }
             else
             {
-                // No more home posts available at the moment
                 Debug.Log("No more HOME posts available, returning null");
                 return null;
             }
         }
         else
         {
-            if (currentExplorePostIndex < explorePosts.Count)
+            if (currentExplorePostIndex < dataHandler.ExplorePosts.Count)
             {
-                Debug.Log($"Showing EXPLORE post {currentExplorePostIndex + 1}/{explorePosts.Count}");
-                return explorePosts[currentExplorePostIndex++];
+                Debug.Log($"Showing EXPLORE post {currentExplorePostIndex + 1}/{dataHandler.ExplorePosts.Count}");
+                return dataHandler.ExplorePosts[currentExplorePostIndex++];
             }
             else
             {
-                // No more explore posts available at the moment
                 Debug.Log("No more EXPLORE posts available, returning null");
                 return null;
             }
         }
     }
     
-    private bool HasMorePostsToShow()
-    {
-        if (isShowingHomeFeed)
-        {
-            bool hasCurrentPosts = currentHomePostIndex < homePosts.Count;
-            bool canLoadMore = hasMoreHomePosts;
-        
-            Debug.Log($"HOME FEED Check: hasCurrentPosts={hasCurrentPosts}, canLoadMore={canLoadMore}");
-            return hasCurrentPosts || canLoadMore;
-        }
-        else
-        {
-            bool hasCurrentPosts = currentExplorePostIndex < explorePosts.Count;
-            bool canLoadMore = hasMoreExplorePosts;
-        
-            Debug.Log($"EXPLORE FEED Check: hasCurrentPosts={hasCurrentPosts}, canLoadMore={canLoadMore}");
-            return hasCurrentPosts || canLoadMore;
-        }
-    }
-    
-    private VisualElement CreateVerticalCard(Post post)
-    {
-        VisualElement verticalCard = verticalCardTemplate.CloneTree();
-        
-        string displayName = "Unknown User"; // Default fallback
-        
-        if (post.author != null)
-        {
-            if (!string.IsNullOrEmpty(post.author.firstName) && !string.IsNullOrEmpty(post.author.lastName))
-            {
-                displayName = $"{post.author.firstName} {post.author.lastName}";
-            }
-            else if (!string.IsNullOrEmpty(post.author.firstName))
-            {
-                displayName = post.author.firstName;
-            }
-            else if (!string.IsNullOrEmpty(post.author.userName))
-            {
-                displayName = post.author.userName;
-            }
-            else if (!string.IsNullOrEmpty(post.author.email))
-            {
-                displayName = post.author.email.Split('@')[0]; // Use email prefix as fallback
-            }
-        }
-        
-        verticalCard.Q<TextElement>("userName").text = displayName;
-        
-        // Set description (use caption if description is null)
-        string description = !string.IsNullOrEmpty(post.description) ? post.description : post.caption;
-        if (!string.IsNullOrEmpty(description) && description.Length > 90)
-        {
-            description = description.Substring(0, 90) + "...";
-        }
-        verticalCard.Q<TextElement>("description").text = description;
-        
-        // Set author image
-        Image userImage = verticalCard.Q<Image>("userImage");
-        if (post.author != null && !string.IsNullOrEmpty(post.author.avatar))
-        {
-            StartCoroutine(LoadImageFromURL(post.author.avatar, userImage));
-        }
-        else
-        {
-            userImage.image = LoadImage("user_placeholder");
-        }
-        
-        // Handle single image only
-        SetupSingleImage(verticalCard, post);
-        
-        // === NEW: ADD SPECIFIC CLICK HANDLERS ===
-    
-        // 1. Click handler for userName - Debug userName
-        TextElement userNameElement = verticalCard.Q<TextElement>("userName");
-        if (userNameElement != null)
-        {
-            userNameElement.pickingMode = PickingMode.Position;
-            userNameElement.RegisterCallback<PointerUpEvent>(evt => 
-            {
-                evt.StopPropagation(); // Prevent event bubbling
-            });
-            
-            // Add hover effect for userName
-            userNameElement.RegisterCallback<PointerEnterEvent>(evt => 
-            {
-                userNameElement.style.opacity = 0.7f;
-            });
-            userNameElement.RegisterCallback<PointerLeaveEvent>(evt => 
-            {
-                userNameElement.style.opacity = 1f;
-            });
-        }
-        
-        // 2. Click handler for userImage - Debug userName
-        if (userImage != null)
-        {
-            userImage.pickingMode = PickingMode.Position;
-            userImage.RegisterCallback<PointerUpEvent>(evt => 
-            {
-                evt.StopPropagation(); // Prevent event bubbling
-            });
-            
-            // Add hover effect for userImage
-            userImage.RegisterCallback<PointerEnterEvent>(evt => 
-            {
-                userImage.style.opacity = 0.8f;
-            });
-            userImage.RegisterCallback<PointerLeaveEvent>(evt => 
-            {
-                userImage.style.opacity = 1f;
-            });
-        }
-        
-        // 3. Click handler for card-image - Debug post images
-        Image cardImage = verticalCard.Q<Image>("card-image");
-        if (cardImage != null)
-        {
-            cardImage.pickingMode = PickingMode.Position;
-            cardImage.RegisterCallback<PointerUpEvent>(evt => 
-            {
-                PostScreenDataHandler.ShowPostStatic(post);
-                evt.StopPropagation();
-            });
-            // ... hover effects
-        }
-
-        // 4. Click handler for comment section
-        VisualElement commentSection = verticalCard.Q<VisualElement>("commentSection");
-        if (commentSection != null)
-        {
-            commentSection.pickingMode = PickingMode.Position;
-            commentSection.RegisterCallback<PointerUpEvent>(evt => 
-            {
-                PostScreenDataHandler.ShowPostStatic(post);
-                evt.StopPropagation();
-            });
-            // ... hover effects
-        }
-        
-        // Setting the like icon for each post based on liked status
-        Image likeIcon = verticalCard.Q<Image>("favourite");
-        if (likeIcon != null)
-        {
-            // Set initial icon based on liked status
-            if (post.liked)
-            {
-                likeIcon.image = LoadImage("heart-filled");
-            }
-            else
-            {
-                likeIcon.image = LoadImage("favourite");
-            }
-            
-            likeIcon.pickingMode = PickingMode.Position;
-            likeIcon.RegisterCallback<PointerUpEvent>(evt => 
-            {
-                StartCoroutine(LikePost(post.postId, likeIcon, post));
-            });
-            likeIcon.RegisterCallback<PointerEnterEvent>(evt => 
-            {
-                likeIcon.style.opacity = 0.7f;
-            });
-            likeIcon.RegisterCallback<PointerLeaveEvent>(evt => 
-            {
-                likeIcon.style.opacity = 1f;
-            });
-        }
-        
-        // Setting the bookmark icon for each post based on bookmarked status
-        Image bookmarkIcon = verticalCard.Q<Image>("bookmark");
-        if (bookmarkIcon != null)
-        {
-            // Set initial icon based on bookmarked status
-            if (post.bookmarked)
-            {
-                bookmarkIcon.image = LoadImage("bookmark-filled");
-            }
-            else
-            {
-                bookmarkIcon.image = LoadImage("Bookmark");
-            }
-            
-            bookmarkIcon.pickingMode = PickingMode.Position;
-            bookmarkIcon.RegisterCallback<PointerUpEvent>(evt => 
-            {
-                StartCoroutine(BookmarkPost(post.postId, bookmarkIcon, post));
-            });
-            bookmarkIcon.RegisterCallback<PointerEnterEvent>(evt => 
-            {
-                bookmarkIcon.style.opacity = 0.7f;
-            });
-            bookmarkIcon.RegisterCallback<PointerLeaveEvent>(evt => 
-            {
-                bookmarkIcon.style.opacity = 1f;
-            });
-        }
-        
-        return verticalCard;
-    }
-
-    private void SetupSingleImage(VisualElement verticalCard, Post post)
-    {
-        Image cardImage = verticalCard.Q<Image>("card-image");
-        string imageUrl = post.GetFirstImageUrl();
-        cardImage.scaleMode = ScaleMode.StretchToFill;
-    
-        if (string.IsNullOrEmpty(imageUrl))
-        {
-            cardImage.image = LoadImage("Contemporary");
-        }
-        else
-        {
-            StartCoroutine(LoadImageFromURL(imageUrl, cardImage));
-        }
-    }
-    
     private IEnumerator AddTrendingDesignersSection()
     {
-        // Check if we have designers to show
-        if (currentDesignerIndex >= trendingDesigners.Count)
+        if (currentDesignerIndex >= dataHandler.TrendingDesigners.Count)
         {
-            // Try to load more designers if available
-            if (hasMoreDesigners)
+            if (dataHandler.HasMoreDesigners)
             {
-                currentDesignerPage++;
-                yield return StartCoroutine(LoadTrendingDesigners(currentDesignerPage));
+                yield return StartCoroutine(dataHandler.LoadTrendingDesigners(dataHandler.GetNextDesignerPage()));
             }
             
-            // If still no designers to show, return
-            if (currentDesignerIndex >= trendingDesigners.Count)
+            if (currentDesignerIndex >= dataHandler.TrendingDesigners.Count)
             {
                 yield break;
             }
         }
         
-        // Add heading for horizontal scroll section
-        Label sectionHeading = new Label("Trending Designers");
-        sectionHeading.style.fontSize = 45;
-        sectionHeading.style.color = new StyleColor(Color.black);
-        sectionHeading.style.marginBottom = 20;
-        sectionHeading.style.marginLeft = 40;
-        sectionHeading.style.unityFontStyleAndWeight = FontStyle.Bold;
+        ScrollView horizontalScroll = uiController.CreateTrendingDesignersSection(
+            dataHandler.TrendingDesigners, 
+            currentDesignerIndex, 
+            10
+        );
         
-        container.Add(sectionHeading);
+        int designersToShow = Mathf.Min(10, dataHandler.TrendingDesigners.Count - currentDesignerIndex);
+        currentDesignerIndex += designersToShow;
         
-        // Add horizontal scroll section
-        ScrollView horizontalScroll = new ScrollView(ScrollViewMode.Horizontal);
-        horizontalScroll.style.flexDirection = FlexDirection.Row;
-        horizontalScroll.style.marginBottom = 100;
-        horizontalScroll.style.paddingLeft = 30;
-        
-        // Add designer cards (show 10 at a time)
-        int designersToShow = Mathf.Min(10, trendingDesigners.Count - currentDesignerIndex);
-        int endIndex = currentDesignerIndex + designersToShow;
-        
-        for (int i = currentDesignerIndex; i < endIndex; i++)
-        {
-            User designerPost = trendingDesigners[i];
-            
-            VisualElement horizontalCard = CreateHorizontalCard(designerPost);
-            horizontalScroll.Add(horizontalCard);
-        }
-        
-        // Update the current designer index
-        currentDesignerIndex = endIndex;
-        
-        container.Add(horizontalScroll);
+        uiController.AddToContainer(horizontalScroll);
     }
     
-    private VisualElement CreateHorizontalCard(User designerPost)
+    public void StartUploadWithService(UploadService.UploadData uploadData)
     {
-        VisualElement horizontalCard = horizontalCardTemplate.CloneTree();
-        string displayName = designerPost.userName;
-        
-        horizontalCard.Q<Label>("userName").text = displayName;
-        
-        // Set designer image
-        Image userImage = horizontalCard.Q<Image>("userImage");
-
-        if (!string.IsNullOrEmpty(designerPost.avatar))
-        {
-            StartCoroutine(LoadImageFromURL(designerPost.avatar, userImage));
-        }
-        else
-        {
-            userImage.image = LoadImage("designer_placeholder");
-        }
-        
-        // Set up follow button
-        Label followText = horizontalCard.Q<Label>("followText");
-        followText.text = "Follow";
-        Button followButton = horizontalCard.Q<Button>("followButton");
-    
-        // Passing the userId and horizontalCard reference to the ToggleFollow function
-        followButton.clicked += () => ToggleFollow(followText, designerPost.userId, horizontalCard);
-        
-        return horizontalCard;
-    }
-    
-    private IEnumerator LoadImageFromURL(string url, Image targetImage)
-    {
-        using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
-        {
-            yield return request.SendWebRequest();
-            
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                Texture2D texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
-                targetImage.image = texture;
-            }
-            else
-            {
-                Debug.LogError($"Failed to load image from {url}: {request.error}");
-            }
-        }
-    }
-    
-    private void OnScroll(WheelEvent evt)
-    {
-        if (container.scrollOffset.y <= 0 && evt.delta.y < 0 && !isRefreshing)
-        {
-            HandlePullToRefresh(-evt.delta.y * 10f);
-        }
-    }
-    
-    private void OnPointerDown(PointerDownEvent evt)
-    {
-        if (container.scrollOffset.y <= 0 && !isRefreshing)
-        {
-            isPulling = true;
-            pullDistance = 0f;
-        }
-    }
-    
-    private void OnPointerMove(PointerMoveEvent evt)
-    {
-        if (isPulling && container.scrollOffset.y <= 0 && !isRefreshing)
-        {
-            pullDistance += evt.deltaPosition.y;
-            HandlePullToRefresh(pullDistance);
-        }
-    }
-    
-    private void OnPointerUp(PointerUpEvent evt)
-    {
-        if (isPulling)
-        {
-            isPulling = false;
-            
-            if (pullDistance >= pullThreshold && !isRefreshing)
-            {
-                StartRefresh();
-            }
-            else
-            {
-                ResetPullIndicator();
-            }
-            
-            pullDistance = 0f;
-        }
-    }
-    
-    private void HandlePullToRefresh(float distance)
-    {
-        if (isRefreshing) return;
-        
-        float normalizedDistance = Mathf.Clamp(distance, 0f, pullThreshold * 1.5f);
-        float progress = normalizedDistance / pullThreshold;
-        refreshContainer.style.height = normalizedDistance;
-        refreshIndicator.style.opacity = Mathf.Clamp01(progress);
-        float rotation = progress * 180f;
-        refreshIcon.transform.rotation = Quaternion.Euler(0, 0, rotation);
-    }
-    
-    private void StartRefresh()
-    {
-        if (isRefreshing) return;
-        isRefreshing = true;
-        refreshContainer.style.height = refreshIndicatorSize + 20f;
-        refreshIndicator.style.opacity = 1f;
-        StartCoroutine(RotateRefreshIcon());
-        StartCoroutine(RefreshContent());
-    }
-    
-    private IEnumerator RotateRefreshIcon()
-    {
-        float rotationSpeed = 360f;
-        
-        while (isRefreshing)
-        {
-            float currentRotation = refreshIcon.transform.rotation.eulerAngles.z;
-            float newRotation = currentRotation + rotationSpeed * Time.deltaTime;
-            refreshIcon.transform.rotation = Quaternion.Euler(0, 0, newRotation);
-            yield return null;
-        }
-    }
-    
-    private IEnumerator RefreshContent()
-    {
-        // Reset pagination
-        currentHomePage = 1;
-        currentExplorePage = 1;
-        currentDesignerPage = 1;
-        yield return StartCoroutine(LoadInitialData());
-        yield return new WaitForSeconds(0.5f);
-        ResetPullIndicator();
-        isRefreshing = false;
-    }
-    
-    private void ResetPullIndicator()
-    {
-        StartCoroutine(AnimateRefreshIndicatorOut());
-    }
-    
-    private IEnumerator AnimateRefreshIndicatorOut()
-    {
-        float animationDuration = 0.3f;
-        float startHeight = refreshContainer.resolvedStyle.height;
-        float startOpacity = refreshIndicator.resolvedStyle.opacity;
-        
-        float elapsedTime = 0f;
-        
-        while (elapsedTime < animationDuration)
-        {
-            elapsedTime += Time.deltaTime;
-            float progress = elapsedTime / animationDuration;
-            float easedProgress = 1f - Mathf.Pow(1f - progress, 3f);
-            
-            refreshContainer.style.height = Mathf.Lerp(startHeight, 0f, easedProgress);
-            refreshIndicator.style.opacity = Mathf.Lerp(startOpacity, 0f, easedProgress);
-            
-            yield return null;
-        }
-        
-        refreshContainer.style.height = 0;
-        refreshIndicator.style.opacity = 0;
-        refreshIcon.transform.rotation = Quaternion.identity;
-    }
-    
-    private void ClearContent()
-    {
-        for (int i = container.childCount - 1; i > 0; i--)
-        {
-            container.RemoveAt(i);
-        }
-    }
-    
-    private Texture2D LoadImage(string imageName)
-    {
-        return Resources.Load<Texture2D>(imageName);
-    }
-    
-    private void ToggleFollow(Label followText, string userId, VisualElement horizontalCard)
-    {
-        Button followButton = followText.parent as Button;
-    
-        if (followText.text == "Follow")
-        {
-            // Immediately update UI to show "Following" state
-            followText.text = "Following";
-            followButton.style.backgroundColor = new StyleColor(new Color32(139, 76, 57, 255));
-            followText.style.color = new StyleColor(Color.white);
-        
-            // Making API call
-            StartCoroutine(FollowUser(userId, followText, followButton, horizontalCard));
-        }
-        else
-        {
-            // For unfollow action
-            followText.text = "Follow";
-            followButton.style.backgroundColor = StyleKeyword.Null;
-            followText.style.color = StyleKeyword.Null;
-        
-            // Making API call
-            StartCoroutine(FollowUser(userId, followText, followButton, horizontalCard));
-        }
+        uiController.ShowUploadProgress();
+        UploadService.Instance.StartUpload(
+            uploadData,
+            OnUploadProgress,
+            OnUploadComplete   
+        );
     }
 
-    
-    private void OnDisable()
+    private void OnUploadProgress(float progress)
     {
-        // Unregister events to prevent memory leaks
-        if (container != null)
+        uiController.UpdateUploadProgress(progress);
+    }
+
+    private void OnUploadComplete(bool success, string message)
+    {
+        uiController.SetUploadComplete(success);
+
+        if (success)
         {
-            container.UnregisterCallback<WheelEvent>(OnScroll);
-            container.UnregisterCallback<PointerDownEvent>(OnPointerDown);
-            container.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
-            container.UnregisterCallback<PointerUpEvent>(OnPointerUp);
+            StartCoroutine(LoadInitialData());
         }
     }
 }

@@ -37,7 +37,7 @@
     width: 100%;
     padding: 0 5%;
     margin-bottom: 3%;
-    display: none; /* Initially hidden */
+    display: none;
 }
 
 .upload-progress-section.show {
@@ -123,4 +123,5 @@
     flex-grow: 1;         
     width: 100%;
     padding: 0 16px 32px 16px;
+    padding-bottom: 160px;
 }
