@@ -21,6 +21,9 @@ public class DescriptionTextBoxSettings
     [Header("Wrapping Settings")]
     public float characterWidth = 20f; // Estimated character width for wrapping
     public bool preserveEnterKey = true;
+    
+    [Header("Character Limit")]
+    public int maxCharacters = 150; // Maximum character limit
 }
 
 [UxmlElement]
@@ -50,8 +53,12 @@ public partial class DescriptionTextBox : VisualElement
     [UxmlAttribute("preserve-enter")]
     public bool preserveEnterKey { get; set; } = true;
     
+    [UxmlAttribute("max-characters")]
+    public int maxCharacters { get; set; } = 150;
+    
     private TextField textField;
     private Label placeholderLabel;
+    private Label characterCountLabel;
     private DescriptionTextBoxSettings settings;
     private bool isInitialized = false;
     private bool isFocused = false;
@@ -61,6 +68,7 @@ public partial class DescriptionTextBox : VisualElement
     public event Action<string> onValueChanged;
     public event Action onFocusIn;
     public event Action onFocusOut;
+    public event Action onCharacterLimitReached;
     
     // Properties
     public string value
@@ -70,13 +78,19 @@ public partial class DescriptionTextBox : VisualElement
         {
             if (textField != null && !isUpdatingText)
             {
-                textField.value = value;
+                // Enforce character limit
+                string limitedValue = EnforceCharacterLimit(value);
+                textField.value = limitedValue;
                 UpdatePlaceholderVisibility();
+                UpdateCharacterCount();
             }
         }
     }
     
     public string text => value; // Alias for convenience
+    
+    public int charactersRemaining => settings != null ? settings.maxCharacters - (textField?.value?.Length ?? 0) : 0;
+    public int currentCharacterCount => textField?.value?.Length ?? 0;
     
     public DescriptionTextBox() : this(null) 
     {
@@ -106,8 +120,24 @@ public partial class DescriptionTextBox : VisualElement
             paddingTop = this.paddingTop,
             paddingBottom = this.paddingBottom,
             characterWidth = this.characterWidth,
-            preserveEnterKey = this.preserveEnterKey
+            preserveEnterKey = this.preserveEnterKey,
+            maxCharacters = this.maxCharacters
         };
+    }
+    
+    private string EnforceCharacterLimit(string text)
+    {
+        if (string.IsNullOrEmpty(text) || settings == null)
+            return text;
+            
+        if (text.Length > settings.maxCharacters)
+        {
+            string truncated = text.Substring(0, settings.maxCharacters);
+            onCharacterLimitReached?.Invoke();
+            return truncated;
+        }
+        
+        return text;
     }
     
     public void Initialize()
@@ -161,6 +191,17 @@ public partial class DescriptionTextBox : VisualElement
         textField.style.unityTextAlign = TextAnchor.UpperLeft;
         textField.style.whiteSpace = WhiteSpace.Normal;
         
+        // Create character count label
+        characterCountLabel = new Label();
+        characterCountLabel.name = "character-count-label";
+        characterCountLabel.style.position = Position.Absolute;
+        characterCountLabel.style.bottom = 5;
+        characterCountLabel.style.right = 10;
+        characterCountLabel.style.fontSize = settings.fontSize - 10; // Smaller font
+        characterCountLabel.style.color = new Color(0.5f, 0.5f, 0.5f); // Gray color
+        characterCountLabel.style.unityTextAlign = TextAnchor.MiddleRight;
+        characterCountLabel.pickingMode = PickingMode.Ignore;
+        
         // Remove all borders from the text field
         textField.style.borderTopWidth = 0;
         textField.style.borderBottomWidth = 0;
@@ -211,9 +252,10 @@ public partial class DescriptionTextBox : VisualElement
             }
         });
         
-        // Add elements - placeholder behind, textfield in front
+        // Add elements - placeholder behind, textfield in front, character count on top
         Add(placeholderLabel);
         Add(textField);
+        Add(characterCountLabel);
         
         // Setup events
         textField.RegisterValueChangedCallback(OnTextChanged);
@@ -224,8 +266,9 @@ public partial class DescriptionTextBox : VisualElement
         // Register for geometry changes
         RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         
-        // Initial state - show placeholder
+        // Initial state - show placeholder and update character count
         UpdatePlaceholderVisibility();
+        UpdateCharacterCount();
         
         isInitialized = true;
     }
@@ -241,6 +284,21 @@ public partial class DescriptionTextBox : VisualElement
     
     private void OnKeyDown(KeyDownEvent evt)
     {
+        // Prevent input if at character limit (except for delete/backspace)
+        if (textField != null && currentCharacterCount >= settings.maxCharacters)
+        {
+            if (evt.keyCode != KeyCode.Backspace && evt.keyCode != KeyCode.Delete && 
+                evt.keyCode != KeyCode.LeftArrow && evt.keyCode != KeyCode.RightArrow &&
+                evt.keyCode != KeyCode.UpArrow && evt.keyCode != KeyCode.DownArrow &&
+                evt.keyCode != KeyCode.Home && evt.keyCode != KeyCode.End)
+            {
+                evt.PreventDefault();
+                evt.StopPropagation();
+                onCharacterLimitReached?.Invoke();
+                return;
+            }
+        }
+        
         // Handle text wrapping on key input
         schedule.Execute(() => ApplyTextWrapping());
     }
@@ -249,9 +307,20 @@ public partial class DescriptionTextBox : VisualElement
     {
         if (isUpdatingText) return;
         
+        // Enforce character limit
+        string limitedValue = EnforceCharacterLimit(evt.newValue);
+        
+        if (limitedValue != evt.newValue)
+        {
+            isUpdatingText = true;
+            textField.value = limitedValue;
+            isUpdatingText = false;
+        }
+        
         UpdatePlaceholderVisibility();
+        UpdateCharacterCount();
         ApplyTextWrapping();
-        onValueChanged?.Invoke(evt.newValue);
+        onValueChanged?.Invoke(limitedValue);
     }
     
     private void OnFocusIn(FocusInEvent evt)
@@ -282,6 +351,30 @@ public partial class DescriptionTextBox : VisualElement
         else
         {
             placeholderLabel.style.display = DisplayStyle.None;
+        }
+    }
+    
+    private void UpdateCharacterCount()
+    {
+        if (!isInitialized || characterCountLabel == null || settings == null) return;
+        
+        int currentCount = currentCharacterCount;
+        int remaining = charactersRemaining;
+        
+        characterCountLabel.text = $"{currentCount}/{settings.maxCharacters}";
+        
+        // Change color based on remaining characters
+        if (remaining <= 10)
+        {
+            characterCountLabel.style.color = new Color(0.8f, 0.2f, 0.2f); // Red when close to limit
+        }
+        else if (remaining <= 30)
+        {
+            characterCountLabel.style.color = new Color(0.8f, 0.6f, 0.2f); // Orange when getting close
+        }
+        else
+        {
+            characterCountLabel.style.color = new Color(0.5f, 0.5f, 0.5f); // Gray when plenty left
         }
     }
     
@@ -447,8 +540,12 @@ public partial class DescriptionTextBox : VisualElement
             placeholderLabel.style.color = settings.placeholderColor;
             placeholderLabel.text = settings.placeholderText;
             
+            // Update character count label
+            characterCountLabel.style.fontSize = settings.fontSize - 10;
+            
             // Refresh display
             UpdatePlaceholderVisibility();
+            UpdateCharacterCount();
             if (!string.IsNullOrEmpty(value))
             {
                 ApplyTextWrapping();

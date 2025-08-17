@@ -1022,7 +1022,7 @@ MonoBehaviour:
   - screenType: 3
     screenObject: {fileID: 1816956111}
   - screenType: 4
-    screenObject: {fileID: 1788447527}
+    screenObject: {fileID: 319875140}
   - screenType: 5
     screenObject: {fileID: 1844930764}
   - screenType: 10
@@ -1750,6 +1750,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiDocument: {fileID: 1769056023}
   homeScreenGameObject: {fileID: 2076168900}
+  baseApiUrl: 
+  authToken: 
 --- !u!1 &1788447527
 GameObject:
   m_ObjectHideFlags: 0
@@ -2736,6 +2738,8 @@ GameObject:
   - component: {fileID: 2076168901}
   - component: {fileID: 2076168902}
   - component: {fileID: 2076168903}
+  - component: {fileID: 2076168905}
+  - component: {fileID: 2076168904}
   m_Layer: 0
   m_Name: HomeScreen
   m_TagString: Untagged
@@ -2789,8 +2793,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9e560c44bdd14acd9d6b941da965328, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  homeCheckInterval: 10
+--- !u!114 &2076168904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076168900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bae0376c7174abda7366cc73d3297fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   verticalCardTemplate: {fileID: 9197481963319205126, guid: 3fca1bac0f8d944ae934d8efaf2ae40a, type: 3}
   horizontalCardTemplate: {fileID: 9197481963319205126, guid: 2c9618c52dbe54cb2a0bce26183b1c98, type: 3}
+  pullThreshold: 100
+  refreshIndicatorSize: 50
+  refreshDuration: 2
+--- !u!114 &2076168905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076168900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63cfacb5617247b39f447c01096f5b9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   baseURL: 
   exploreFeedUrl: /api/v1/post/explore-feed
   homeFeedUrl: /api/v1/post/user-feed
@@ -2798,10 +2830,6 @@ MonoBehaviour:
   authToken: 
   postsPerPage: 10
   designersPerPage: 10
-  homeCheckInterval: 10
-  pullThreshold: 100
-  refreshIndicatorSize: 50
-  refreshDuration: 2
 --- !u!1 &2142930228
 GameObject:
   m_ObjectHideFlags: 0

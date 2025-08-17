@@ -8,6 +8,7 @@
                 <ui:VisualElement name="media-preview-container" class="media-preview" style="flex-direction: row; flex-wrap: wrap; margin-top: 10px;" />
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:Label name="warningImageText" class="warning-text" style="align-self: flex-start;" />
         <ui:VisualElement class="input-group">
             <ui:Label text="Caption" class="input-label" />
             <ui:VisualElement class="input-wrapper" style="margin-top: 20px">
@@ -23,7 +24,6 @@
                     preserve-enter="true"
                     class="input-field"/>
             </ui:VisualElement>
-            <ui:Label name="warningLabelCaption" class="warning-text-1" style="align-self: flex-start;" />
         </ui:VisualElement>
         <ui:VisualElement class="tags-section">
             <ui:Label text="Tags" class="field-label" />
@@ -34,7 +34,7 @@
             <ui:VisualElement name="tags-container" />
         </ui:VisualElement>
         <ui:Label name="title" text="Room Type" class="title" />
-        <ui:VisualElement name="roomTyeDropdown" class="location-dropdown" style="justify-content: flex-start;">
+        <ui:VisualElement name="roomTypeDropdown" class="location-dropdown" style="justify-content: flex-start;">
             <ui:VisualElement name="roomTypeDropdownTrigger" class="dropdown-trigger">
                 <ui:Label name="roomTypeSelectedText" text="Select room type" class="selected-text" style="justify-content: flex-start; align-content: flex-start;" />
                 <ui:Label text="▼" class="dropdown-arrow" />

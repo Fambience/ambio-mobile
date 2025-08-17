@@ -3,86 +3,152 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Linq;
+using UnityEngine.Networking;
+using System.IO;
 
 public class CreatePostController : MonoBehaviour
 {
     private VisualElement root;
-    
-    // Components
     private CreatePostMediaHandler mediaHandler;
     private CreatePostDropdownHandler dropdownHandler;
-    
-    // Tag elements
     private TextField tagInput;
     private Button addTagButton;
     private VisualElement tagsContainer;
-    
-    // Other elements
     private Button completeButton;
-    
-    // Data storage
+    private DescriptionTextBox descriptionBox;
     private List<string> addedTags = new List<string>();
+    private string baseURL;
+    private string authToken;
+    private bool isValidationEnabled = true;
+
+    [System.Serializable]
+    public class PostUploadResponse
+    {
+        public bool success;
+        public string message;
+        public string data;
+        public string[] uploadResults;
+    }
     
     private void OnEnable()
     {
+        baseURL = baseScript.baseURL;
+        authToken = AuthTokenManager.GetToken();
         var uiDocument = GetComponent<UIDocument>();
         root = uiDocument.rootVisualElement;
+        StartCoroutine(ShowNavigationAfterDelay());   
         
-        // Initialize components
-        mediaHandler = GetComponent<CreatePostMediaHandler>();
-        if (mediaHandler == null)
-            mediaHandler = gameObject.AddComponent<CreatePostMediaHandler>();
-            
-        dropdownHandler = GetComponent<CreatePostDropdownHandler>();
-        if (dropdownHandler == null)
-            dropdownHandler = gameObject.AddComponent<CreatePostDropdownHandler>();
+        mediaHandler = GetComponent<CreatePostMediaHandler>() ?? gameObject.AddComponent<CreatePostMediaHandler>();
+        dropdownHandler = GetComponent<CreatePostDropdownHandler>() ?? gameObject.AddComponent<CreatePostDropdownHandler>();
         
-        // Initialize components
         mediaHandler.Initialize(root);
         dropdownHandler.Initialize(root);
         
         BindUIElements();
         SetupTags();
         SetupButtons();
+        SetupValidation();
+    }
+    
+    private IEnumerator ShowNavigationAfterDelay()
+    {
+        yield return new WaitForSeconds(0.1f);
+        NavigationManager.ToggleNavigationBar(true);
+        NavigationManager.UpdateSelectedIcon(NavScreen.Create);
+        yield return new WaitForSeconds(0.1f);
     }
     
     private void BindUIElements()
     {
-        // Tag elements
         tagInput = root.Q<TextField>("tag-input");
         addTagButton = root.Q<Button>("add-tag-button");
         tagsContainer = root.Q<VisualElement>("tags-container");
-        
-        // Other elements
         completeButton = root.Q<Button>("completeButton");
-        
-        Debug.Log($"Tag Input Found: {tagInput != null}");
-        Debug.Log($"Add Tag Button Found: {addTagButton != null}");
-        Debug.Log($"Tags Container Found: {tagsContainer != null}");
-        Debug.Log($"Complete Button Found: {completeButton != null}");
+        descriptionBox = root.Q<DescriptionTextBox>("descriptionBox");
     }
+
+    private void SetupValidation()
+    {
+        if (mediaHandler != null)
+            mediaHandler.OnMediaChanged += ValidateForm;
+
+        if (descriptionBox != null)
+            descriptionBox.onValueChanged += (value) => ValidateForm();
+        
+        if (dropdownHandler != null)
+            dropdownHandler.OnSelectionChanged += ValidateForm;
+        
+        ValidateForm();
+    }
+
+    private void ValidateForm()
+    {
+        if (!isValidationEnabled || completeButton == null) return;
+
+        bool isValid = IsFormValid();
+        completeButton.SetEnabled(isValid);
+        
+        if (isValid)
+        {
+            completeButton.style.opacity = 1f;
+            completeButton.style.backgroundColor = new StyleColor(new Color(90f / 255f, 42f / 255f, 31f / 255f, 1f));
+        }
+        else
+        {
+            completeButton.style.opacity = 0.6f;
+            completeButton.style.backgroundColor = new StyleColor(Color.gray);
+        }
+    }
+
+    private bool IsFormValid()
+    {
+        
+        string roomType = dropdownHandler?.GetSelectedRoomType() ?? "";
+        Debug.Log($"Room Type: '{roomType}' | Valid: {!string.IsNullOrWhiteSpace(roomType)}");
     
-    #region Tag System
+        string designStyle = dropdownHandler?.GetSelectedDesignStyle() ?? "";
+        Debug.Log($"Design Style: '{designStyle}' | Valid: {!string.IsNullOrWhiteSpace(designStyle)}");
+        
+        string description = descriptionBox?.text ?? "";
+        if (string.IsNullOrWhiteSpace(description)) return false;
+        if (string.IsNullOrWhiteSpace(dropdownHandler?.GetSelectedRoomType())) return false;
+        if (string.IsNullOrWhiteSpace(dropdownHandler?.GetSelectedDesignStyle())) return false;
+        if (!mediaHandler?.HasValidMedia() ?? true) return false;
+        if (addedTags == null || addedTags.Count == 0) return false;
+    
+        return true;
+    }
+
+    private void ShowValidationError()
+    {
+        string errorMessage = GetValidationErrorMessage();
+        ShowErrorMessage(errorMessage);
+    }
+
+    private string GetValidationErrorMessage()
+    {
+        string description = descriptionBox?.text ?? "";
+        if (string.IsNullOrWhiteSpace(description)) return "Please add a description";
+        if (string.IsNullOrWhiteSpace(dropdownHandler?.GetSelectedRoomType())) return "Please select a room type";
+        if (string.IsNullOrWhiteSpace(dropdownHandler?.GetSelectedDesignStyle())) return "Please select a design style";
+        if (!mediaHandler?.HasValidMedia() ?? true) return "Please add at least one image or video";
+        return "Please fill in all required fields";
+    }
     
     private void SetupTags()
     {
         if (addTagButton != null)
-        {
             addTagButton.clicked += AddTag;
-        }
         
         if (tagInput != null)
         {
             tagInput.RegisterCallback<KeyDownEvent>(evt => 
             {
                 if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter)
-                {
                     AddTag();
-                }
             });
         }
         
-        // Set tags container to horizontal flow
         if (tagsContainer != null)
         {
             tagsContainer.style.flexDirection = FlexDirection.Row;
@@ -96,35 +162,27 @@ public class CreatePostController : MonoBehaviour
         if (tagInput == null) return;
         
         string tagText = tagInput.value.Trim();
-        
-        if (string.IsNullOrEmpty(tagText))
-        {
-            Debug.Log("Tag text is empty");
-            return;
-        }
-        
+        if (string.IsNullOrEmpty(tagText)) return;
         if (addedTags.Contains(tagText))
         {
-            Debug.Log("Tag already exists");
+            ShowErrorMessage("Tag already exists");
             return;
         }
         
         addedTags.Add(tagText);
         CreateTagElement(tagText);
         tagInput.value = "";
-        
-        Debug.Log($"Added tag: {tagText}");
+        ValidateForm();
     }
     
     private void CreateTagElement(string tagText)
     {
         if (tagsContainer == null) return;
         
-        // Create main tag container
         var tagElement = new VisualElement();
         tagElement.style.flexDirection = FlexDirection.Row;
         tagElement.style.alignItems = Align.Center;
-        tagElement.style.backgroundColor = new StyleColor(new Color(0.545f, 0.298f, 0.216f)); // #8B4C39
+        tagElement.style.backgroundColor = new StyleColor(new Color(0.545f, 0.298f, 0.216f));
         tagElement.style.borderTopLeftRadius = 15;
         tagElement.style.borderTopRightRadius = 15;
         tagElement.style.borderBottomLeftRadius = 15;
@@ -137,14 +195,12 @@ public class CreatePostController : MonoBehaviour
         tagElement.style.marginBottom = 10;
         tagElement.style.height = 50;
         
-        // Create tag text label
         var tagLabel = new Label(tagText);
         tagLabel.style.color = Color.white;
         tagLabel.style.fontSize = 25;
         tagLabel.style.flexGrow = 1;
         tagLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
         
-        // Create remove button (X)
         var removeButton = new Button();
         removeButton.text = "×";
         removeButton.style.backgroundColor = StyleKeyword.None;
@@ -163,7 +219,6 @@ public class CreatePostController : MonoBehaviour
         removeButton.style.paddingLeft = 0;
         removeButton.style.paddingRight = 0;
         
-        // Add hover effect for remove button
         removeButton.RegisterCallback<MouseEnterEvent>(evt => 
         {
             removeButton.style.backgroundColor = new StyleColor(new Color(1f, 1f, 1f, 0.2f));
@@ -174,86 +229,116 @@ public class CreatePostController : MonoBehaviour
             removeButton.style.backgroundColor = StyleKeyword.None;
         });
         
-        // Add remove functionality
         removeButton.clicked += () => RemoveTag(tagText, tagElement);
         
-        // Assemble the tag element
         tagElement.Add(tagLabel);
         tagElement.Add(removeButton);
-        
-        // Add to tags container
         tagsContainer.Add(tagElement);
     }
     
     private void RemoveTag(string tagText, VisualElement tagElement)
     {
         if (tagsContainer == null) return;
-        
         addedTags.Remove(tagText);
         tagsContainer.Remove(tagElement);
-        
-        Debug.Log($"Removed tag: {tagText}");
+        ValidateForm();
     }
-    
-    #endregion
-    
-    #region Button Setup
     
     private void SetupButtons()
     {
         if (completeButton != null)
-        {
             completeButton.clicked += OnCompleteButtonClicked;
-        }
     }
     
     private void OnCompleteButtonClicked()
     {
-        // Collect all form data
-        var descriptionBox = root.Q<VisualElement>("descriptionBox");
-        string description = ""; // You'll need to get this from your custom DescriptionTextBox component
-        
-        Debug.Log("=== Post Data ===");
-        Debug.Log($"Description: {description}");
-        Debug.Log($"Room Type: {dropdownHandler.GetSelectedRoomType()}");
-        Debug.Log($"Design Style: {dropdownHandler.GetSelectedDesignStyle()}");
-        Debug.Log($"Tags: {string.Join(", ", addedTags)}");
-        Debug.Log($"Media Items: {mediaHandler.GetSelectedMedia().Count}");
-        
-        // Log media information
-        var selectedMedia = mediaHandler.GetSelectedMedia();
-        for (int i = 0; i < selectedMedia.Count; i++)
+        if (!IsFormValid())
         {
-            var media = selectedMedia[i];
-            Debug.Log($"  Media {i + 1}: {media.fileName} (Video: {media.isVideo})");
+            ShowValidationError();
+            return;
         }
-        
-        // Here you can add your upload logic
-        // For example: UploadPost(description, selectedRoomType, selectedDesignStyle, addedTags, selectedMedia);
+        string description = descriptionBox?.text ?? "";
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            ShowErrorMessage("Please add a description");
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(dropdownHandler.GetSelectedRoomType()))
+        {
+            ShowErrorMessage("Please select a room type");
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(dropdownHandler.GetSelectedDesignStyle()))
+        {
+            ShowErrorMessage("Please select a design style");
+            return;
+        }
+        var selectedMedia = mediaHandler.GetSelectedMedia();
+        if (selectedMedia.Count == 0)
+        {
+            ShowErrorMessage("Please add at least one image or video");
+            return;
+        }
+
+        isValidationEnabled = false;
+        completeButton.SetEnabled(false);
+
+        // Navigate to Home screen first
+        UIManager.Instance.OpenScreen(UIScreenType.Home);
+        var uploadData = new UploadService.UploadData
+        {
+            description = description,
+            roomType = dropdownHandler.GetSelectedRoomType(),
+            designStyle = dropdownHandler.GetSelectedDesignStyle(),
+            tags = new List<string>(addedTags),
+            mediaItems = selectedMedia,
+            baseURL = baseURL,
+            authToken = authToken
+        };
+
+        // Get home controller and start upload
+        var homeController = FindObjectOfType<HomeScreenController>();
+        if (homeController != null)
+        {
+            homeController.StartUploadWithService(uploadData);
+        }
+
+        // Reset form
+        ResetForm();
+    }
+
+    private void ResetForm()
+    {
+        isValidationEnabled = true;
+        completeButton.SetEnabled(true);
+        ClearAllTags();
+        ClearAllMedia();
+        dropdownHandler?.ResetSelections();
+        descriptionBox?.ClearText();
+        ValidateForm();
     }
     
-    #endregion
+    private void ShowErrorMessage(string message)
+    {
+        Debug.LogError(message);
+    }
     
-    #region Public API Methods
+    private void ShowSuccessMessage(string message)
+    {
+        Debug.Log(message);
+    }
     
-    // Public method to get added tags
     public List<string> GetAddedTags()
     {
         return new List<string>(addedTags);
     }
     
-    // Public method to clear all tags
     public void ClearAllTags()
     {
         addedTags.Clear();
-        if (tagsContainer != null)
-        {
-            tagsContainer.Clear();
-        }
-        Debug.Log("All tags cleared");
+        tagsContainer?.Clear();
     }
-    
-    // Delegate methods to access other components
+
     public string GetSelectedRoomType()
     {
         return dropdownHandler?.GetSelectedRoomType() ?? "";
@@ -289,23 +374,38 @@ public class CreatePostController : MonoBehaviour
         mediaHandler?.SetMaxMediaItems(max);
     }
     
-    #endregion
+    public void TriggerValidation()
+    {
+        ValidateForm();
+    }
     
-    #region Cleanup
+    public bool IsCurrentlyValid()
+    {
+        return IsFormValid();
+    }
     
     private void OnDisable()
     {
-        // Clean up resources when component is disabled
         ClearAllTags();
         mediaHandler?.ClearAllMedia();
+        CancelInvoke(nameof(ValidateForm));
+        
+        if (mediaHandler != null)
+            mediaHandler.OnMediaChanged -= ValidateForm;
+        
+        if (dropdownHandler != null)
+            dropdownHandler.OnSelectionChanged -= ValidateForm;
     }
     
     private void OnDestroy()
     {
-        // Clean up resources when component is destroyed
         ClearAllTags();
         mediaHandler?.ClearAllMedia();
+        CancelInvoke(nameof(ValidateForm));
+        if (mediaHandler != null)
+            mediaHandler.OnMediaChanged -= ValidateForm;
+        
+        if (dropdownHandler != null)
+            dropdownHandler.OnSelectionChanged -= ValidateForm;
     }
-    
-    #endregion
 }

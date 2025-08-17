@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.IO;
+using System;
 
 public class CreatePostMediaHandler : MonoBehaviour
 {
@@ -11,10 +12,14 @@ public class CreatePostMediaHandler : MonoBehaviour
     // Media upload elements
     private VisualElement uploadImageIcon;
     private VisualElement mediaPreviewContainer;
+    private Label warningImageText;
     
     // Media storage
     private List<MediaItem> selectedMedia = new List<MediaItem>();
     private int maxMediaItems = 10; // Set your limit
+
+    // Events for validation
+    public event Action OnMediaChanged;
 
     // Media item class to store media data
     [System.Serializable]
@@ -39,6 +44,7 @@ public class CreatePostMediaHandler : MonoBehaviour
         root = rootElement;
         BindUIElements();
         SetupMediaUpload();
+        HideWarningText(); // Initially hide warning
     }
     
     private void BindUIElements()
@@ -46,11 +52,44 @@ public class CreatePostMediaHandler : MonoBehaviour
         // Media upload elements
         uploadImageIcon = root.Q<VisualElement>("UploadImageIcon");
         mediaPreviewContainer = root.Q<VisualElement>("media-preview-container");
+        warningImageText = root.Q<Label>("warningImageText");
         
         // Debug: Check if elements are found
         Debug.Log($"Upload Icon Found: {uploadImageIcon != null}");
         Debug.Log($"Media Preview Container Found: {mediaPreviewContainer != null}");
+        Debug.Log($"Warning Text Found: {warningImageText != null}");
     }
+    
+    #region Warning Text Management
+    
+    private void ShowWarningText(string message)
+    {
+        if (warningImageText != null)
+        {
+            warningImageText.text = message;
+            warningImageText.style.display = DisplayStyle.Flex;
+            warningImageText.style.color = new StyleColor(Color.red);
+            
+            // Auto-hide after 5 seconds
+            StartCoroutine(HideWarningAfterDelay(5f));
+        }
+    }
+    
+    private void HideWarningText()
+    {
+        if (warningImageText != null)
+        {
+            warningImageText.style.display = DisplayStyle.None;
+        }
+    }
+    
+    private IEnumerator HideWarningAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        HideWarningText();
+    }
+    
+    #endregion
     
     #region Media Upload Setup
     
@@ -113,9 +152,13 @@ public class CreatePostMediaHandler : MonoBehaviour
     {
         if (selectedMedia.Count >= maxMediaItems)
         {
+            ShowWarningText($"Maximum media items ({maxMediaItems}) reached!");
             Debug.Log($"Maximum media items ({maxMediaItems}) reached!");
             return;
         }
+        
+        // Hide any existing warning before opening picker
+        HideWarningText();
         
         // Show options: Camera or Gallery
         ShowMediaPickerDialog();
@@ -134,9 +177,11 @@ public class CreatePostMediaHandler : MonoBehaviour
         }
         else
         {
+            ShowWarningText("Media picker is busy! Please try again.");
             Debug.Log("Media picker is busy!");
         }
 #else
+        ShowWarningText("Media picker only works on Android/iOS devices.");
         Debug.Log("Media picker only works on Android/iOS");
 #endif
     }
@@ -167,6 +212,7 @@ public class CreatePostMediaHandler : MonoBehaviour
                 }
                 else
                 {
+                    ShowWarningText("Gallery permission denied! Please enable it in device settings.");
                     Debug.Log("Gallery permission denied!");
                     if (permission == NativeGallery.Permission.Denied)
                     {
@@ -211,6 +257,7 @@ public class CreatePostMediaHandler : MonoBehaviour
         // Verify file exists
         if (!File.Exists(path))
         {
+            ShowWarningText("Selected file does not exist!");
             Debug.LogError($"Selected file does not exist: {path}");
             return;
         }
@@ -239,6 +286,9 @@ public class CreatePostMediaHandler : MonoBehaviour
         Debug.Log($"Is video: {isVideo}");
         Debug.Log("File passed security validation ✅");
         
+        // Hide warning on successful validation
+        HideWarningText();
+        
         if (isVideo)
         {
             ProcessVideoFile(path);
@@ -262,8 +312,8 @@ public class CreatePostMediaHandler : MonoBehaviour
         Debug.Log("Images: .jpg, .jpeg, .png, .webp, .heic (with valid content)");
         Debug.Log("Videos: .mp4, .mov (with valid content)");
         
-        // You can add UI notification here if needed
-        // For example, show a security warning popup to the user
+        // Show warning to user
+        ShowWarningText($"Invalid file format! Supported: JPG, PNG, WEBP, HEIC, MP4, MOV");
     }
     
     private void ShowUnsupportedFormatMessage(string extension)
@@ -273,8 +323,8 @@ public class CreatePostMediaHandler : MonoBehaviour
         Debug.Log("Images: .jpg, .jpeg, .png, .webp, .heic");
         Debug.Log("Videos: .mp4, .mov");
         
-        // You can add UI notification here if needed
-        // For example, show a popup or toast message to the user
+        // Show warning to user
+        ShowWarningText($"Unsupported format '{extension}'! Use JPG, PNG, WEBP, HEIC, MP4, MOV");
     }
     
     private bool IsImageFile(string path)
@@ -425,10 +475,14 @@ public class CreatePostMediaHandler : MonoBehaviour
             // Update UI on main thread
             CreateMediaPreview(mediaItem);
             
+            // Trigger validation update
+            OnMediaChanged?.Invoke();
+            
             Debug.Log($"Image loaded: {fileName}");
         }
         else
         {
+            ShowWarningText("Failed to load image. File may be corrupted.");
             Debug.LogError("Failed to load image");
             DestroyImmediate(texture);
         }
@@ -472,6 +526,10 @@ public class CreatePostMediaHandler : MonoBehaviour
             MediaItem mediaItem = new MediaItem(path, thumbnailTexture, true, fileName);
             selectedMedia.Add(mediaItem);
             CreateMediaPreview(mediaItem);
+            
+            // Trigger validation update
+            OnMediaChanged?.Invoke();
+            
             Debug.Log($"Video thumbnail loaded successfully: {fileName} ({thumbnailTexture.width}x{thumbnailTexture.height})");
         }
         else
@@ -534,6 +592,9 @@ public class CreatePostMediaHandler : MonoBehaviour
         MediaItem mediaItem = new MediaItem(path, placeholderTexture, true, fileName);
         selectedMedia.Add(mediaItem);
         CreateMediaPreview(mediaItem);
+        
+        // Trigger validation update
+        OnMediaChanged?.Invoke();
         
         Debug.Log($"Enhanced video placeholder created: {fileName}");
     }
@@ -712,6 +773,9 @@ public class CreatePostMediaHandler : MonoBehaviour
                 mediaPreviewContainer.Remove(previewElement);
             }
         }
+
+        // Trigger validation update
+        OnMediaChanged?.Invoke();
     
         Debug.Log($"Removed media item: {mediaItem.fileName}");
     }
@@ -724,6 +788,12 @@ public class CreatePostMediaHandler : MonoBehaviour
     public List<MediaItem> GetSelectedMedia()
     {
         return new List<MediaItem>(selectedMedia);
+    }
+    
+    // Public method to check if media is valid/present
+    public bool HasValidMedia()
+    {
+        return selectedMedia.Count > 0;
     }
     
     // Public method to get supported image formats
@@ -787,6 +857,12 @@ public class CreatePostMediaHandler : MonoBehaviour
                 SetupMediaUpload();
             }
         }
+
+        // Hide warning text when clearing
+        HideWarningText();
+
+        // Trigger validation update
+        OnMediaChanged?.Invoke();
     
         Debug.Log("All media cleared");
     }
