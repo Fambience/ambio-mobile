@@ -4,6 +4,7 @@
     height: 100%;
     width: 100%;
     justify-content: flex-start;
+    margin-bottom: 150px;
 }
 
 .header {
@@ -48,13 +49,18 @@
     margin-bottom: 20px;
 }
 
-.user-image {
+.user-image-container {
     width: 100px;
     height: 100px;
-    border-radius: 50%;
-    background-image: resource("userImage");
+    border-radius: 50px;
     margin-bottom: 10px;
     margin-top: 10px;
+}
+
+.user-image-inner {
+    width: 100px;
+    height: 100px;
+    background-image: resource("userImage");
 }
 
 .user-name {
@@ -103,7 +109,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    -unity-background-scale-mode: scale-and-crop;
+    -unity-background-scale-mode: stretch-to-fill;
     background-size: cover;
 }
 
@@ -152,11 +158,11 @@
 }
 
 .prev-icon {
-    background-image: resource("arrow-left"); /* You'll need to add this icon */
+    background-image: resource("arrow-left");
 }
 
 .next-icon {
-    background-image: resource("arrow-right"); /* You'll need to add this icon */
+    background-image: resource("arrow-right");
 }
 
 .dots-container {
@@ -190,7 +196,6 @@
     margin: 0 4px;
 }
 
-/* Legacy card-image class for backward compatibility */
 .card-image {
     width: 100%;
     height: 700px;
@@ -235,7 +240,7 @@
 }
 
 .like.liked {
-    background-image: resource("favourite-filled"); /* You'll need a filled heart icon */
+    background-image: resource("favourite-filled"); 
 }
 
 .share{
@@ -247,7 +252,7 @@
 }
 
 .bookmark.bookmarked {
-    background-image: resource("Bookmark-filled"); /* You'll need a filled bookmark icon */
+    background-image: resource("Bookmark-filled"); 
 }
 
 .footer{
@@ -265,7 +270,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    /* Added to prevent expansion */
+    
     flex-shrink: 0;
 }
 
@@ -325,7 +330,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    max-height: 600px; /* Adjust based on your design needs */
+    max-height: 600px; 
     min-height: 200px;
     flex-grow: 1;
     overflow: hidden;
@@ -364,7 +369,7 @@
     width: 100%;
 }
 
-/* Scrollable Comments Classes */
+
 .comments-scroll-view {
     flex-grow: 1;
     width: 100%;
@@ -382,23 +387,22 @@
     display: none;
 }
 
-/* Make sure content container takes full width */
+
 .comments-scroll-view .unity-scroll-view__content-container {
     padding: 0 0 20px;
     width: 100%;
 }
 
-/* UPDATE the existing .comment-item to add spacing: */
+
 .comment-item {
     width: 100%;
     flex-direction: column;
     justify-content: flex-start;
-    /* Add these for better spacing between comments */
+    
     margin-bottom: 30px;
     padding: 15px 0;
 }
 
-/* No Comments Message Styles - ADD these: */
 .no-comments-container {
     width: 100%;
     flex-direction: column;
