@@ -598,7 +598,6 @@ public class PostScreenDataHandler : MonoBehaviour
         if (imageCounter != null)
         {
             imageCounter.text = $"{currentImageIndex + 1}/{imageUrls.Count}";
-            Debug.Log($"Image counter updated: {currentImageIndex + 1}/{imageUrls.Count}");
         }
 
         if (dotsContainer != null)
@@ -1011,7 +1010,6 @@ public class PostScreenDataHandler : MonoBehaviour
                     addCommentField.value = "";
                     ResetPaginationState();
                     StartCoroutine(FetchCommentsFromAPI(1, false));
-                    Debug.Log("Comment submitted successfully, refreshing comments list");
                 }
                 catch (System.Exception e)
                 {
@@ -1134,10 +1132,6 @@ public class PostScreenDataHandler : MonoBehaviour
         {
             instance.ShowPost(post);
         }
-        else
-        {
-            Debug.LogError("Cannot show post - PostScreen instance not available!");
-        }
     }
 
     public void ShowPostScreen()
@@ -1156,10 +1150,6 @@ public class PostScreenDataHandler : MonoBehaviour
         if (homeScreenGameObject != null)
         {
             homeScreenGameObject.SetActive(true);
-        }
-        else
-        {
-            Debug.LogWarning("HomeScreen GameObject reference not found!");
         }
     }
 
