@@ -100,8 +100,6 @@ public class UserProfileDataFetcher : MonoBehaviour
             {
                 userProfileCache[userId] = profile;
                 Debug.Log("[UserProfileDataFetcher] User profile stored: " + userId);
-
-                // ✅ Show correct screen based on role
                 if (profile.role == "USER")
                 {
                     UIManager.Instance.OpenScreen(UIScreenType.UserProfileScreen);
