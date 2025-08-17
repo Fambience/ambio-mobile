@@ -933,6 +933,7 @@ GameObject:
   m_Component:
   - component: {fileID: 953065711}
   - component: {fileID: 953065712}
+  - component: {fileID: 953065713}
   m_Layer: 0
   m_Name: CreatorProfileScreen
   m_TagString: Untagged
@@ -974,6 +975,19 @@ MonoBehaviour:
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920
   m_WorldSpaceHeight: 1080
+--- !u!114 &953065713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 953065710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8335479632bb4472b80aae8d76c1c6e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiDocument: {fileID: 953065712}
 --- !u!1 &1107861829
 GameObject:
   m_ObjectHideFlags: 0
@@ -1669,7 +1683,7 @@ GameObject:
   - component: {fileID: 1823170432}
   - component: {fileID: 1823170433}
   m_Layer: 0
-  m_Name: ProfileScreen
+  m_Name: UserProfileScreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1721,7 +1735,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fa525def97f44b7ab62f9d7b592818f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  postCardTemplate: {fileID: 9197481963319205126, guid: 3fca1bac0f8d944ae934d8efaf2ae40a, type: 3}
   uiDocument: {fileID: 1823170432}
 --- !u!1 &1825180359
 GameObject:
@@ -2354,7 +2367,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2039348688
 Transform:
   m_ObjectHideFlags: 0
