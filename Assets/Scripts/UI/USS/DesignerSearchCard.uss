@@ -1,23 +1,29 @@
 .main-container {
-    margin-top: 100px;
     background-color: #F5F0ED;
     width: 100%;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    margin-left: 3%;
 }
 
-.designer-icon {
+.icon-container {
     margin-top: 10px;
     margin-bottom: 10px;
     width: 100px;
     height: 100px;
-    background-color: black;
-    border-radius: 50%;
+    border-radius: 50px;
+}
+
+.designer-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50px;
+    background-image: resource("userImage");
 }
 
 .user-details {
-    margin-left: 20px;
+    margin-left: 30px;
     flex-direction: column;
 }
 

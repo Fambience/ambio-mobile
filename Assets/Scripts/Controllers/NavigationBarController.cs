@@ -33,6 +33,12 @@ public class NavigationBarController : MonoBehaviour
             UIManager.Instance.OpenScreen(UIScreenType.Home);
         });
         
+        RegisterClick(root, "explore", () =>
+        {
+            Debug.Log("Explore icon clicked");
+            UIManager.Instance.OpenScreen(UIScreenType.Explore);
+        });
+        // RegisterClick(root, "create", () => UIManager.Instance.OpenScreen(UIScreenType.Create));
         // Uncomment when you have these screen types
         // RegisterClick(root, "explore", () => UIManager.Instance.OpenScreen(UIScreenType.Explore));
         RegisterClick(root, "create", () => { 

@@ -1,48 +1,85 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 public static class ExploreHeaderUIBuilder
 {
-    public static VisualElement CreateHeaderSection(Action onFilterClicked)
+    public delegate void SearchClickedDelegate();
+    public static event SearchClickedDelegate OnSearchClicked;
+    
+    
+    private static string baseURL;
+    private static string authToken;
+    private static VisualElement tagsContainer;
+    
+    public delegate void TagSelectedDelegate(string tagName, int tagId);
+    public static event TagSelectedDelegate OnTagSelected;
+    
+    private static VisualElement currentlyLoadingTag;
+    private static bool isLoadingData = false;
+    private static bool isInitialLoad = true;
+
+    // Track the currently selected tag (visual element)
+    private static VisualElement currentlySelectedTag;
+
+    public static VisualElement CreateHeaderSection(Action onFilterClicked, TagSelectedDelegate onTagSelected = null, SearchClickedDelegate onSearchClicked = null)
     {
+        baseURL = baseScript.baseURL;
+        authToken = AuthTokenManager.GetToken();
+
+        // Store the callback for use in tag clicks
+        OnTagSelected = onTagSelected;
+        OnSearchClicked = onSearchClicked;
+
         VisualElement headerSection = new VisualElement();
         headerSection.name = "headerSection";
         headerSection.AddToClassList("headerSection");
         headerSection.style.marginTop = 120;
         headerSection.style.height = 250;
-        
+
         // Create search section
         VisualElement searchSection = CreateSearchSection(onFilterClicked);
-        
+
         // Create tag section
         VisualElement tagSection = CreateTagSection();
-        
+
         headerSection.Add(searchSection);
         headerSection.Add(tagSection);
-        
+
+        // Fetch and populate trending tags via PostDataGetter (API moved out)
+        CoroutineRunner.Instance.StartRoutine(
+            PostDataGetter.FetchWeeklyTrendingTags(
+                baseURL,
+                authToken,
+                onSuccess: tags => UpdateTagsWithData(tags),
+                onError: _ => UpdateTagsWithError()
+            )
+        );
+
         return headerSection;
     }
-    
+
     private static VisualElement CreateSearchSection(Action onFilterClicked)
     {
         VisualElement searchSection = new VisualElement();
         searchSection.AddToClassList("searchSection");
         searchSection.style.flexDirection = FlexDirection.Row;
         searchSection.style.alignItems = Align.Center;
-        
+
         // Search wrapper and field
         VisualElement searchWrapper = CreateSearchWrapper();
-        
+
         // Filter wrapper and button
         VisualElement filterWrapper = CreateFilterWrapper(onFilterClicked);
-        
+
         searchSection.Add(searchWrapper);
         searchSection.Add(filterWrapper);
-        
+
         return searchSection;
     }
-    
+
     private static VisualElement CreateSearchWrapper()
     {
         VisualElement searchWrapper = new VisualElement();
@@ -52,13 +89,13 @@ public static class ExploreHeaderUIBuilder
         searchWrapper.style.paddingTop = 16;
         searchWrapper.style.paddingBottom = 16;
         searchWrapper.style.width = Length.Percent(80);
-        
+
         TextField searchField = CreateSearchField();
         searchWrapper.Add(searchField);
-        
+
         return searchWrapper;
     }
-    
+
     private static TextField CreateSearchField()
     {
         TextField searchField = new TextField();
@@ -66,7 +103,8 @@ public static class ExploreHeaderUIBuilder
         searchField.AddToClassList("search-field");
         searchField.value = "";
         searchField.SetValueWithoutNotify("");
-        
+        searchField.isReadOnly = true; // Make it read-only since it's just a button now
+
         // Styling
         searchField.style.width = Length.Percent(100);
         searchField.style.height = 100;
@@ -85,22 +123,24 @@ public static class ExploreHeaderUIBuilder
         searchField.style.borderBottomLeftRadius = 50;
         searchField.style.borderBottomRightRadius = 50;
         searchField.style.fontSize = 35;
-        
-        // Add placeholder functionality
+
+        // Placeholder
         SetupSearchFieldPlaceholder(searchField);
-        
+    
+        // Add click event to open search screen
+        searchField.RegisterCallback<ClickEvent>(evt => OnSearchClicked?.Invoke());
+
         return searchField;
     }
-    
+
     private static void SetupSearchFieldPlaceholder(TextField searchField)
     {
         string placeholderText = "Search for designers...";
         bool isPlaceholderActive = true;
-        
-        // Set initial placeholder
+
         searchField.SetValueWithoutNotify(placeholderText);
         searchField.style.color = new Color(0.6f, 0.6f, 0.6f, 1f);
-        
+
         searchField.RegisterCallback<FocusInEvent>(evt =>
         {
             if (isPlaceholderActive)
@@ -110,7 +150,7 @@ public static class ExploreHeaderUIBuilder
                 isPlaceholderActive = false;
             }
         });
-        
+
         searchField.RegisterCallback<FocusOutEvent>(evt =>
         {
             if (string.IsNullOrEmpty(searchField.value.Trim()))
@@ -121,7 +161,7 @@ public static class ExploreHeaderUIBuilder
             }
         });
     }
-    
+
     private static VisualElement CreateFilterWrapper(Action onFilterClicked)
     {
         VisualElement filterWrapper = new VisualElement();
@@ -131,13 +171,13 @@ public static class ExploreHeaderUIBuilder
         filterWrapper.style.paddingTop = 16;
         filterWrapper.style.paddingBottom = 16;
         filterWrapper.style.width = Length.Percent(30);
-        
+
         Button filterButton = CreateFilterButton(onFilterClicked);
         filterWrapper.Add(filterButton);
-        
+
         return filterWrapper;
     }
-    
+
     private static Button CreateFilterButton(Action onFilterClicked)
     {
         Button filterButton = new Button();
@@ -162,21 +202,9 @@ public static class ExploreHeaderUIBuilder
         filterButton.style.flexDirection = FlexDirection.Row;
         filterButton.style.alignItems = Align.Center;
         filterButton.style.justifyContent = Justify.Center;
-        
-        // Add filter icon
-        AddFilterIcon(filterButton);
-        
-        // Add click event
-        filterButton.RegisterCallback<ClickEvent>(evt => onFilterClicked?.Invoke());
-        
-        return filterButton;
-    }
-    
-    private static void AddFilterIcon(Button filterButton)
-    {
-        // Try to load the filter icon from Resources
+
+        // Icon
         Texture2D filterIconTexture = Resources.Load<Texture2D>("filter-Icon");
-        
         if (filterIconTexture != null)
         {
             Image filterIcon = new Image();
@@ -186,19 +214,20 @@ public static class ExploreHeaderUIBuilder
             filterIcon.style.height = 55;
             filterIcon.image = filterIconTexture;
             filterButton.Add(filterIcon);
-            Debug.Log("Filter icon loaded successfully");
         }
         else
         {
-            Debug.LogWarning("Filter icon not found in Resources. Please ensure 'filter-Icon' is in the Resources folder.");
-            // Create a simple text placeholder if icon is not found
             Label filterText = new Label("⚙");
             filterText.style.fontSize = 30;
             filterText.style.color = Color.black;
             filterButton.Add(filterText);
         }
+
+        // Click
+        filterButton.RegisterCallback<ClickEvent>(evt => onFilterClicked?.Invoke());
+        return filterButton;
     }
-    
+
     private static VisualElement CreateTagSection()
     {
         VisualElement tagSection = new VisualElement();
@@ -207,8 +236,8 @@ public static class ExploreHeaderUIBuilder
         tagSection.style.marginTop = 20;
         tagSection.style.marginLeft = Length.Percent(1);
         tagSection.style.marginRight = Length.Percent(1);
-        
-        // Create horizontal scroll view
+
+        // Horizontal scroll view
         ScrollView scrollView = new ScrollView();
         scrollView.name = "tagScrollView";
         scrollView.mode = ScrollViewMode.Horizontal;
@@ -216,73 +245,373 @@ public static class ExploreHeaderUIBuilder
         scrollView.verticalScrollerVisibility = ScrollerVisibility.Hidden;
         scrollView.style.width = Length.Percent(100);
         scrollView.style.height = 70;
-        
-        // Container for tags
-        VisualElement tagsContainer = new VisualElement();
+
+        // Container for tags - store reference for dynamic updates
+        tagsContainer = new VisualElement();
         tagsContainer.name = "tagsContainer";
         tagsContainer.style.flexDirection = FlexDirection.Row;
         tagsContainer.style.alignItems = Align.Center;
         tagsContainer.style.height = 70;
-        
-        // Dummy tag data (replace with API data later)
-        string[] dummyTags = { "Minimal", "Modern Design", "Corporate", "Creative Studio", "Bold Typography" };
-        
-        for (int i = 0; i < dummyTags.Length; i++)
-        {
-            VisualElement designTag = CreateDesignTag(dummyTags[i]);
-            
-            // Add margin between tags (except for the last one)
-            if (i > 0)
-            {
-                designTag.style.marginLeft = 15;
-            }
-            
-            tagsContainer.Add(designTag);
-        }
-        
+
+        // Loading tag
+        CreateLoadingTag();
+
         scrollView.Add(tagsContainer);
         tagSection.Add(scrollView);
-        
+
         return tagSection;
     }
-    
-    private static VisualElement CreateDesignTag(string tagText)
+
+    private static void CreateLoadingTag()
+    {
+        VisualElement loadingTag = CreateDesignTag("Loading...");
+        loadingTag.style.opacity = 0.5f;
+        tagsContainer.Add(loadingTag);
+    }
+
+    private static VisualElement CreateDesignTag(string tagText, int? tagId = null)
     {
         VisualElement designTag = new VisualElement();
         designTag.name = "designTag";
         designTag.AddToClassList("designTag");
-        designTag.style.width = StyleKeyword.Auto; // Auto width based on content
-        designTag.style.minWidth = 120; // Minimum width to ensure it looks good
+
+        if (tagId.HasValue)
+        {
+            designTag.userData = tagId.Value;
+
+            // Click -> selection
+            designTag.RegisterCallback<ClickEvent>(evt =>
+            {
+                OnTagClicked(tagId.Value, tagText, designTag);
+            });
+
+            // Hover (skip when selected)
+            designTag.RegisterCallback<MouseEnterEvent>(evt =>
+            {
+                if (designTag != currentlySelectedTag)
+                {
+                    designTag.style.backgroundColor = new Color(0.95f, 0.95f, 0.95f, 0.3f);
+                }
+            });
+            designTag.RegisterCallback<MouseLeaveEvent>(evt =>
+            {
+                if (designTag != currentlySelectedTag)
+                {
+                    designTag.style.backgroundColor = Color.clear;
+                }
+            });
+        }
+
+        // Base style
+        designTag.style.width = StyleKeyword.Auto;
+        designTag.style.minWidth = 120;
         designTag.style.height = 70;
-        designTag.style.paddingLeft = 25; // Add horizontal padding
-        designTag.style.paddingRight = 25; // Add horizontal padding
+        designTag.style.paddingLeft = 25;
+        designTag.style.paddingRight = 25;
         designTag.style.borderBottomWidth = 2;
         designTag.style.borderTopWidth = 2;
         designTag.style.borderLeftWidth = 2;
         designTag.style.borderRightWidth = 2;
-        designTag.style.borderBottomColor = new Color(129f/255f, 129f/255f, 129f/255f, 0.84f);
-        designTag.style.borderTopColor = new Color(129f/255f, 129f/255f, 129f/255f, 0.84f);
-        designTag.style.borderLeftColor = new Color(129f/255f, 129f/255f, 129f/255f, 0.84f);
-        designTag.style.borderRightColor = new Color(129f/255f, 129f/255f, 129f/255f, 0.84f);
+        var grey = new Color(129f / 255f, 129f / 255f, 129f / 255f, 0.84f);
+        designTag.style.borderBottomColor = grey;
+        designTag.style.borderTopColor = grey;
+        designTag.style.borderLeftColor = grey;
+        designTag.style.borderRightColor = grey;
         designTag.style.borderTopLeftRadius = 35;
         designTag.style.borderTopRightRadius = 35;
         designTag.style.borderBottomLeftRadius = 35;
         designTag.style.borderBottomRightRadius = 35;
         designTag.style.alignItems = Align.Center;
         designTag.style.justifyContent = Justify.Center;
-        designTag.style.flexShrink = 0; // Prevent tags from shrinking
-        
+        designTag.style.flexShrink = 0;
+
         Label tagLabel = new Label(tagText);
         tagLabel.name = "tagLabel";
         tagLabel.AddToClassList("tagLabel");
         tagLabel.style.fontSize = 35;
-        tagLabel.style.color = new Color(129f/255f, 129f/255f, 129f/255f, 0.84f);
-        tagLabel.style.whiteSpace = WhiteSpace.NoWrap; // Prevent text wrapping
-        tagLabel.style.width = StyleKeyword.Auto; // Auto width for label
-        tagLabel.style.unityTextAlign = TextAnchor.MiddleCenter; // Center align text
-        
+        tagLabel.style.color = grey; // default
+        tagLabel.style.whiteSpace = WhiteSpace.NoWrap;
+        tagLabel.style.width = StyleKeyword.Auto;
+        tagLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+
         designTag.Add(tagLabel);
-        
         return designTag;
+    }
+
+    private static void OnTagClicked(int tagId, string tagName, VisualElement clickedTag)
+    {
+        // Prevent clicking while another tag is loading
+        if (isLoadingData)
+        {
+            Debug.Log("Another tag is still loading, ignoring click");
+            return;
+        }
+
+        // Don't do anything if clicking the already selected tag
+        if (clickedTag == currentlySelectedTag)
+        {
+            Debug.Log("Tag already selected, ignoring click");
+            return;
+        }
+
+        Debug.Log($"Tag clicked: {tagName} (ID: {tagId})");
+
+        // Set loading state (this only applies to manual clicks, not initial load)
+        isLoadingData = true;
+        currentlyLoadingTag = clickedTag;
+
+        // Apply loading visual state to the clicked tag
+        ApplyLoadingStyle(clickedTag);
+
+        // Determine the API type parameter based on tag
+        string apiType = GetAPITypeFromTag(tagName, tagId);
+    
+        // Call the API with the selected tag type
+        OnTagSelected?.Invoke(apiType, tagId);
+    }
+    
+    public static bool IsInitialLoad()
+    {
+        return isInitialLoad;
+    }
+    
+    private static void ApplyLoadingStyle(VisualElement tag)
+    {
+        if (tag == null) return;
+    
+        var label = tag.Q<Label>("tagLabel");
+        if (label != null)
+        {
+            // Make text slightly dimmer to show loading state
+            label.style.color = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+        }
+    
+        // Apply a subtle loading background
+        tag.style.backgroundColor = new Color(0.9f, 0.9f, 0.9f, 0.3f);
+    
+        // Optional: Add a subtle pulsing effect
+        tag.style.opacity = 0.7f;
+    }
+    
+    public static void OnDataLoadSuccess(int tagId)
+    {
+        if (!isLoadingData || currentlyLoadingTag == null) return;
+
+        Debug.Log($"Data loaded successfully for tag ID: {tagId}");
+
+        // Remove previous selection
+        RemoveSelectedStyle(currentlySelectedTag);
+
+        // Apply selected style to the loading tag
+        ApplySelectedStyle(currentlyLoadingTag);
+
+        // Update current selection
+        currentlySelectedTag = currentlyLoadingTag;
+
+        // Clear loading state
+        ResetLoadingState();
+    }
+    
+    public static void OnDataLoadError(int tagId)
+    {
+        if (!isLoadingData || currentlyLoadingTag == null) return;
+
+        Debug.Log($"Data load failed for tag ID: {tagId}");
+
+        // Remove loading style and revert to normal
+        RemoveLoadingStyle(currentlyLoadingTag);
+
+        // Clear loading state
+        ResetLoadingState();
+
+        // Optionally show error feedback (you could add a brief red border or something)
+        ShowTagErrorFeedback(currentlyLoadingTag);
+    }
+    
+    private static void RemoveLoadingStyle(VisualElement tag)
+    {
+        if (tag == null) return;
+    
+        var label = tag.Q<Label>("tagLabel");
+        if (label != null)
+        {
+            var grey = new Color(129f / 255f, 129f / 255f, 129f / 255f, 0.84f);
+            label.style.color = grey;
+        }
+    
+        tag.style.backgroundColor = Color.clear;
+        tag.style.opacity = 1f;
+    }
+
+    private static void ResetLoadingState()
+    {
+        isLoadingData = false;
+        currentlyLoadingTag = null;
+    }
+    
+    private static void ShowTagErrorFeedback(VisualElement tag)
+    {
+        if (tag == null) return;
+    
+        // Brief red border to indicate error
+        tag.style.borderBottomColor = Color.red;
+        tag.style.borderTopColor = Color.red;
+        tag.style.borderLeftColor = Color.red;
+        tag.style.borderRightColor = Color.red;
+    
+        // Revert back to normal after a short delay
+        CoroutineRunner.Instance.StartRoutine(RevertErrorFeedback(tag));
+    }
+    
+    private static IEnumerator RevertErrorFeedback(VisualElement tag)
+    {
+        yield return new WaitForSeconds(1.5f);
+    
+        if (tag != null)
+        {
+            var grey = new Color(129f / 255f, 129f / 255f, 129f / 255f, 0.84f);
+            tag.style.borderBottomColor = grey;
+            tag.style.borderTopColor = grey;
+            tag.style.borderLeftColor = grey;
+            tag.style.borderRightColor = grey;
+        }
+    }
+    
+    private static string GetAPITypeFromTag(string tagName, int tagId)
+    {
+        if (tagId == 0 || tagName.ToLower() == "trending")
+        {
+            return "trending";
+        }
+    
+        return tagName.ToLower().Replace(" ", "-");
+    }
+
+    
+    private static void UpdateTagsWithData(List<PostDataGetter.TagItem> tags)
+    {
+        tagsContainer.Clear();
+
+        // Always add and preselect "Trending"
+        VisualElement defaultTag = CreateDesignTag("Trending", 0);
+        tagsContainer.Add(defaultTag);
+    
+        // For initial load, directly apply selected style without loading state
+        if (isInitialLoad)
+        {
+            ApplySelectedStyle(defaultTag);
+            currentlySelectedTag = defaultTag;
+            isInitialLoad = false; // Mark that initial load is done
+        }
+        else
+        {
+            // For subsequent loads (like refresh), use loading state
+            isLoadingData = true;
+            currentlyLoadingTag = defaultTag;
+            ApplyLoadingStyle(defaultTag);
+        }
+
+        // Add others from API
+        if (tags != null)
+        {
+            for (int i = 0; i < tags.Count; i++)
+            {
+                VisualElement designTag = CreateDesignTag(tags[i].name, tags[i].id);
+                designTag.style.marginLeft = 15;
+                tagsContainer.Add(designTag);
+            }
+        }
+
+        // Automatically trigger trending API call
+        OnTagSelected?.Invoke("trending", 0);
+    }
+
+    private static void UpdateTagsWithError()
+    {
+        tagsContainer.Clear();
+
+        VisualElement errorTag = CreateDesignTag("Error loading tags");
+        errorTag.style.opacity = 0.7f;
+        tagsContainer.Add(errorTag);
+
+        // Still show and preselect "Trending" so UI is usable
+        VisualElement fallbackTrending = CreateDesignTag("Trending", 0);
+        fallbackTrending.style.marginLeft = 15;
+        tagsContainer.Add(fallbackTrending);
+    
+        // For initial load, directly apply selected style
+        if (isInitialLoad)
+        {
+            ApplySelectedStyle(fallbackTrending);
+            currentlySelectedTag = fallbackTrending;
+            isInitialLoad = false;
+        }
+        else
+        {
+            // For subsequent loads, use loading state
+            isLoadingData = true;
+            currentlyLoadingTag = fallbackTrending;
+            ApplyLoadingStyle(fallbackTrending);
+        }
+
+        // Automatically trigger trending API call
+        OnTagSelected?.Invoke("trending", 0);
+    }
+    
+    public static void ResetInitialLoadFlag()
+    {
+        isInitialLoad = true;
+    }
+    
+    private static void ApplySelectedStyle(VisualElement tag)
+    {
+        if (tag == null) return;
+        var label = tag.Q<Label>("tagLabel");
+        if (label != null)
+            label.style.color = HexToColor("#F5F0ED");
+        tag.style.backgroundColor = HexToColor("#6B3629");
+    }
+
+    private static void RemoveSelectedStyle(VisualElement tag)
+    {
+        if (tag == null) return;
+        var label = tag.Q<Label>("tagLabel");
+        if (label != null)
+        {
+            var grey = new Color(129f / 255f, 129f / 255f, 129f / 255f, 0.84f);
+            label.style.color = grey;
+        }
+        tag.style.backgroundColor = Color.clear;
+    }
+
+    private static Color HexToColor(string hex)
+    {
+        if (ColorUtility.TryParseHtmlString(hex, out var color))
+            return color;
+        return Color.white;
+    }
+
+    // Local coroutine runner (unchanged)
+    private class CoroutineRunner : MonoBehaviour
+    {
+        private static CoroutineRunner _instance;
+        public static CoroutineRunner Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    GameObject obj = new GameObject("CoroutineRunner");
+                    _instance = obj.AddComponent<CoroutineRunner>();
+                    UnityEngine.Object.DontDestroyOnLoad(obj);
+                }
+                return _instance;
+            }
+        }
+
+        public void StartRoutine(IEnumerator routine)
+        {
+            StartCoroutine(routine);
+        }
     }
 }
