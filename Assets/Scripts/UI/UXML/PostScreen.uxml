@@ -8,7 +8,9 @@
         </ui:VisualElement>
         <ui:VisualElement name="content" class="content">
             <ui:VisualElement class="card-header">
-                <ui:Image name="userImage" class="user-image" />
+                <ui:VisualElement class="user-image-container">
+                    <ui:Image name="userImage" class="user-image-inner" />
+                </ui:VisualElement>
                 <ui:TextElement name="userName" text="Arvind Rao" class="user-name" />
             </ui:VisualElement>
             <ui:VisualElement class="card-body">
@@ -16,12 +18,6 @@
                 <ui:VisualElement name="imageSliderContainer" class="image-slider-container">
                     <ui:TextElement name="imageCounter" text="1/1" class="image-counter" />
                     <ui:VisualElement name="imageContainer" class="image-container"/>
-                    <!-- <ui:Button name="previousButton" class="nav-button prev-button"> -->
-                    <!--     <ui:Image class="nav-icon prev-icon" /> -->
-                    <!-- </ui:Button> -->
-                    <!-- <ui:Button name="nextButton" class="nav-button next-button"> -->
-                    <!--     <ui:Image class="nav-icon next-icon" /> -->
-                    <!-- </ui:Button> -->
                     <ui:VisualElement name="dotsContainer" class="dots-container"/>
                 </ui:VisualElement>
             </ui:VisualElement>
