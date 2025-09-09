@@ -43,7 +43,6 @@ public class CreatorLocationController : MonoBehaviour
         dropdownArrow = root.Q<Label>("dropdown-arrow");
         searchField = root.Q<TextField>("searchField");
         optionsList = root.Q<ScrollView>("optionsList");
-        Debug.Log("Options List found: " + (optionsList != null));
         backButton = root.Q<Button>("backButton");
         skipButton = root.Q<Button>("skipButton");
         completeButton = root.Q<Button>("completeButton");
@@ -80,38 +79,17 @@ public class CreatorLocationController : MonoBehaviour
             }
             else
             {
-                Debug.Log("City fetch successful");
                 string json = request.downloadHandler.text;
-                Debug.Log("Raw JSON:\n" + json);
-                var parsed = MiniJSON.JSON.Deserialize(json) as Dictionary<string, object>;
-
-                if (parsed != null && parsed.ContainsKey("data"))
+                CityWrapper wrapper = JsonUtility.FromJson<CityWrapper>(json);
+                if (wrapper != null && wrapper.success && wrapper.data != null)
                 {
-                    var cityList = parsed["data"] as List<object>;
-                    indianCities.Clear();
-
-                    foreach (var obj in cityList)
-                    {
-                        var cityDict = obj as Dictionary<string, object>;
-                        if (cityDict != null && cityDict.ContainsKey("cityName"))
-                        {
-                            string cityName = cityDict["cityName"].ToString();
-                            indianCities.Add(cityName);
-                        }
-                    }
-
-                    Debug.Log("Filtered Cities Count: " + indianCities.Count);
-                    filteredCities = new List<string>(indianCities);
-                    PopulateOptionsList();
-                }
-                else
-                {
-                    Debug.LogError("Unexpected JSON structure or missing 'data' key.");
+                    indianCities = wrapper.data.Select(c => c.cityName).ToList();
                 }
             }
+            filteredCities = new List<string>(indianCities);
+            PopulateOptionsList();
         }
     }
-
 
     void ToggleDropdown()
     {
@@ -151,7 +129,6 @@ public class CreatorLocationController : MonoBehaviour
 
     void PopulateOptionsList()
     {
-        Debug.Log("Populating options with count: " + filteredCities.Count);
         optionsList.Clear();
         foreach (string city in filteredCities)
         {

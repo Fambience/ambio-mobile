@@ -7,14 +7,58 @@ using UnityEngine.Networking;
 using MiniJSON;
 using Services;
 
-public class ProfileDataHandlers : MonoBehaviour
+// Define ProfileUserLite at the top level, outside of any class
+[System.Serializable]
+public class ProfileUserLite
+{
+    public string userId;
+    public string firstName;
+    public string lastName;
+    public string userName;
+    public string avatar;
+}
+
+// Add these classes at the top level for followers/following API responses
+[System.Serializable]
+public class FollowersApiResponse
+{
+    public bool success;
+    public string message;
+    public FollowerData[] data;
+    public PaginationData pagination;
+}
+
+[System.Serializable]
+public class FollowerData
+{
+    public string userId;
+    public string firstName;
+    public string lastName;
+    public string userName;
+    public string avatar;
+}
+
+[System.Serializable]
+public class PaginationData
+{
+    public int total;
+    public int page;
+    public int limit;
+    public int totalPages;
+}
+
+public partial class ProfileDataHandlers : MonoBehaviour
 {
     public static ProfileDataHandlers Instance { get; private set; }
-
     public ProfileCache ProfileData { get; private set; }
+
+    // Static lists for followers and following
+    public static List<ProfileUserLite> FollowersList = new List<ProfileUserLite>();
+    public static List<ProfileUserLite> FollowingList = new List<ProfileUserLite>();
 
     private string token;
     private string cachePath => Path.Combine(Application.persistentDataPath, "profile_cache.json");
+    public string baseURL = baseScript.baseURL;
 
     void Awake()
     {
@@ -35,11 +79,23 @@ public class ProfileDataHandlers : MonoBehaviour
             if (success)
             {
                 Debug.Log("[ProfileDataHandlers] Profile data fetched successfully.");
+                // Fetch followers and following after profile data is loaded
+                FetchFollowersAndFollowing();
             }
             else
             {
                 Debug.LogWarning("[ProfileDataHandlers] Failed to fetch profile data.");
             }
+        }));
+    }
+
+    public void FetchFollowersAndFollowing()
+    {
+        StartCoroutine(FetchMyFollowersList(() => {
+            Debug.Log("[ProfileDataHandlers] Followers fetch completed");
+        }));
+        StartCoroutine(FetchMyFollowingList(() => {
+            Debug.Log("[ProfileDataHandlers] Following fetch completed");
         }));
     }
 
@@ -49,7 +105,7 @@ public class ProfileDataHandlers : MonoBehaviour
         string url = baseScript.baseURL + baseScript.profileEndpoint;
         Debug.Log("[ProfileDataHandlers] API url: " + url);
         UnityWebRequest request = UnityWebRequest.Get(url);
-        request.SetRequestHeader("Authorization", $"{authToken}");
+        request.SetRequestHeader("Authorization", authToken);
         request.SetRequestHeader("Content-Type", "application/json");
 
         yield return request.SendWebRequest();
@@ -120,6 +176,332 @@ public class ProfileDataHandlers : MonoBehaviour
         }
 
         onComplete?.Invoke(parseSuccess);
+    }
+
+    public IEnumerator FetchMyFollowersList(Action onComplete = null)
+    {
+        Debug.Log("[Followers] Starting FetchMyFollowersList...");
+        
+        string token = AuthTokenManager.GetToken();
+        Debug.Log($"[Followers] Token retrieved: {(!string.IsNullOrEmpty(token) ? "Valid" : "NULL/EMPTY")}");
+        
+        if (string.IsNullOrEmpty(token))
+        {
+            Debug.LogError("[Followers] Token missing.");
+            onComplete?.Invoke();
+            yield break;
+        }
+
+        // Check if UserData.userName is available
+        string userName = "";
+        if (ProfileData != null && !string.IsNullOrEmpty(ProfileData.userName))
+        {
+            userName = ProfileData.userName;
+        }
+        else if (UserData.userName != null)
+        {
+            userName = UserData.userName;
+        }
+        
+        Debug.Log($"[Followers] Using userName: {userName ?? "NULL"}");
+        if (string.IsNullOrEmpty(userName))
+        {
+            Debug.LogError("[Followers] Username missing. Cannot fetch followers.");
+            onComplete?.Invoke();
+            yield break;
+        }
+
+        string followersURL = $"{baseURL}/api/v1/profile/{userName}/followers";
+        Debug.Log($"[Followers] Request URL: {followersURL}");
+        
+        UnityWebRequest req = UnityWebRequest.Get(followersURL);
+        req.SetRequestHeader("Authorization", token);
+        
+        Debug.Log("[Followers] Sending web request...");
+        yield return req.SendWebRequest();
+
+        Debug.Log($"[Followers] Request completed with result: {req.result}");
+        Debug.Log($"[Followers] Response code: {req.responseCode}");
+
+        if (req.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("[Followers] Request successful, processing response...");
+            FollowersList.Clear();
+
+            var json = req.downloadHandler.text;
+            Debug.Log($"[Followers] Raw JSON response: {json}");
+            Debug.Log($"[Followers] JSON length: {json?.Length ?? 0}");
+            Debug.Log($"[Followers] JSON is null or empty: {string.IsNullOrEmpty(json)}");
+            
+            if (string.IsNullOrEmpty(json))
+            {
+                Debug.LogError("[Followers] Response JSON is null or empty");
+                onComplete?.Invoke();
+                yield break;
+            }
+            
+            try
+            {
+                // Try Unity's JsonUtility first (more reliable)
+                var followersResponse = JsonUtility.FromJson<FollowersApiResponse>(json);
+                if (followersResponse != null && followersResponse.success && followersResponse.data != null)
+                {
+                    Debug.Log($"[Followers] JsonUtility parsing successful. Found {followersResponse.data.Length} followers");
+                    
+                    foreach (var follower in followersResponse.data)
+                    {
+                        var u = new ProfileUserLite
+                        {
+                            userId = follower.userId ?? "",
+                            firstName = follower.firstName ?? "",
+                            lastName = follower.lastName ?? "",
+                            userName = follower.userName ?? "",
+                            avatar = follower.avatar ?? ""
+                        };
+
+                        Debug.Log($"[Followers] Added user: {u.userName} ({u.firstName} {u.lastName})");
+                        FollowersList.Add(u);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[Followers] JsonUtility parsing failed, trying MiniJSON fallback...");
+                    
+                    // Fallback to MiniJSON
+                    var parsed = JSON.Deserialize(json) as Dictionary<string, object>;
+                    Debug.Log($"[Followers] MiniJSON parsed object is null: {parsed == null}");
+                    if (parsed != null)
+                    {
+                        Debug.Log($"[Followers] JSON parsed successfully. Keys: {string.Join(", ", parsed.Keys)}");
+                        
+                        if (parsed.TryGetValue("data", out var dataObj))
+                        {
+                            Debug.Log($"[Followers] Data object type: {dataObj?.GetType().Name ?? "NULL"}");
+                            
+                            if (dataObj is List<object> list)
+                            {
+                                Debug.Log($"[Followers] Found {list.Count} followers in response");
+                                
+                                foreach (var item in list)
+                                {
+                                    if (item is Dictionary<string, object> dict)
+                                    {
+                                        Debug.Log($"[Followers] Processing follower with keys: {string.Join(", ", dict.Keys)}");
+                                        
+                                        var u = new ProfileUserLite
+                                        {
+                                            userId = dict.ContainsKey("userId") ? dict["userId"].ToString() : "",
+                                            firstName = dict.ContainsKey("firstName") ? dict["firstName"].ToString() : "",
+                                            lastName = dict.ContainsKey("lastName") ? dict["lastName"].ToString() : "",
+                                            userName = dict.ContainsKey("userName") ? dict["userName"].ToString() : "",
+                                            avatar = dict.ContainsKey("avatar") && dict["avatar"] != null ? dict["avatar"].ToString() : ""
+                                        };
+
+                                        Debug.Log($"[Followers] Added user: {u.userName} ({u.firstName} {u.lastName})");
+                                        FollowersList.Add(u);
+                                    }
+                                    else
+                                    {
+                                        Debug.LogWarning($"[Followers] Unexpected item type in list: {item?.GetType().Name ?? "NULL"}");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"[Followers] Data is not a List<object>. Type: {dataObj?.GetType().Name ?? "NULL"}");
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogWarning("[Followers] No 'data' key found in response");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("[Followers] Failed to parse JSON response - both JsonUtility and MiniJSON failed");
+                        Debug.LogError($"[Followers] Raw JSON for debugging: '{json}'");
+                        Debug.LogError($"[Followers] First 100 chars: '{json.Substring(0, Math.Min(100, json.Length))}'");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[Followers] Exception during JSON parsing: {e.Message}\nStackTrace: {e.StackTrace}");
+                Debug.LogError($"[Followers] Raw JSON that failed: '{json}'");
+            }
+            
+            Debug.Log($"[Followers] Final count: {FollowersList.Count} users cached.");
+        }
+        else
+        {
+            Debug.LogError($"[Followers] Request failed - Result: {req.result}, Error: {req.error}");
+            Debug.LogError($"[Followers] Response text: {req.downloadHandler?.text ?? "No response text"}");
+        }
+
+        onComplete?.Invoke();
+    }
+
+    public IEnumerator FetchMyFollowingList(Action onComplete = null)
+    {
+        Debug.Log("[Following] Starting FetchMyFollowingList...");
+        
+        string token = AuthTokenManager.GetToken();
+        Debug.Log($"[Following] Token retrieved: {(!string.IsNullOrEmpty(token) ? "Valid" : "NULL/EMPTY")}");
+        
+        if (string.IsNullOrEmpty(token))
+        {
+            Debug.LogError("[Following] Token missing.");
+            onComplete?.Invoke();
+            yield break;
+        }
+
+        // Check if UserData.userName is available
+        string userName = "";
+        if (ProfileData != null && !string.IsNullOrEmpty(ProfileData.userName))
+        {
+            userName = ProfileData.userName;
+        }
+        else if (UserData.userName != null)
+        {
+            userName = UserData.userName;
+        }
+        
+        Debug.Log($"[Following] Using userName: {userName ?? "NULL"}");
+        if (string.IsNullOrEmpty(userName))
+        {
+            Debug.LogError("[Following] Username missing. Cannot fetch following.");
+            onComplete?.Invoke();
+            yield break;
+        }
+
+        string followingURL = $"{baseURL}/api/v1/profile/{userName}/following";
+        Debug.Log($"[Following] Request URL: {followingURL}");
+        
+        UnityWebRequest req = UnityWebRequest.Get(followingURL);
+        req.SetRequestHeader("Authorization", token);
+        
+        Debug.Log("[Following] Sending web request...");
+        yield return req.SendWebRequest();
+
+        Debug.Log($"[Following] Request completed with result: {req.result}");
+        Debug.Log($"[Following] Response code: {req.responseCode}");
+
+        if (req.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("[Following] Request successful, processing response...");
+            FollowingList.Clear();
+
+            var json = req.downloadHandler.text;
+            Debug.Log($"[Following] Raw JSON response: {json}");
+            Debug.Log($"[Following] JSON length: {json?.Length ?? 0}");
+            Debug.Log($"[Following] JSON is null or empty: {string.IsNullOrEmpty(json)}");
+            
+            if (string.IsNullOrEmpty(json))
+            {
+                Debug.LogError("[Following] Response JSON is null or empty");
+                onComplete?.Invoke();
+                yield break;
+            }
+            
+            try
+            {
+                // Try Unity's JsonUtility first (more reliable)
+                var followingResponse = JsonUtility.FromJson<FollowersApiResponse>(json);
+                if (followingResponse != null && followingResponse.success && followingResponse.data != null)
+                {
+                    Debug.Log($"[Following] JsonUtility parsing successful. Found {followingResponse.data.Length} following users");
+                    
+                    foreach (var followingUser in followingResponse.data)
+                    {
+                        var u = new ProfileUserLite
+                        {
+                            userId = followingUser.userId ?? "",
+                            firstName = followingUser.firstName ?? "",
+                            lastName = followingUser.lastName ?? "",
+                            userName = followingUser.userName ?? "",
+                            avatar = followingUser.avatar ?? ""
+                        };
+
+                        Debug.Log($"[Following] Added user: {u.userName} ({u.firstName} {u.lastName})");
+                        FollowingList.Add(u);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[Following] JsonUtility parsing failed, trying MiniJSON fallback...");
+                    
+                    // Fallback to MiniJSON
+                    var parsed = JSON.Deserialize(json) as Dictionary<string, object>;
+                    Debug.Log($"[Following] MiniJSON parsed object is null: {parsed == null}");
+                    if (parsed != null)
+                    {
+                        Debug.Log($"[Following] JSON parsed successfully. Keys: {string.Join(", ", parsed.Keys)}");
+                        
+                        if (parsed.TryGetValue("data", out var dataObj))
+                        {
+                            Debug.Log($"[Following] Data object type: {dataObj?.GetType().Name ?? "NULL"}");
+                            
+                            if (dataObj is List<object> list)
+                            {
+                                Debug.Log($"[Following] Found {list.Count} following users in response");
+                                
+                                foreach (var item in list)
+                                {
+                                    if (item is Dictionary<string, object> dict)
+                                    {
+                                        Debug.Log($"[Following] Processing user with keys: {string.Join(", ", dict.Keys)}");
+                                        
+                                        var u = new ProfileUserLite
+                                        {
+                                            userId = dict.ContainsKey("userId") ? dict["userId"].ToString() : "",
+                                            firstName = dict.ContainsKey("firstName") ? dict["firstName"].ToString() : "",
+                                            lastName = dict.ContainsKey("lastName") ? dict["lastName"].ToString() : "",
+                                            userName = dict.ContainsKey("userName") ? dict["userName"].ToString() : "",
+                                            avatar = dict.ContainsKey("avatar") && dict["avatar"] != null ? dict["avatar"].ToString() : ""
+                                        };
+
+                                        Debug.Log($"[Following] Added user: {u.userName} ({u.firstName} {u.lastName})");
+                                        FollowingList.Add(u);
+                                    }
+                                    else
+                                    {
+                                        Debug.LogWarning($"[Following] Unexpected item type in list: {item?.GetType().Name ?? "NULL"}");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"[Following] Data is not a List<object>. Type: {dataObj?.GetType().Name ?? "NULL"}");
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogWarning("[Following] No 'data' key found in response");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("[Following] Failed to parse JSON response - both JsonUtility and MiniJSON failed");
+                        Debug.LogError($"[Following] Raw JSON for debugging: '{json}'");
+                        Debug.LogError($"[Following] First 100 chars: '{json.Substring(0, Math.Min(100, json.Length))}'");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[Following] Exception during JSON parsing: {e.Message}\nStackTrace: {e.StackTrace}");
+                Debug.LogError($"[Following] Raw JSON that failed: '{json}'");
+            }
+            
+            Debug.Log($"[Following] Final count: {FollowingList.Count} users cached.");
+        }
+        else
+        {
+            Debug.LogError($"[Following] Request failed - Result: {req.result}, Error: {req.error}");
+            Debug.LogError($"[Following] Response text: {req.downloadHandler?.text ?? "No response text"}");
+        }
+
+        onComplete?.Invoke();
     }
 
     private ProfileCache ConvertToProfileCache(ProfileDataRaw rawData)

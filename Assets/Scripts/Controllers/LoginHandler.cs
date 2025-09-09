@@ -206,10 +206,12 @@ public class LoginHandler : MonoBehaviour
 
             var response = JsonUtility.FromJson<LoginResponse>(request.downloadHandler.text);
             string token = response.token;
-
             AuthTokenManager.SetToken(token);
             userEmail = email;
-            scriptHandler.SetActive(true);
+            string userName = response.data.userName;
+            Debug.Log("[LOGIN] Remaining Questions (" + response.data.remainingQuestions.Count + "): " + string.Join(", ", response.data.remainingQuestions));
+            UserData.userName = userName;
+            Debug.Log("[USERNAME] user name of the user : " + userName);
             UserData.Email = email;
             UserData.Role = response.data.role;
             HandleLoginStage(response);
@@ -239,7 +241,7 @@ public class LoginHandler : MonoBehaviour
                     break;
 
                 case "ONBOARD_DETAILS":
-                    HandleDynamicOnboardingFromQuestions(response.data.role, response.data.remainingQuestions);
+                    UIManager.Instance.OpenScreen(UIScreenType.BasicDetails);
                     break;
 
                 case "ONBOARDING_PARTIALLY_COMPLETED":
@@ -249,6 +251,7 @@ public class LoginHandler : MonoBehaviour
                 case "ONBOARDING_COMPLETED":
                     if (!string.IsNullOrEmpty(response.token))
                         UIManager.Instance.OpenScreen(UIScreenType.Home);
+                        scriptHandler.SetActive(true);
                     break;
 
                 case "BASIC_DETAILS":
@@ -257,7 +260,6 @@ public class LoginHandler : MonoBehaviour
 
                 default:
                     Debug.LogError("Unknown onboarding state.");
-                    UIManager.Instance.OpenScreen(UIScreenType.Home);
                     break;
             }
         }else if (response.data.role == "CREATOR")
@@ -269,7 +271,7 @@ public class LoginHandler : MonoBehaviour
                    break;
 
                case "ONBOARD_DETAILS":
-                   HandleDynamicOnboardingFromQuestions(response.data.role, response.data.remainingQuestions);
+                   UIManager.Instance.OpenScreen(UIScreenType.CreatorBasicDetails);
                    break;
 
                case "ONBOARDING_PARTIALLY_COMPLETED":
@@ -279,6 +281,8 @@ public class LoginHandler : MonoBehaviour
                case "ONBOARDING_COMPLETED":
                    if (!string.IsNullOrEmpty(response.token))
                        UIManager.Instance.OpenScreen(UIScreenType.Home);
+                        
+                   scriptHandler.SetActive(true);
                    break;
 
                case "BASIC_DETAILS":
@@ -319,7 +323,6 @@ public class LoginHandler : MonoBehaviour
         else
         {
             Debug.LogWarning("No valid screen mapping found in remaining onboarding questions.");
-            UIManager.Instance.OpenScreen(UIScreenType.Home);
         }
     }
 
@@ -407,6 +410,7 @@ public class LoginHandler : MonoBehaviour
     {
         public string onboardingState;
         public string role;
+        public string userName;
         public List<string> remainingQuestions;
     }
 

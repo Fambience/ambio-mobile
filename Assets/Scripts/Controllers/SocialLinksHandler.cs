@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine.Networking;
-
+using System;
 
 public class SocialLinksController : MonoBehaviour
 {
@@ -21,8 +21,10 @@ public class SocialLinksController : MonoBehaviour
     private TextField websiteField;
 
     private Dictionary<string, string> socialsData = new();
-
     private string token = "";
+
+    [SerializeField] private GameObject dataHandler;
+
     private void OnEnable()
     {
         token = AuthTokenManager.GetToken();
@@ -83,14 +85,28 @@ public class SocialLinksController : MonoBehaviour
     }
 
     void SubmitProfileDetails()
-{
-    // Store in OnboardingData
-    OnboardingData.Tagline = taglineField.value?.Trim();
-    OnboardingData.Website = websiteField.value?.Trim();
-    OnboardingData.SocialLinks = new Dictionary<string, string>(socialsData);
+    {
+        OnboardingData.Tagline = taglineField.value?.Trim();
+        OnboardingData.Website = NormalizeUrl(websiteField.value?.Trim());
 
-    StartCoroutine(SubmitDesignerOnboarding());
-}
+        var validatedSocials = new Dictionary<string, string>();
+        foreach (var kvp in socialsData)
+        {
+            string url = NormalizeUrl(kvp.Value);
+            if (IsValidURL(url))
+            {
+                validatedSocials[kvp.Key] = url;
+            }
+            else
+            {
+                Debug.LogWarning($"Invalid URL skipped: {kvp.Value}");
+            }
+        }
+
+        OnboardingData.SocialLinks = validatedSocials;
+
+        StartCoroutine(SubmitDesignerOnboarding());
+    }
 
     private IEnumerator SubmitDesignerOnboarding()
     {
@@ -99,7 +115,6 @@ public class SocialLinksController : MonoBehaviour
         string endpoint = "/api/v1/user/onboarding-details";
         string url = baseScript.baseURL + endpoint;
 
-        // Convert social links dictionary to a list of URLs
         List<string> socials = new List<string>(OnboardingData.SocialLinks.Values);
 
         var payload = new Dictionary<string, object>
@@ -107,12 +122,11 @@ public class SocialLinksController : MonoBehaviour
             { "name", OnboardingData.DesignerName },
             { "region", OnboardingData.SelectedCities?.Count > 0 ? OnboardingData.SelectedCities : null },
             { "creatorType", string.IsNullOrWhiteSpace(OnboardingData.Occupation) ? null : OnboardingData.Occupation },
-            {  "yearsOfExperience", OnboardingData.YearsOfExperience > 0 ? OnboardingData.YearsOfExperience : null },
+            { "yearsOfExperience", OnboardingData.YearsOfExperience > 0 ? OnboardingData.YearsOfExperience : null },
             { "tagline", string.IsNullOrWhiteSpace(OnboardingData.Tagline) ? null : OnboardingData.Tagline },
-            { "socials", OnboardingData.SocialLinks?.Values?.ToList() ?? new List<string>() },
+            { "socials", socials },
             { "website", string.IsNullOrWhiteSpace(OnboardingData.Website) ? null : OnboardingData.Website }
         };
-
 
         string json = MiniJSON.JSON.Serialize(payload);
         Debug.Log("Payload: " + json);
@@ -130,6 +144,7 @@ public class SocialLinksController : MonoBehaviour
         {
             Debug.Log("Onboarding submission successful: " + request.downloadHandler.text);
             UIManager.Instance.OpenScreen(UIScreenType.Home);
+            dataHandler.SetActive(true);
         }
         else
         {
@@ -137,5 +152,18 @@ public class SocialLinksController : MonoBehaviour
         }
     }
 
+    private string NormalizeUrl(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return "";
+        if (!input.StartsWith("http://") && !input.StartsWith("https://"))
+        {
+            return "https://" + input;
+        }
+        return input;
+    }
 
+    private bool IsValidURL(string url)
+    {
+        return Uri.IsWellFormedUriString(url, UriKind.Absolute);
+    }
 }

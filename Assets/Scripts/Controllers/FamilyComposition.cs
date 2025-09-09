@@ -15,11 +15,13 @@ public class FamilyComposition : MonoBehaviour
     private string onboardingEndpoint = "/api/v1/user/onboarding-details";
     private string baseURL;
 
-    private Button backButton, completeButton, skipButton;
+    private Button backButton, completeButton;
     private Toggle aloneToggle, partnerToggle, familyToggle, roommatesToggle, petsToggle;
 
     private List<Toggle> allToggles = new();
     private Dictionary<Toggle, string> toggleLabels = new();
+
+    [SerializeField] private GameObject dataHandler;
 
     void OnEnable()
     {
@@ -46,7 +48,6 @@ public class FamilyComposition : MonoBehaviour
 
         backButton = root.Q<Button>("backButton");
         completeButton = root.Q<Button>("completeButton");
-        skipButton = root.Q<Button>("skipButton");
 
         aloneToggle = root.Q<Toggle>("aloneToggle");
         partnerToggle = root.Q<Toggle>("partnerToggle");
@@ -69,7 +70,6 @@ public class FamilyComposition : MonoBehaviour
     {
         backButton.clicked += () => UIManager.Instance.OpenScreen(UIScreenType.ColorTone);
         completeButton.clicked += OnCompleteButtonClicked;
-        skipButton.clicked += () => StartCoroutine(SendOnboardingData());
 
         foreach (var toggle in allToggles.Where(t => t != aloneToggle))
             toggle.RegisterValueChangedCallback(OnOtherToggleChanged);
@@ -196,6 +196,7 @@ public class FamilyComposition : MonoBehaviour
             {
                 Debug.Log("Onboarding data submitted successfully.");
                 UIManager.Instance.OpenScreen(UIScreenType.Home);
+                dataHandler.SetActive(true);
             }
         }
     }

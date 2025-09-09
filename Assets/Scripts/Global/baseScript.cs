@@ -1,3 +1,5 @@
+using Services;
+
 public static class baseScript 
 {
 
@@ -5,4 +7,6 @@ public static class baseScript
     
     public static string baseURL ="https://ambio-backend-853941045139.asia-south2.run.app";
     public static string profileEndpoint = "/api/v1/profile/me";
+    public static string followersEndpoint = "/api/v1/profile/"+UserData.userName+"/followers";
+    public static string followingEndpoint = "/api/v1/profile/"+UserData.userName+"/following";
 }

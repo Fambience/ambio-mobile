@@ -4,7 +4,7 @@ public static class OnboardingEnumValidator
 {
     public static readonly HashSet<string> CreativeStyles = new()
     {
-        "ARTDECO", "BOHEMIAN", "COASTAL", "ECLACTIC", "SCANDINAVIAN", "RUSTIC"
+        "ARTDECO", "BOHEMIAN", "COASTAL", "ECLECTIC", "SCANDINAVIAN", "RUSTIC"
     };
 
     public static readonly HashSet<string> ModernStyles = new()
@@ -14,6 +14,7 @@ public static class OnboardingEnumValidator
 
     public static readonly HashSet<string> ColorSchemes = new()
     {
-        "WARM_PALETTE", "NEUTRAL_PALETTE", "EARTHY_PALETTE", "MONOCHROME", "PASTEL_PALETTE", "VIBRANT_PALETTE"
+        "WARM_PALETTE", "CALM_PALETTE", "NEUTRAL_PALETTE", "BOLD_PALETTE"
+
     };
 }
