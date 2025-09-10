@@ -1,0 +1,75 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/ProfileSettings.uss?fileID=7433441132597879392&amp;guid=09db02b36e62c42cfb94108d2fa1de6f&amp;type=3#ProfileSettings" />
+    <ui:VisualElement name="profileSettingScreen" class="main-container">
+        <ui:VisualElement class="top-bar">
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+            <ui:VisualElement class="titleArea">
+                <ui:TextElement class="title" name="title" text="Settings"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:ScrollView name="scroll-container" class="scrollView">
+            <ui:VisualElement class="user-profile" name="userProfile">
+                <ui:VisualElement class="user-photo-container" name="userPhotoContainer">
+                    <ui:Image class="user-photo" name="userPhoto"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="user-info" name="userInfo">
+                    <ui:TextElement class="user-name" name="userName" text="Krishna Yadav"/>
+                    <ui:TextElement class="user-email" name="userEmail" text="xyz@gmail.com"/>
+                    <ui:VisualElement name="designerTag" class="interiorDesignerTag">
+                        <ui:TextElement text="Interior Designer" name="profileTag" class="creatorTitle" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:TextElement name="accountTitle" class="account-title" text="Account"/>
+            <ui:VisualElement class="account-details" name="accountDetails">
+                <ui:VisualElement class="account-details-container" name="account-details-container">
+                    <ui:Image class="tabHomeIcon" name="tabIcon"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="account-tabs" name="accountTabProfile">
+                    <ui:TextElement class="tabTitle" name="tabTitle" text="Edit Profile"/>
+                    <ui:TextElement class="tabDescription" name="tabDescription" text="Update your personal Information"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="account-details" name="accountDetails">
+                <ui:VisualElement class="account-details-container" name="account-details-container">
+                    <ui:Image class="tabPASIcon" name="tabIcon"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="account-tabs" name="accountTabProfile">
+                    <ui:TextElement class="tabTitle" name="tabTitle" text="Privacy &amp; Security"/>
+                    <ui:TextElement class="tabDescription" name="tabDescription" text="Manage your privacy settings"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="account-details" name="accountDetails">
+                <ui:VisualElement class="account-details-container" name="account-details-container">
+                    <ui:Image class="tabOnBoardIcon" name="tabIcon"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="account-tabs" name="accountTabProfile">
+                    <ui:TextElement class="tabTitle" name="tabTitle" text="Edit Onboarding"/>
+                    <ui:TextElement class="tabDescription" name="tabDescription" text="Update your onboarding"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:TextElement name="accountTitle" class="account-title" text="Support"/>
+            <ui:VisualElement class="account-details" name="accountDetails">
+                <ui:VisualElement class="account-details-container" name="account-details-container">
+                    <ui:Image class="tabHelpIcon" name="tabIcon"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="account-tabs" name="accountTabProfile">
+                    <ui:TextElement class="tabTitle" name="tabTitle" text="Help &amp; Support"/>
+                    <ui:TextElement class="tabDescription" name="tabDescription" text="Gelp Help and contact support"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="account-details" name="accountDetails">
+                <ui:VisualElement class="account-details-container" name="account-details-container">
+                    <ui:Image class="tabShareIcon" name="tabIcon"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="account-tabs" name="accountTabProfile">
+                    <ui:TextElement class="tabTitle" name="tabTitle" text="Share App"/>
+                    <ui:TextElement class="tabDescription" name="tabDescription" text="Invite your friends to join Ambio"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Button name="signOutButton" text="Sign Out" class="sign-out-button" />
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

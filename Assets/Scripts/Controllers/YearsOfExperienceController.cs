@@ -27,12 +27,25 @@ public class YearsOfExperienceController : MonoBehaviour
         experienceInput.RegisterValueChangedCallback(evt => ValidateInput(evt.newValue));
 
         completeButton.clicked += OnComplete;
-        backButton.clicked += () => UIManager.Instance.OpenScreen(UIScreenType.CreatorType);
-        skipButton.clicked += () =>
+        backButton.clicked += OnBack;
+        skipButton.clicked += OnSkip;
+        
+        // If in edit mode, prefill the data
+        if (EditOnboardingManager.IsInEditMode)
         {
-            OnboardingData.YearsOfExperience = null;
-            UIManager.Instance.OpenScreen(UIScreenType.taglineSocials);
-        };
+            PrefillData();
+        }
+    }
+
+    private void PrefillData()
+    {
+        if (OnboardingData.YearsOfExperience.HasValue && OnboardingData.YearsOfExperience > 0)
+        {
+            experienceInput.value = OnboardingData.YearsOfExperience.Value.ToString();
+            // Trigger validation to enable the button if the value is valid
+            ValidateInput(experienceInput.value);
+            Debug.Log($"[YearsOfExperienceController] Prefilled years of experience: {OnboardingData.YearsOfExperience}");
+        }
     }
 
     private void ValidateInput(string input)
@@ -57,12 +70,44 @@ public class YearsOfExperienceController : MonoBehaviour
 
         if (int.TryParse(input, out int years) && years >= 1 && years <= 99)
         {
+            int? previousValue = OnboardingData.YearsOfExperience;
             OnboardingData.YearsOfExperience = years;
+        
+            if (EditOnboardingManager.IsInEditMode && previousValue != years)
+            {
+                EditOnboardingManager.TrackDataChange("YearsOfExperience", years, previousValue);
+            }
+        
             UIManager.Instance.OpenScreen(UIScreenType.taglineSocials);
         }
         else
         {
             warningLabel.text = "Invalid input. Please correct it.";
         }
+    }
+
+    private void OnBack()
+    {
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            UIManager.Instance.OpenScreen(UIScreenType.CreatorType);
+        }
+        else
+        {
+            UIManager.Instance.OpenScreen(UIScreenType.CreatorType);
+        }
+    }
+
+    private void OnSkip()
+    {
+        int? previousValue = OnboardingData.YearsOfExperience;
+        OnboardingData.YearsOfExperience = null;
+    
+        if (EditOnboardingManager.IsInEditMode && previousValue != null)
+        {
+            EditOnboardingManager.TrackDataChange("YearsOfExperience", null, previousValue);
+        }
+    
+        UIManager.Instance.OpenScreen(UIScreenType.taglineSocials);
     }
 }

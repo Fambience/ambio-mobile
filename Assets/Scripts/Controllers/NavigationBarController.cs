@@ -45,7 +45,7 @@ public class NavigationBarController : MonoBehaviour
             Debug.Log("Home icon clicked");
             UIManager.Instance.OpenScreen(UIScreenType.Create);
         });
-        // RegisterClick(root, "profile", () => UIManager.Instance.OpenScreen(UIScreenType.Profile));
+        RegisterClick(root, "profile", () => UIManager.Instance.OpenScreen(UIScreenType.Profile));
     }
 
     private void RegisterClick(VisualElement root, string name, System.Action callback)

@@ -131,6 +131,7 @@ public partial class ProfileDataHandlers : MonoBehaviour
             if (apiResponse != null && apiResponse.success)
             {
                 Debug.Log("[ProfileDataHandlers] JsonUtility parsing successful");
+                Debug.Log("himanshu" + apiResponse.data);
                 ProfileData = ConvertToProfileCache(apiResponse.data);
                 SaveProfileCache(ProfileData);
                 Debug.Log("[ProfileDataHandlers] Profile data processing completed successfully.");
@@ -514,6 +515,8 @@ public partial class ProfileDataHandlers : MonoBehaviour
         cache.email = rawData.email ?? "";
         cache.role = rawData.role ?? "";
         cache.provider = rawData.provider ?? "";
+        cache.age = rawData.age;
+        cache.gender = rawData.gender ?? "";
         cache.bio = rawData.bio ?? "";
         cache.avatar = rawData.avatar ?? "";
         cache.followerCount = rawData.followerCount;
@@ -601,6 +604,8 @@ public partial class ProfileDataHandlers : MonoBehaviour
             cache.email = GetString(dict, "email");
             cache.role = GetString(dict, "role");
             cache.provider = GetString(dict, "provider");
+            cache.gender = GetString(dict, "gender");
+            cache.age = GetInt(dict, "age");
             cache.bio = GetString(dict, "bio");
             cache.avatar = GetString(dict, "avatar");
             cache.followerCount = GetInt(dict, "followerCount");
@@ -720,6 +725,8 @@ public class ProfileDataRaw
     public string email;
     public string role;
     public string provider;
+    public string gender;
+    public int age;
     public string bio;
     public string avatar;
     public string createdAt;
@@ -760,6 +767,8 @@ public class ProfileCache
     public string email;
     public string role;
     public string provider;
+    public string gender;
+    public int age;
     public string bio;
     public string avatar;
 
@@ -799,6 +808,8 @@ public class ProfileCache
             {"email", email},
             {"role", role},
             {"provider", provider},
+            {"gender", gender},
+            {"age", age},
             {"bio", bio},
             {"avatar", avatar},
             {"homeLocation", homeLocation},

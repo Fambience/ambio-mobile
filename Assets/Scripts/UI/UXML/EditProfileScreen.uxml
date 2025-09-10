@@ -1,0 +1,80 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/EditProfileScreen.uss?fileID=7433441132597879392&amp;guid=01658b7da5fe548acb37c315a53718d6&amp;type=3#EditProfileScreen" />
+    <ui:VisualElement name="profileSettingScreen" class="main-container">
+        <ui:VisualElement class="top-bar">
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+            <ui:VisualElement class="titleArea">
+                <ui:TextElement name="title" text="Edit Profile" class="title" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement class="form-section">
+            <ui:VisualElement name="fullNameInputGroup" class="input-group">
+                <ui:Label text="Full Name" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon person-icon" />
+                    <ui:TextField name="fullName" placeholder-text="Enter your full name" class="input-field" />
+                </ui:VisualElement>
+                <ui:Label name="WarningFullName" class="warning-text" style="align-self: flex-start;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="firstNameInputGroup" class="input-group">
+                <ui:Label text="First Name" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon person-icon" />
+                    <ui:TextField name="firstName" placeholder-text="First Name" class="input-field" />
+                </ui:VisualElement>
+                <ui:Label name="WarningFirstName" class="warning-text" style="align-self: flex-start;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="lastNameInputGroup" class="input-group">
+                <ui:Label text="Last Name" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon person-icon" />
+                    <ui:TextField name="lastName" placeholder-text="Last Name" class="input-field" />
+                </ui:VisualElement>
+                <ui:Label name="WarningLastName" class="warning-text" style="align-self: flex-start;" />
+            </ui:VisualElement>
+            <ui:VisualElement class="input-group">
+                <ui:Label text="UserName" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon person-icon" />
+                    <ui:TextField name="userName" placeholder-text="username" class="input-field" />
+                </ui:VisualElement>
+                <ui:Label name="warningLabelUserName" class="warning-text" style="align-self: flex-start;" />
+            </ui:VisualElement>
+            <ui:VisualElement class="form-row">
+                <ui:VisualElement class="age-input-group">
+                    <ui:Label text="Age" class="age-input-label" />
+                    <ui:VisualElement class="input-wrapper">
+                        <ui:TextField name="age" placeholder-text="25" class="input-field age-input-field" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="genderDropdown" class="gender-dropdown" style="justify-content: flex-start;">
+                    <ui:Label text="Gender" class="age-input-label" />
+                    <ui:VisualElement name="dropdownTrigger" class="dropdown-trigger">
+                        <ui:Label name="selectedText" text="Select your Gender" class="selected-text" style="justify-content: flex-start; align-content: flex-start;" />
+                        <ui:Label name="dropdownArrow" text="▼" class="dropdown-arrow" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="dropdownContent" class="dropdown-content" style="display: none;">
+                        <ui:ScrollView name="optionsList" class="options-list" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="warningLabelAgeGender" class="warning-text-2" style="align-self: flex-start;" />
+            <ui:Label text="Location" class="age-input-label" />
+            <ui:VisualElement name="locationDropdown" class="location-dropdown" style="justify-content: flex-start;">
+                <ui:VisualElement name="dropdownTrigger" class="dropdown-trigger">
+                    <ui:Label name="selectedText" text="Select your location" class="selected-text" style="justify-content: flex-start; align-content: flex-start;" />
+                    <ui:Label text="▼" class="dropdown-arrow" />
+                </ui:VisualElement>
+                <ui:VisualElement name="dropdownContent" class="dropdown-content" style="display: none;">
+                    <ui:VisualElement class="search-wrapper">
+                        <ui:TextField name="searchField" placeholder-text="Search City" class="search-field" />
+                    </ui:VisualElement>
+                    <ui:ScrollView name="optionsList" class="options-list" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="updateProfile" text="Update Profile" class="signin-button" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,45 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/UpdatePasswordScreen.uss?fileID=7433441132597879392&amp;guid=4240706e1cc2842579fd77cb014e35ef&amp;type=3#UpdatePasswordScreen" />
+    <ui:VisualElement name="profileSettingScreen" class="main-container">
+        <ui:VisualElement class="top-bar">
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+            <ui:VisualElement class="titleArea">
+                <ui:TextElement class="title" name="title" text="Privacy &amp; Security"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Image class="email-verify-icon" style="align-items: flex-start; align-self: flex-start;" />
+        <ui:Label name="title" text="Set New Password" class="title-head" style="align-items: flex-start; align-self: flex-start;" />
+        <ui:Label name="subtitle" text="For security, confirm your current password before setting a new one" class="subtitle" style="align-items: flex-start; align-self: flex-start;" />
+        <ui:VisualElement class="form-section">
+            <ui:VisualElement class="input-group">
+                <ui:Label text="Old Password" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon password-icon" />
+                    <ui:TextField name="oldPasswordField" placeholder-text="Old Password" class="input-field" />
+                </ui:VisualElement>
+                <ui:Label name="WarningOldPassword" class="warning-text" style="align-self: flex-start;" />
+            </ui:VisualElement>
+            <ui:VisualElement class="input-group">
+                <ui:Label text="New Password" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon password-icon" />
+                    <ui:TextField name="newPasswordField" placeholder-text="New Password" class="input-field" />
+                </ui:VisualElement>
+                <ui:Label name="WarningNewPassword" class="warning-text" style="align-self: flex-start;" />
+            </ui:VisualElement>
+            <ui:VisualElement class="input-group">
+                <ui:Label text="Confirm New Password" class="input-label" />
+                <ui:VisualElement class="input-wrapper">
+                    <ui:Image class="input-icon email-icon" />
+                    <ui:TextField name="confirmPasswordField" placeholder-text="Confirm Password" class="input-field" />
+                </ui:VisualElement>
+                <ui:Label name="WarningCnfNewPassword" class="warning-text" style="align-self: flex-start;" />
+            </ui:VisualElement>
+            <ui:Label name="forgotPassword" text="Forgot Password?" class="forgot-password" />
+        </ui:VisualElement>
+        <ui:Label name="warningForgotPassword" class="warning-text" style="align-self: middle-center; align-content: flex-end; margin-left: 0; margin-top: 50px;" />
+        <ui:Button name="savePassword" text="Confirm" class="verify-button" />
+    </ui:VisualElement>    
+</ui:UXML>

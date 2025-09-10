@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -31,6 +32,32 @@ public class DesignStyleSelector2 : MonoBehaviour
         InitializeUIElements();
         SetupButtonListeners();
         CreateWarningLabel();
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            PrefillDesignStyleSelections();
+        }
+    }
+    
+    void PrefillDesignStyleSelections()
+    {
+        if (OnboardingData.DesignInspoScreen2 != null && OnboardingData.DesignInspoScreen2.Count > 0)
+        {
+            Debug.Log($"[DesignStyleSelector2] Prefilling modern styles: {string.Join(", ", OnboardingData.DesignInspoScreen2)}");
+        
+            foreach (var styleName in OnboardingData.DesignInspoScreen2)
+            {
+                // Find the button that corresponds to this style
+                var button = buttonStyleNames.FirstOrDefault(kvp => kvp.Value.ToUpper() == styleName.ToUpper()).Key;
+                if (button != null && selectedButtons.Count < MAX_SELECTIONS)
+                {
+                    SelectButton(button);
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("[DesignStyleSelector2] No existing modern style data to prefill");
+        }
     }
 
     void InitializeUIElements()
@@ -171,11 +198,18 @@ public class DesignStyleSelector2 : MonoBehaviour
 
     void OnBackButtonClicked()
     {
-        
         StoreSelectedStyles();
-        UIManager.Instance.OpenScreen(UIScreenType.CreativeStyles);
+    
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            UIManager.Instance.OpenScreen(UIScreenType.CreativeStyles);
+        }
+        else
+        {
+            UIManager.Instance.OpenScreen(UIScreenType.CreativeStyles);
+        }
     }
-
+    
     void OnNextButtonClicked()
     {
         if (selectedButtons.Count == 0)
@@ -186,11 +220,24 @@ public class DesignStyleSelector2 : MonoBehaviour
         }
 
         StoreSelectedStyles();
-        UIManager.Instance.OpenScreen(UIScreenType.ColorTone);
+    
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            UIManager.Instance.OpenScreen(UIScreenType.ColorTone);
+        }
+        else
+        {
+            UIManager.Instance.OpenScreen(UIScreenType.ColorTone);
+        }
     }
     
     void OnSkipButtonClicked()
     {
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            StoreSelectedStyles();
+        }
+    
         UIManager.Instance.OpenScreen(UIScreenType.ColorTone);
     }
 
@@ -205,12 +252,15 @@ public class DesignStyleSelector2 : MonoBehaviour
 
     void StoreSelectedStyles()
     {
+        // Get old values for change tracking
+        List<string> oldStyles = OnboardingData.DesignInspoScreen2 != null ? 
+            new List<string>(OnboardingData.DesignInspoScreen2) : new List<string>();
+    
         List<string> selectedStyleNames = new List<string>();
         foreach (Button button in selectedButtons)
         {
             if (buttonStyleNames.TryGetValue(button, out var styleName))
             {
-                // Convert to API-compliant uppercase enum format (e.g., "ARTDECO")
                 string apiStyleName = styleName.Replace("-", "").ToUpper();
                 selectedStyleNames.Add(apiStyleName);
             }
@@ -220,6 +270,27 @@ public class DesignStyleSelector2 : MonoBehaviour
         OnboardingData.DesignInspoScreen2 = selectedStyleNames;
 
         Debug.Log("Design styles stored to OnboardingData: " + string.Join(", ", selectedStyleNames));
+    
+        // Track changes if in edit mode
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            if (!ListsEqual(oldStyles, selectedStyleNames))
+            {
+                EditOnboardingManager.TrackDataChange("Modern Styles", selectedStyleNames, oldStyles);
+            }
+        }
+    }
+    
+    private bool ListsEqual(List<string> list1, List<string> list2)
+    {
+        if (list1 == null && list2 == null) return true;
+        if (list1 == null || list2 == null) return false;
+        if (list1.Count != list2.Count) return false;
+    
+        var sorted1 = list1.OrderBy(x => x).ToList();
+        var sorted2 = list2.OrderBy(x => x).ToList();
+    
+        return sorted1.SequenceEqual(sorted2);
     }
 
     void LogSelectedStyles()

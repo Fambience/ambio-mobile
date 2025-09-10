@@ -24,6 +24,25 @@ public class DesignerTypeController : MonoBehaviour
         completeButton.clicked += OnComplete;
         backButton.clicked += OnBack;
         skipButton.clicked += OnSkip;
+        
+        // If in edit mode, prefill the data
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            PrefillData();
+        }
+    }
+
+    private void PrefillData()
+    {
+        if (!string.IsNullOrEmpty(OnboardingData.Occupation))
+        {
+            int selectedIndex = EditOnboardingManager.GetDesignerTypeIndex(designerOptions);
+            if (selectedIndex >= 0)
+            {
+                designerRadioGroup.value = selectedIndex;
+                Debug.Log($"[DesignerTypeController] Prefilled designer type: {OnboardingData.Occupation} (index: {selectedIndex})");
+            }
+        }
     }
 
     private void OnComplete()
@@ -33,10 +52,16 @@ public class DesignerTypeController : MonoBehaviour
         if (selectedIndex >= 0 && selectedIndex < designerOptions.Length)
         {
             string selectedType = designerOptions[selectedIndex];
+            string previousValue = OnboardingData.Occupation;
             OnboardingData.Occupation = selectedType;
+        
+            if (EditOnboardingManager.IsInEditMode && previousValue != selectedType)
+            {
+                EditOnboardingManager.TrackDataChange("Occupation", selectedType, previousValue);
+            }
+        
             Debug.Log("Selected Designer Type: " + selectedType);
-
-           UIManager.Instance.OpenScreen(UIScreenType.CeatorExperience); // Adjust screen as needed
+            UIManager.Instance.OpenScreen(UIScreenType.CeatorExperience);
         }
         else
         {
@@ -46,12 +71,28 @@ public class DesignerTypeController : MonoBehaviour
 
     private void OnBack()
     {
-        UIManager.Instance.OpenScreen(UIScreenType.CreatorLocation); // Replace with actual previous screen enum
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            // In edit mode, cancel and go back to profile settings
+            EditOnboardingManager.Instance.CancelEditOnboarding();
+        }
+        else
+        {
+            // Normal onboarding flow
+            UIManager.Instance.OpenScreen(UIScreenType.CreatorLocation); // Replace with actual previous screen enum
+        }
     }
 
     private void OnSkip()
     {
+        string previousValue = OnboardingData.Occupation;
         OnboardingData.Occupation = null;
-        UIManager.Instance.OpenScreen(UIScreenType.CeatorExperience); // Adjust screen as needed
+    
+        if (EditOnboardingManager.IsInEditMode && previousValue != null)
+        {
+            EditOnboardingManager.TrackDataChange("Occupation", null, previousValue);
+        }
+    
+        UIManager.Instance.OpenScreen(UIScreenType.CeatorExperience);
     }
 }

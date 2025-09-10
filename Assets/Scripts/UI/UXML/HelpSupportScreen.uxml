@@ -1,0 +1,31 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/HelpSupportScreen.uss?fileID=7433441132597879392&amp;guid=6cbf2a8fda3fe49c68bc2c902299a43f&amp;type=3#HelpSupportScreen" />
+    <ui:VisualElement name="profileSettingScreen" class="main-container">
+        <ui:VisualElement class="top-bar">
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+            <ui:VisualElement class="titleArea">
+                <ui:TextElement class="title" name="title" text="Help &amp; Support"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label name="title" text="We’re here to help" class="title-head" style="align-items: flex-start; align-self: flex-start;" />
+        <ui:Label name="subtitle" text="Describe your issue or question below, and our team will get back to you shortly." class="subtitle" style="align-items: flex-start; align-self: flex-start;" />
+        <ui:VisualElement class="input-wrapper" style="margin-top: 20px">
+            <DescriptionTextBox 
+                name="descriptionBox" 
+                placeholder-text="Describe your design..." 
+                font-size="35"
+                padding-left="20"
+                padding-right="20"
+                padding-top="30"
+                padding-bottom="20"
+                character-width="20"
+                preserve-enter="true"
+                class="input-field"/>
+        </ui:VisualElement>
+        <ui:Button name="completeButton" class="primary-button">
+            <ui:Label text="Submit" class="button-text" />
+        </ui:Button>
+    </ui:VisualElement>    
+</ui:UXML>

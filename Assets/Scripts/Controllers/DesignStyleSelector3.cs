@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -29,7 +30,32 @@ public class DesignStyleSelector3 : MonoBehaviour
         InitializeUIElements();
         SetupButtonListeners();
         CreateWarningLabel();
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            PrefillColorSchemeSelection();
+        }
     }
+    
+    void PrefillColorSchemeSelection()
+    {
+        if (OnboardingData.ColorScheme != null && OnboardingData.ColorScheme.Count > 0)
+        {
+            string colorScheme = OnboardingData.ColorScheme[0]; // Single selection
+            Debug.Log($"[DesignStyleSelector3] Prefilling color scheme: {colorScheme}");
+        
+            // Find the button that corresponds to this color scheme
+            var button = buttonStyleNames.FirstOrDefault(kvp => kvp.Value.ToUpper() == colorScheme.ToUpper()).Key;
+            if (button != null)
+            {
+                SelectButton(button);
+            }
+        }
+        else
+        {
+            Debug.Log("[DesignStyleSelector3] No existing color scheme data to prefill");
+        }
+    }
+
 
     void InitializeUIElements()
     {
@@ -173,31 +199,56 @@ public class DesignStyleSelector3 : MonoBehaviour
     void OnBackButtonClicked()
     {
         StoreSelectedStyle();
-        UIManager.Instance.OpenScreen(UIScreenType.ModernStyles);
+    
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            // In edit mode, go back to modern styles
+            UIManager.Instance.OpenScreen(UIScreenType.ModernStyles);
+        }
+        else
+        {
+            // Normal onboarding flow
+            UIManager.Instance.OpenScreen(UIScreenType.ModernStyles);
+        }
     }
-
+    
     void OnNextButtonClicked()
     {
-        Debug.Log("✅ OnNextButtonClicked called");
+        Debug.Log("OnNextButtonClicked called");
 
         if (selectedButton == null)
         {
-            Debug.LogWarning("⚠️ No button selected when Next was clicked");
+            Debug.LogWarning("No button selected when Next was clicked");
             warningLabel.text = "Please select a color scheme!";
             ShowWarning();
             return;
         }
 
-        Debug.Log($"📌 SelectedButton: {selectedButton.name}");
+        Debug.Log($"SelectedButton: {selectedButton.name}");
         StoreSelectedStyle();
 
-        Debug.Log($"➡️ Navigating to Family screen with ColorScheme: {string.Join(",", OnboardingData.ColorScheme ?? new List<string> { "null" })}");
+        Debug.Log($"Navigating to Family screen with ColorScheme: {string.Join(",", OnboardingData.ColorScheme ?? new List<string> { "null" })}");
 
-        UIManager.Instance.OpenScreen(UIScreenType.Family);
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            // In edit mode, continue to family composition
+            UIManager.Instance.OpenScreen(UIScreenType.Family);
+        }
+        else
+        {
+            // Normal onboarding flow
+            UIManager.Instance.OpenScreen(UIScreenType.Family);
+        }
     }
     
     void OnSkipButtonClicked()
     {
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            // In edit mode, save current selection even when skipping
+            StoreSelectedStyle();
+        }
+    
         UIManager.Instance.OpenScreen(UIScreenType.Family);
     }
 
@@ -212,16 +263,30 @@ public class DesignStyleSelector3 : MonoBehaviour
 
     void StoreSelectedStyle()
     {
-        Debug.Log("🧠 StoreSelectedStyle called");
+        Debug.Log("StoreSelectedStyle called");
+
+        // Get old value for change tracking
+        string oldColorScheme = OnboardingData.ColorScheme != null && OnboardingData.ColorScheme.Count > 0 ? 
+            OnboardingData.ColorScheme[0] : null;
 
         if (selectedButton != null && buttonStyleNames.TryGetValue(selectedButton, out string selectedStyleName))
         {
-            OnboardingData.ColorScheme = new List<string> { selectedStyleName.ToUpper() };
-            Debug.Log($"✅ Color scheme saved to OnboardingData: {string.Join(",", OnboardingData.ColorScheme)}");
+            string newColorScheme = selectedStyleName.ToUpper();
+            OnboardingData.ColorScheme = new List<string> { newColorScheme };
+            Debug.Log($"Color scheme saved to OnboardingData: {string.Join(",", OnboardingData.ColorScheme)}");
+        
+            // Track changes if in edit mode
+            if (EditOnboardingManager.IsInEditMode)
+            {
+                if (oldColorScheme != newColorScheme)
+                {
+                    EditOnboardingManager.TrackDataChange("Color Scheme", newColorScheme, oldColorScheme);
+                }
+            }
         }
         else
         {
-            Debug.LogError("❌ Failed to store color scheme: selectedButton or mapping missing");
+            Debug.LogError("Failed to store color scheme: selectedButton or mapping missing");
         }
     }
 

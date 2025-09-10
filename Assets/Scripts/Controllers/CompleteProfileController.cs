@@ -87,7 +87,7 @@ public class CompleteProfileController : MonoBehaviour
     
     private IEnumerator FetchCitiesFromAPI()
     {
-        string url = "https://ambiobackend-stage.onrender.com/api/v1/public/cities";
+        string url = $"{baseScript.baseURL}/api/v1/public/cities";
 
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {

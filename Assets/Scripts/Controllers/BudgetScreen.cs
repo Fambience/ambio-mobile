@@ -74,6 +74,26 @@ public class BudgetScreen : MonoBehaviour
         // Set initial selection state
         selectedBudgetIndex = -1;
         selectedBudget = "";
+        
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            PrefillBudgetSelection();
+        }
+    }
+    
+    void PrefillBudgetSelection()
+    {
+        int budgetIndex = EditOnboardingManager.GetBudgetSelectionIndex();
+    
+        if (budgetIndex >= 0 && budgetIndex < budgetOptions.Length)
+        {
+            Debug.Log($"[BudgetScreen] Prefilling budget selection: {budgetOptions[budgetIndex]}");
+            SetBudgetSelection(budgetIndex);
+        }
+        else
+        {
+            Debug.Log("[BudgetScreen] No existing budget data to prefill");
+        }
     }
     
     void OnBudgetSelectionChanged(ChangeEvent<int> evt)
@@ -126,20 +146,45 @@ public class BudgetScreen : MonoBehaviour
     
     void OnSkipButtonClicked()
     {
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            if (selectedBudgetIndex != -1)
+            {
+                SaveSelectedBudget();
+            }
+        }
+    
         UIManager.Instance.OpenScreen(UIScreenType.CreativeStyles);
     }
     
     void OnBackButtonClicked()
     {
         Debug.Log("Back button clicked");
-        
-        // Navigate back to previous screen
-        // You can implement this based on your navigation system
-        NavigateToPreviousScreen();
+    
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            if (EditOnboardingManager.Instance != null)
+            {
+                EditOnboardingManager.Instance.CancelEditOnboarding();
+            }
+            else
+            {
+                UIManager.Instance.OpenScreen(UIScreenType.ProfileSetting);
+            }
+        }
+        else
+        {
+            NavigateToPreviousScreen();
+        }
     }
     
     void SaveSelectedBudget()
     {
+        // Get old values for change tracking
+        int oldMin = OnboardingData.BudgetMin;
+        int oldMax = OnboardingData.BudgetMax;
+        string oldBudgetRange = GetBudgetRangeString(oldMin, oldMax);
+    
         switch (selectedBudget)
         {
             case "3L":
@@ -161,6 +206,26 @@ public class BudgetScreen : MonoBehaviour
         }
 
         Debug.Log($"Budget saved to OnboardingData: ₹{OnboardingData.BudgetMin} - ₹{OnboardingData.BudgetMax}");
+    
+        // Track changes if in edit mode
+        if (EditOnboardingManager.IsInEditMode)
+        {
+            string newBudgetRange = selectedBudget;
+            if (oldBudgetRange != newBudgetRange)
+            {
+                EditOnboardingManager.TrackDataChange("Budget Range", newBudgetRange, oldBudgetRange);
+                EditOnboardingManager.TrackDataChange("Budget Min", OnboardingData.BudgetMin, oldMin);
+                EditOnboardingManager.TrackDataChange("Budget Max", OnboardingData.BudgetMax, oldMax);
+            }
+        }
+    }
+    
+    private string GetBudgetRangeString(int min, int max)
+    {
+        if (min == 0 && max == 300000) return "3L";
+        if (min == 300000 && max == 500000) return "3L - 5L";
+        if (min == 500000 && max == 700000) return "5L - 7L";
+        return "No Selection";
     }
     
     void NavigateToNextScreen()
