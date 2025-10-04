@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "506296903677",
+    "project_id": "ambio-backend",
+    "storage_bucket": "ambio-backend.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:506296903677:android:5eb861e332ee559e1e1b94",
+        "android_client_info": {
+          "package_name": "com.fambience.ambio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "506296903677-nju0s3rig8bklqvjetovua8u4v74v12d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4GoAEcmWw9qPiTNA3eV_GKwT8rkikuRg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "506296903677-nju0s3rig8bklqvjetovua8u4v74v12d.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "506296903677-ukj73klioqkbm3q6fvbepp1nlh0mth5l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.fambience.ambio"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
