@@ -43,6 +43,7 @@
             </ui:VisualElement>
             <ui:Label name="WarningRegister" class="warning-text" style="align-self: middle-center; top: 0px; margin-left: 0px;" />
             <ui:Button name="continueButton" text="Continue" class="continue-button" />
+            <ui:Button name="OAuth" text="Continue with Google" class="oauth" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

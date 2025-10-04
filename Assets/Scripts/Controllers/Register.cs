@@ -9,10 +9,12 @@
         [Header("UI Toolkit")]
         public UIDocument uiDocument;
 
+        private string intent = "";
         private TextField emailField;
         private TextField passwordField;
         private TextField confirmPasswordField;
         private Button continueButton;
+        private Button continuewithGoogle;
         private Button backToLoginButton;
         private Image eyeIcon1;
         private Image eyeIcon2;
@@ -41,6 +43,7 @@
             passwordField = root.Q<TextField>("passwordField");
             confirmPasswordField = root.Q<TextField>("confirmPasswordField");
             continueButton = root.Q<Button>("continueButton");
+            continuewithGoogle = root.Q<Button>("OAuth");
             backToLoginButton = root.Q<Button>("BackToLoginLabel");
             eyeIcon1 = root.Q<Image>("eyeIconPass");
             eyeIcon2 = root.Q<Image>("eyeIconConPass");
@@ -86,6 +89,7 @@
             eyeIcon2.RegisterCallback<ClickEvent>(_ => TogglePasswordVisibility("confirmPassword"));
 
             continueButton.clicked += RegisterUser;
+            continuewithGoogle.clicked += registerwithGoogle;
 
             backToLoginButton?.RegisterCallback<ClickEvent>(evt =>
             {
@@ -129,7 +133,17 @@
                 }
             }
         }
-        
+
+        private void registerwithGoogle()
+        {
+            intent = "Register";
+            // TODO: write function to connect firebase
+        }
+
+        // private IEnumerator RegisterWithGoogleCoroutine()
+        // {
+        //     
+        // }
 
         private void RegisterUser()
         {
@@ -330,4 +344,6 @@
         [System.Serializable] public class EmailData { public string email; public EmailData(string e) { email = e; } }
         [System.Serializable] public class RegisterResponse { public string token; public bool success; public string message; }
         [System.Serializable] public class messege { public string message; }
+        [System.Serializable] public class GoogleAuthRequest { public string firebaseToker; public string googleSubID; public string intent; }
+        [System.Serializable] public class GoogleAuthResponse {} //public string firebaseToker; public string googleSubID; public string intent; } 
     }
