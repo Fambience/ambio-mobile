@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>506296903677-ukj73klioqkbm3q6fvbepp1nlh0mth5l.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.506296903677-ukj73klioqkbm3q6fvbepp1nlh0mth5l</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>506296903677-n49m6trf6p9a17ljiduj3mcc9aofb4k0.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBxeAB8Udkl4eunJ-uxoMGafjlsqEoOyzQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>506296903677</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.fambience.ambio</string>
+	<key>PROJECT_ID</key>
+	<string>ambio-backend</string>
+	<key>STORAGE_BUCKET</key>
+	<string>ambio-backend.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:506296903677:ios:c310eac52e24731c1e1b94</string>
+</dict>
+</plist>
