@@ -15,6 +15,12 @@ public static class SearchScreenUIBuilder
     private static bool isPlaceholderActive = true;
     private static string placeholderText = "Search for designers...";
     private static VisualTreeAsset designerCardTemplate;
+
+    // Loader elements
+    private static VisualElement loadingIndicator;
+    private static Image loadingIcon;
+    private static bool isLoading = false;
+    private static Coroutine loaderRotationCoroutine;
     
     public delegate void BackButtonDelegate();
     public static event BackButtonDelegate OnBackButtonClicked;
@@ -178,13 +184,36 @@ public static class SearchScreenUIBuilder
         scrollView.style.width = Length.Percent(100);
         scrollView.style.flexGrow = 1;
         scrollView.style.marginTop = 16;
-        
+
         searchResultsContainer = new VisualElement();
         searchResultsContainer.name = "searchResultsContainer";
         searchResultsContainer.style.width = Length.Percent(100);
-        
+
+        // Create loader indicator (same as home screen)
+        CreateLoadingIndicator();
+
         scrollView.Add(searchResultsContainer);
         container.Add(scrollView);
+    }
+
+    private static void CreateLoadingIndicator()
+    {
+        loadingIndicator = new VisualElement();
+        loadingIndicator.name = "loadingIndicator";
+        loadingIndicator.style.width = Length.Percent(100);
+        loadingIndicator.style.height = 100;
+        loadingIndicator.style.alignItems = Align.Center;
+        loadingIndicator.style.justifyContent = Justify.Center;
+        loadingIndicator.style.marginTop = 100;
+        loadingIndicator.style.display = DisplayStyle.None;
+        loadingIndicator.style.opacity = 0;
+
+        loadingIcon = new Image();
+        loadingIcon.image = Resources.Load<Texture2D>("loader");
+        loadingIcon.style.width = 50;
+        loadingIcon.style.height = 50;
+
+        loadingIndicator.Add(loadingIcon);
     }
     
     private static VisualElement CreateSearchScreenProgrammatically()
@@ -247,25 +276,32 @@ public static class SearchScreenUIBuilder
         {
             return;
         }
-        
+
         if (searchDelayCoroutine != null)
         {
             CoroutineRunner.Instance.StopRoutine(searchDelayCoroutine);
         }
-        
+
         if (string.IsNullOrEmpty(searchQuery.Trim()))
         {
             ClearSearchResults();
+            HideLoader();
             return;
         }
-        
+
+        // Show loader immediately when user starts typing
+        ShowLoader();
+
         searchDelayCoroutine = CoroutineRunner.Instance.StartRoutine(SearchWithDelay(searchQuery.Trim()));
     }
     
     private static IEnumerator SearchWithDelay(string query)
     {
         yield return new WaitForSeconds(3f);
-        
+
+        // Clear previous results before fetching new ones
+        ClearSearchResults();
+
         yield return PostDataGetter.SearchDesigners(
             baseURL,
             authToken,
@@ -277,14 +313,17 @@ public static class SearchScreenUIBuilder
     
     private static void UpdateSearchResults(List<PostDataGetter.DesignerSearchResult> designers)
     {
+        // Hide loader
+        HideLoader();
+
         ClearSearchResults();
-        
+
         if (designers == null || designers.Count == 0)
         {
             ShowNoResultsMessage();
             return;
         }
-        
+
         foreach (var designer in designers)
         {
             VisualElement designerCard = CreateDesignerCard(designer);
@@ -426,20 +465,23 @@ public static class SearchScreenUIBuilder
     
     private static void ShowSearchError(string error)
     {
+        // Hide loader
+        HideLoader();
+
         VisualElement errorContainer = new VisualElement();
         errorContainer.style.alignItems = Align.Center;
         errorContainer.style.justifyContent = Justify.Center;
         errorContainer.style.paddingTop = 60;
-        
+
         Label errorLabel = new Label("Search failed. Please try again.");
         errorLabel.style.fontSize = 35;
         errorLabel.style.color = Color.red;
         errorLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
-        
+
         errorContainer.Add(errorLabel);
         searchResultsContainer.Clear();
         searchResultsContainer.Add(errorContainer);
-        
+
         Debug.LogError($"Search error: {error}");
     }
     
@@ -447,7 +489,69 @@ public static class SearchScreenUIBuilder
     {
         searchField?.Focus();
     }
-    
+
+    private static void ShowLoader()
+    {
+        if (loadingIndicator == null || isLoading) return;
+
+        isLoading = true;
+
+        // Add loader to search results container
+        if (searchResultsContainer != null && !searchResultsContainer.Contains(loadingIndicator))
+        {
+            searchResultsContainer.Add(loadingIndicator);
+        }
+
+        loadingIndicator.style.display = DisplayStyle.Flex;
+        loadingIndicator.style.opacity = 1;
+
+        // Start rotation animation
+        if (loaderRotationCoroutine != null)
+        {
+            CoroutineRunner.Instance.StopRoutine(loaderRotationCoroutine);
+        }
+        loaderRotationCoroutine = CoroutineRunner.Instance.StartRoutine(RotateLoader());
+    }
+
+    private static void HideLoader()
+    {
+        if (loadingIndicator == null) return;
+
+        isLoading = false;
+
+        // Stop rotation animation
+        if (loaderRotationCoroutine != null)
+        {
+            CoroutineRunner.Instance.StopRoutine(loaderRotationCoroutine);
+            loaderRotationCoroutine = null;
+        }
+
+        loadingIndicator.style.display = DisplayStyle.None;
+        loadingIndicator.style.opacity = 0;
+
+        // Reset rotation
+        if (loadingIcon != null)
+        {
+            loadingIcon.transform.rotation = Quaternion.identity;
+        }
+    }
+
+    private static IEnumerator RotateLoader()
+    {
+        float rotationSpeed = 360f; // degrees per second
+
+        while (isLoading)
+        {
+            if (loadingIcon != null)
+            {
+                float currentRotation = loadingIcon.transform.rotation.eulerAngles.z;
+                float newRotation = currentRotation + rotationSpeed * Time.deltaTime;
+                loadingIcon.transform.rotation = Quaternion.Euler(0, 0, newRotation);
+            }
+            yield return null;
+        }
+    }
+
     private class CoroutineRunner : MonoBehaviour
     {
         private static CoroutineRunner _instance;

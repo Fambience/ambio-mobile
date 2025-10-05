@@ -83,8 +83,15 @@ public class BudgetScreen : MonoBehaviour
     
     void PrefillBudgetSelection()
     {
-        int budgetIndex = EditOnboardingManager.GetBudgetSelectionIndex();
+        int budgetIndex = -1;
     
+        if (OnboardingData.BudgetMin == 0 && OnboardingData.BudgetMax == 300000)
+            budgetIndex = 0; // "3L"
+        else if (OnboardingData.BudgetMin == 300000 && OnboardingData.BudgetMax == 500000)
+            budgetIndex = 1; // "3L - 5L"
+        else if (OnboardingData.BudgetMin == 500000 && OnboardingData.BudgetMax == 700000)
+            budgetIndex = 2; // "5L - 7L"
+
         if (budgetIndex >= 0 && budgetIndex < budgetOptions.Length)
         {
             Debug.Log($"[BudgetScreen] Prefilling budget selection: {budgetOptions[budgetIndex]}");

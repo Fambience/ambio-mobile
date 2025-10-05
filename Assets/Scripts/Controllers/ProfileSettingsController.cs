@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.Networking;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ProfileSettingsController : MonoBehaviour
 {
@@ -192,8 +193,7 @@ public class ProfileSettingsController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[ProfileSettingsController] EditOnboardingManager instance not found! Make sure EditOnboardingManager GameObject exists in the scene.");
-            // UIManager.Instance.TransitionScreens(UIScreenType.ProfileSetting, UIScreenType.Budget);
+            Debug.LogError("[ProfileSettingsController] EditOnboardingManager instance not found!");
         }
     }
     

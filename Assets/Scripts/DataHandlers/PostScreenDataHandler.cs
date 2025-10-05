@@ -14,6 +14,7 @@ public class PostScreenDataHandler : MonoBehaviour
 
     [Header("Screen Management")]
     public GameObject homeScreenGameObject;
+    private GameObject previousScreenGameObject;
 
     [Header("API Configuration")]
     [SerializeField] private string baseApiUrl;
@@ -1125,21 +1126,24 @@ public class PostScreenDataHandler : MonoBehaviour
         ShowPostScreen();
     }
 
-    public static void ShowPostStatic(Post post)
+    public static void ShowPostStatic(Post post, GameObject previousScreen)
     {
         PostScreenDataHandler instance = GetInstance();
         if (instance != null)
         {
+            instance.previousScreenGameObject = previousScreen;
             instance.ShowPost(post);
         }
     }
 
     public void ShowPostScreen()
     {
-        if (homeScreenGameObject != null)
+        // Hide the previous screen
+        if (previousScreenGameObject != null)
         {
-            homeScreenGameObject.SetActive(false);
+            previousScreenGameObject.SetActive(false);
         }
+
         gameObject.SetActive(true);
     }
 
@@ -1147,7 +1151,13 @@ public class PostScreenDataHandler : MonoBehaviour
     {
         gameObject.SetActive(false);
 
-        if (homeScreenGameObject != null)
+        // Return to the previous screen that was active before opening the post
+        if (previousScreenGameObject != null)
+        {
+            previousScreenGameObject.SetActive(true);
+        }
+        // Fallback to homeScreenGameObject if previousScreenGameObject is null
+        else if (homeScreenGameObject != null)
         {
             homeScreenGameObject.SetActive(true);
         }
