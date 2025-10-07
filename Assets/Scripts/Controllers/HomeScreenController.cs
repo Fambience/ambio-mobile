@@ -102,15 +102,28 @@ public class HomeScreenController : MonoBehaviour
     private void BuildInitialUI()
     {
         uiController.ClearContent();
-        
+
         cardsDisplayed = 0;
         currentHomePostIndex = 0;
         currentExplorePostIndex = 0;
         currentDesignerIndex = 0;
-        
+
         isShowingHomeFeed = dataHandler.HomePosts.Count > 0;
-        
-        StartCoroutine(BuildUIGradually());
+
+        // Check if we're using cached data (not first load)
+        bool usingCache = ScreenStateManager.Instance.IsScreenInitialized("Home") &&
+                         !ScreenStateManager.Instance.ShouldLoadData("Home", forceRefresh: false);
+
+        if (usingCache)
+        {
+            Debug.Log("[HomeScreen] Using cached data - building all cards immediately");
+            BuildAllCardsImmediately();
+        }
+        else
+        {
+            Debug.Log("[HomeScreen] Fresh load - building cards gradually");
+            StartCoroutine(BuildUIGradually());
+        }
     }
     
     private IEnumerator BuildUIGradually()
@@ -268,23 +281,70 @@ public class HomeScreenController : MonoBehaviour
             {
                 yield return StartCoroutine(dataHandler.LoadTrendingDesigners(dataHandler.GetNextDesignerPage()));
             }
-            
+
             if (currentDesignerIndex >= dataHandler.TrendingDesigners.Count)
             {
                 yield break;
             }
         }
-        
+
         ScrollView horizontalScroll = uiController.CreateTrendingDesignersSection(
-            dataHandler.TrendingDesigners, 
-            currentDesignerIndex, 
+            dataHandler.TrendingDesigners,
+            currentDesignerIndex,
             10
         );
-        
+
         int designersToShow = Mathf.Min(10, dataHandler.TrendingDesigners.Count - currentDesignerIndex);
         currentDesignerIndex += designersToShow;
-        
+
         uiController.AddToContainer(horizontalScroll);
+    }
+
+    private void BuildAllCardsImmediately()
+    {
+        Debug.Log("[HomeScreen] Building all cards immediately from cache");
+
+        int totalPostsToShow = dataHandler.HomePosts.Count + dataHandler.ExplorePosts.Count;
+        int designerSectionsNeeded = Mathf.CeilToInt(totalPostsToShow / 5f);
+
+        // Build all cards at once
+        while (true)
+        {
+            // Add designer section every 5 cards
+            if (cardsDisplayed > 0 && cardsDisplayed % 5 == 0 && currentDesignerIndex < dataHandler.TrendingDesigners.Count)
+            {
+                int designersToShow = Mathf.Min(10, dataHandler.TrendingDesigners.Count - currentDesignerIndex);
+                if (designersToShow > 0)
+                {
+                    ScrollView horizontalScroll = uiController.CreateTrendingDesignersSection(
+                        dataHandler.TrendingDesigners,
+                        currentDesignerIndex,
+                        designersToShow
+                    );
+                    currentDesignerIndex += designersToShow;
+                    uiController.AddToContainer(horizontalScroll);
+                }
+            }
+
+            Post postToShow = GetNextPost();
+
+            if (postToShow != null)
+            {
+                VisualElement verticalCard = uiController.CreateVerticalCard(postToShow);
+                uiController.AddToContainer(verticalCard);
+                cardsDisplayed++;
+            }
+            else
+            {
+                // No more posts available
+                break;
+            }
+        }
+
+        Debug.Log($"[HomeScreen] Built {cardsDisplayed} cards immediately");
+
+        // Restore scroll position after all cards are built
+        uiController.RestoreScrollPosition();
     }
     
     public void StartUploadWithService(UploadService.UploadData uploadData)
