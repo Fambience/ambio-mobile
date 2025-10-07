@@ -41,7 +41,19 @@ public class HomeScreenController : MonoBehaviour
     private void OnEnable()
     {
         uiController.OnRefreshRequested += HandleRefresh;
-        StartCoroutine(LoadInitialData());
+
+        // Check if we need to load data or use cached data
+        if (ScreenStateManager.Instance.ShouldLoadData("Home"))
+        {
+            Debug.Log("[HomeScreen] Loading initial data (not cached or expired)");
+            StartCoroutine(LoadInitialData());
+        }
+        else
+        {
+            Debug.Log("[HomeScreen] Using cached data, rebuilding UI");
+            // Data is already in dataHandler from cache, just rebuild UI
+            BuildInitialUI();
+        }
     }
 
     private void OnDisable()
@@ -51,11 +63,15 @@ public class HomeScreenController : MonoBehaviour
 
     private void HandleRefresh()
     {
+        Debug.Log("[HomeScreen] Manual refresh requested - invalidating cache");
+        ScreenStateManager.Instance.InvalidateScreen("Home");
         StartCoroutine(RefreshContent());
     }
 
     private IEnumerator RefreshContent()
     {
+        // Clear cache and reset pagination for fresh data
+        DataCache.Instance.InvalidateScreen("Home");
         dataHandler.ResetPaginationData();
         yield return StartCoroutine(LoadInitialData());
         uiController.CompleteRefresh();
@@ -65,11 +81,18 @@ public class HomeScreenController : MonoBehaviour
     {
         isLoadingData = true;
 
-        dataHandler.ResetPaginationData();
+        // Only reset pagination if this is a fresh load (not using cache)
+        if (!ScreenStateManager.Instance.IsScreenInitialized("Home"))
+        {
+            dataHandler.ResetPaginationData();
+        }
 
         yield return StartCoroutine(dataHandler.LoadHomeFeed(1));
         yield return StartCoroutine(dataHandler.LoadExploreFeed(1));
         yield return StartCoroutine(dataHandler.LoadTrendingDesigners(1));
+
+        // Mark screen as initialized after successful data load
+        ScreenStateManager.Instance.MarkScreenInitialized("Home");
 
         BuildInitialUI();
 
@@ -285,6 +308,10 @@ public class HomeScreenController : MonoBehaviour
 
         if (success)
         {
+            // Invalidate cache to show new upload
+            Debug.Log("[HomeScreen] Upload complete - refreshing data");
+            ScreenStateManager.Instance.InvalidateScreen("Home");
+            DataCache.Instance.InvalidateScreen("Home");
             StartCoroutine(LoadInitialData());
         }
     }

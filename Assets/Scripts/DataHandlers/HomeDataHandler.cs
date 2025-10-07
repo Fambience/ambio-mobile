@@ -156,22 +156,38 @@ public class HomeDataHandler : MonoBehaviour
 
     public IEnumerator LoadHomeFeed(int page)
     {
+        // Check cache for page 1 only (initial load)
+        if (page == 1)
+        {
+            List<Post> cachedPosts = DataCache.Instance.GetCachedPostList("Home_HomeFeed");
+            if (cachedPosts != null)
+            {
+                Debug.Log($"[HomeDataHandler] Using cached home feed ({cachedPosts.Count} posts)");
+                homePosts.Clear();
+                homePosts.AddRange(cachedPosts);
+                totalHomePagesLoaded = 1;
+                hasMoreHomePosts = cachedPosts.Count >= postsPerPage;
+                currentHomePage = 1;
+                yield break;
+            }
+        }
+
         string url = $"{baseURL}{homeFeedUrl}?page={page}&limit={postsPerPage}";
-        
+
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             request.SetRequestHeader("Authorization", authToken);
-            
+
             yield return request.SendWebRequest();
-            
+
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string jsonResponse = request.downloadHandler.text;
-                
+
                 try
                 {
                     ApiResponse<HomeApiResponse> response = JsonUtility.FromJson<ApiResponse<HomeApiResponse>>(jsonResponse);
-                    
+
                     if (response.success && response.data != null && response.data.posts != null)
                     {
                         if (page == 1)
@@ -180,16 +196,22 @@ public class HomeDataHandler : MonoBehaviour
                             totalHomePagesLoaded = 0;
                             Debug.Log("HOME FEED: Cleared previous data for fresh start");
                         }
-                        
+
                         if (page > totalHomePagesLoaded)
                         {
                             int postsBeforeAdd = homePosts.Count;
-                            
+
                             homePosts.AddRange(response.data.posts);
                             totalHomePagesLoaded = page;
                             hasMoreHomePosts = response.data.posts.Count >= postsPerPage;
-                            
+
                             Debug.Log($"HOME FEED: Added {response.data.posts.Count} posts. Total now: {homePosts.Count}");
+
+                            // Cache page 1 data
+                            if (page == 1)
+                            {
+                                DataCache.Instance.CachePostList("Home_HomeFeed", new List<Post>(homePosts));
+                            }
                         }
                         else
                         {
@@ -220,22 +242,38 @@ public class HomeDataHandler : MonoBehaviour
 
     public IEnumerator LoadExploreFeed(int page)
     {
+        // Check cache for page 1 only (initial load)
+        if (page == 1)
+        {
+            List<Post> cachedPosts = DataCache.Instance.GetCachedPostList("Home_ExploreFeed");
+            if (cachedPosts != null)
+            {
+                Debug.Log($"[HomeDataHandler] Using cached explore feed ({cachedPosts.Count} posts)");
+                explorePosts.Clear();
+                explorePosts.AddRange(cachedPosts);
+                totalExplorePagesLoaded = 1;
+                hasMoreExplorePosts = cachedPosts.Count >= postsPerPage;
+                currentExplorePage = 1;
+                yield break;
+            }
+        }
+
         string url = $"{baseURL}{exploreFeedUrl}?page={page}&limit={postsPerPage}";
-        
+
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             request.SetRequestHeader("Authorization", authToken);
-            
+
             yield return request.SendWebRequest();
-            
+
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string jsonResponse = request.downloadHandler.text;
-                
+
                 try
                 {
                     ApiResponse<List<Post>> response = JsonUtility.FromJson<ApiResponse<List<Post>>>(jsonResponse);
-                    
+
                     if (response.success && response.data != null)
                     {
                         if (page == 1)
@@ -243,14 +281,20 @@ public class HomeDataHandler : MonoBehaviour
                             explorePosts.Clear();
                             totalExplorePagesLoaded = 0;
                         }
-                        
+
                         if (page > totalExplorePagesLoaded)
                         {
                             int postsBeforeAdd = explorePosts.Count;
-                            
+
                             explorePosts.AddRange(response.data);
                             totalExplorePagesLoaded = page;
                             hasMoreExplorePosts = response.data.Count >= postsPerPage;
+
+                            // Cache page 1 data
+                            if (page == 1)
+                            {
+                                DataCache.Instance.CachePostList("Home_ExploreFeed", new List<Post>(explorePosts));
+                            }
                         }
                         else
                         {
@@ -278,22 +322,38 @@ public class HomeDataHandler : MonoBehaviour
 
     public IEnumerator LoadTrendingDesigners(int page)
     {
+        // Check cache for page 1 only (initial load)
+        if (page == 1)
+        {
+            List<User> cachedUsers = DataCache.Instance.GetCachedUserList("Home_TrendingDesigners");
+            if (cachedUsers != null)
+            {
+                Debug.Log($"[HomeDataHandler] Using cached trending designers ({cachedUsers.Count} users)");
+                trendingDesigners.Clear();
+                trendingDesigners.AddRange(cachedUsers);
+                totalDesignerPagesLoaded = 1;
+                hasMoreDesigners = cachedUsers.Count >= designersPerPage;
+                currentDesignerPage = 1;
+                yield break;
+            }
+        }
+
         string url = $"{baseURL}{trendingDesignersUrl}?page={page}&limit={designersPerPage}";
-        
+
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             request.SetRequestHeader("Authorization", authToken);
-            
+
             yield return request.SendWebRequest();
-            
+
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string jsonResponse = request.downloadHandler.text;
-                
+
                 try
                 {
                     ApiResponse<List<User>> response = JsonUtility.FromJson<ApiResponse<List<User>>>(jsonResponse);
-                    
+
                     if (response.success && response.data != null)
                     {
                         if (page == 1)
@@ -301,12 +361,18 @@ public class HomeDataHandler : MonoBehaviour
                             trendingDesigners.Clear();
                             totalDesignerPagesLoaded = 0;
                         }
-                        
+
                         if (page > totalDesignerPagesLoaded)
                         {
                             trendingDesigners.AddRange(response.data);
                             totalDesignerPagesLoaded = page;
                             hasMoreDesigners = response.data.Count >= designersPerPage;
+
+                            // Cache page 1 data
+                            if (page == 1)
+                            {
+                                DataCache.Instance.CacheUserList("Home_TrendingDesigners", new List<User>(trendingDesigners));
+                            }
                         }
                         else
                         {
