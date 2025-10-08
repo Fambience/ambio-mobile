@@ -18,10 +18,10 @@ public class AuthenticationManager : MonoBehaviour
     [Header("Config")]
     [SerializeField] private string webClientId =
         "506296903677-nju0s3rig8bklqvjetovua8u4v74v12d.apps.googleusercontent.com"; // Firebase → Web client ID
-    [SerializeField] private string backendBaseUrl = baseScript.baseURL;   // leave empty to auto-use baseScript.baseURL
-    [SerializeField] private bool mockBackend = true;      // flip to false when your backend is ready
+    [SerializeField] private string backendBaseUrl = baseScript.stageBaseURL; // or leave empty to auto-use baseScript.baseURL
+    [SerializeField] private bool mockBackend = false; // flip to false when your backend is ready
 
-    private const string AuthSessionPath = "/api/v1/auth/session";
+    private const string AuthSessionPath = "/api/v1/auth/google/firebase-login";
 
     /// Wait until Firebase deps are ready. UI can await this.
     public static async Task<bool> WaitUntilReady()
@@ -35,7 +35,7 @@ public class AuthenticationManager : MonoBehaviour
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        // if you’ll ever load another scene, you can keep this:
+        // Keep if you ever add scene loads:
         // DontDestroyOnLoad(gameObject);
 
         if (string.IsNullOrWhiteSpace(backendBaseUrl))
@@ -75,7 +75,7 @@ public class AuthenticationManager : MonoBehaviour
     // Convenience overload (defaults to "register")
     public Task<AuthResponse> SignInWithGoogleAsync() => SignInWithGoogleAsync("register");
 
-    // intent: "login" | "register"
+    // intent: "login" | "register" | "link"
     public async Task<AuthResponse> SignInWithGoogleAsync(string intent)
     {
         if (auth == null) return Error("FIREBASE_NOT_READY", "Firebase not initialized");
@@ -109,28 +109,28 @@ public class AuthenticationManager : MonoBehaviour
         {
             return new AuthResponse
             {
-                sessionToken = "dev-session-" + System.Guid.NewGuid().ToString("N"),
-                user = new GoogleUserData
+                status = "ok",
+                intent = intent,
+                tokenType = "Bearer",
+                token = "dev-session-" + System.Guid.NewGuid().ToString("N"),
+                user = new ServerUser
                 {
                     userId = fUser.UserId,
-                    email  = fUser.Email,
-                    name   = fUser.DisplayName,
-                    isNewUser = (intent == "register")
-                }
+                    email = fUser.Email,
+                    role = "user",
+                    userName = fUser.DisplayName,
+                    onboardingState = (intent == "register") ? "pending" : "complete"
+                },
+                remainingQuestions = (intent == "register") ? 3 : 0
             };
         }
 
         // 5) Real backend call
         var payload = new Dictionary<string, object>
         {
-            { "intent", intent },
             { "idToken", firebaseIdToken },
-            { "googleSub", string.IsNullOrEmpty(gUser.UserId) ? TryDecodeSub(firebaseIdToken) : gUser.UserId },
-            { "deviceInfo", new Dictionary<string, object> {
-                { "platform", Application.platform.ToString().ToLower() },
-                { "appIdentifier", Application.identifier },
-                { "deviceId", SystemInfo.deviceUniqueIdentifier },
-            } },
+            { "intent", intent }, // "login" | "register" | "link"
+            { "googleSub", string.IsNullOrEmpty(gUser.UserId) ? TryDecodeSub(firebaseIdToken) : gUser.UserId }
         };
 
         var baseUrl = string.IsNullOrWhiteSpace(backendBaseUrl) ? baseScript.baseURL?.TrimEnd('/') : backendBaseUrl;
@@ -166,22 +166,27 @@ public class AuthenticationManager : MonoBehaviour
         {
             return new AuthResponse
             {
-                sessionToken = "dev-session-" + System.Guid.NewGuid().ToString("N"),
-                user = new GoogleUserData
+                status = "ok",
+                intent = "link",
+                tokenType = "Bearer",
+                token = "dev-session-" + System.Guid.NewGuid().ToString("N"),
+                user = new ServerUser
                 {
                     userId = auth.CurrentUser.UserId,
-                    email  = auth.CurrentUser.Email,
-                    name   = auth.CurrentUser.DisplayName,
-                    isNewUser = false
-                }
+                    email = auth.CurrentUser.Email,
+                    role = "user",
+                    userName = auth.CurrentUser.DisplayName,
+                    onboardingState = "complete"
+                },
+                remainingQuestions = 0
             };
         }
 
         var payload = new Dictionary<string, object>
         {
-            { "intent", "link" },
             { "idToken", firebaseIdToken },
-            { "googleSub", string.IsNullOrEmpty(gUser.UserId) ? TryDecodeSub(firebaseIdToken) : gUser.UserId },
+            { "intent", "link" },
+            { "googleSub", string.IsNullOrEmpty(gUser.UserId) ? TryDecodeSub(firebaseIdToken) : gUser.UserId }
         };
 
         var baseUrl = string.IsNullOrWhiteSpace(backendBaseUrl) ? baseScript.baseURL?.TrimEnd('/') : backendBaseUrl;
@@ -224,19 +229,32 @@ public class AuthenticationManager : MonoBehaviour
 
     private AuthResponse ParseAuthResponse(Dictionary<string, object> data)
     {
-        var r = new AuthResponse { user = new GoogleUserData() };
+        var r = new AuthResponse { user = new ServerUser() };
         if (data == null) return r;
 
-        if (data.TryGetValue("sessionToken", out var st)) r.sessionToken = st as string;
-        if (data.TryGetValue("errorCode", out var ec)) r.errorCode = ec as string;
-        if (data.TryGetValue("error", out var er)) r.error = er as string;
+        string S(object o) => o as string;
+
+        if (data.TryGetValue("status", out var st)) r.status = S(st);
+        if (data.TryGetValue("intent", out var it)) r.intent = S(it);
+        if (data.TryGetValue("tokenType", out var tt)) r.tokenType = S(tt);
+        if (data.TryGetValue("token", out var tk)) r.token = S(tk);
+        if (data.TryGetValue("error", out var er)) r.error = S(er);
+        if (data.TryGetValue("errorCode", out var ec)) r.errorCode = S(ec);
+
+        if (data.TryGetValue("remainingQuestions", out var rq))
+        {
+            if (rq is long l) r.remainingQuestions = (int)l;
+            else if (rq is int i) r.remainingQuestions = i;
+            else int.TryParse(S(rq), out r.remainingQuestions);
+        }
 
         if (data.TryGetValue("user", out var u) && u is Dictionary<string, object> ud)
         {
-            if (ud.TryGetValue("userId", out var uid)) r.user.userId = uid as string;
-            if (ud.TryGetValue("email", out var em)) r.user.email = em as string;
-            if (ud.TryGetValue("name", out var nm)) r.user.name = nm as string;
-            if (ud.TryGetValue("isNewUser", out var nu)) r.user.isNewUser = nu is bool b && b;
+            if (ud.TryGetValue("userId", out var uid)) r.user.userId = S(uid);
+            if (ud.TryGetValue("email", out var em)) r.user.email = S(em);
+            if (ud.TryGetValue("role", out var rl)) r.user.role = S(rl);
+            if (ud.TryGetValue("userName", out var un)) r.user.userName = S(un);
+            if (ud.TryGetValue("onboardingState", out var ob)) r.user.onboardingState = S(ob);
         }
         return r;
     }
@@ -257,8 +275,30 @@ public class AuthenticationManager : MonoBehaviour
         catch { return null; }
     }
 
-    private AuthResponse Error(string code, string msg) => new AuthResponse { errorCode = code, error = msg };
+    private AuthResponse Error(string code, string msg) =>
+        new AuthResponse { status = "error", errorCode = code, error = msg };
 }
 
-[System.Serializable] public class AuthResponse { public string sessionToken; public GoogleUserData user; public string error; public string errorCode; }
-[System.Serializable] public class GoogleUserData { public string userId; public string email; public string name; public bool isNewUser; }
+// ===== Models aligned to your backend =====
+[System.Serializable]
+public class AuthResponse
+{
+    public string status;         // "ok" on success
+    public string intent;         // echo from server
+    public string tokenType;      // "Bearer"
+    public string token;          // app JWT
+    public ServerUser user;       // user payload
+    public int remainingQuestions;
+    public string error;          // failures
+    public string errorCode;      // failures
+}
+
+[System.Serializable]
+public class ServerUser
+{
+    public string userId;
+    public string email;
+    public string role;
+    public string userName;
+    public string onboardingState; // "pending" | "complete" | ...
+}

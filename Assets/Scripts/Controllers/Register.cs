@@ -48,6 +48,7 @@ public class Register : MonoBehaviour
         backToLoginButton = root.Q<Button>("BackToLoginLabel");
         eyeIcon1 = root.Q<Image>("eyeIconPass");
         eyeIcon2 = root.Q<Image>("eyeIconConPass");
+
         Toggle termsToggle = root.Q<Toggle>("termsToggle");
         termsToggle.RegisterValueChangedCallback(evt =>
         {
@@ -59,6 +60,7 @@ public class Register : MonoBehaviour
                 warningRegister.text = "";
             }
         });
+
         Label termsLink = root.Q<Label>("termsLink");
         termsLink.RegisterCallback<ClickEvent>(evt =>
         {
@@ -134,13 +136,21 @@ public class Register : MonoBehaviour
 
         try
         {
-            AuthResponse response = await AuthenticationManager.Instance.SignInWithGoogleAsync();
+            var response = await AuthenticationManager.Instance.SignInWithGoogleAsync();
 
-            if (!string.IsNullOrEmpty(response?.sessionToken))
+            if (response != null && response.status == "ok" && !string.IsNullOrEmpty(response.token))
             {
-                AuthTokenManager.SetToken(response.sessionToken);
+                // Store "Bearer <token>" (uses tokenType from server)
+                var bearer = string.IsNullOrEmpty(response.tokenType) ? "Bearer" : response.tokenType;
+                AuthTokenManager.SetToken($"{bearer} {response.token}");
 
-                if (response.user != null && response.user.isNewUser)
+                // Route based on onboarding status / remaining questions
+                bool needsOnboarding =
+                    response.user != null &&
+                    (!string.Equals(response.user.onboardingState, "complete", System.StringComparison.OrdinalIgnoreCase)
+                     || response.remainingQuestions > 0);
+
+                if (needsOnboarding)
                     UIManager.Instance.OpenScreen(UIScreenType.BasicDetails);
                 else
                     UIManager.Instance.OpenScreen(UIScreenType.Home);
@@ -246,6 +256,8 @@ public class Register : MonoBehaviour
             {
                 warningRegister.text = "";
                 var response = JsonUtility.FromJson<RegisterResponse>(request.downloadHandler.text);
+
+                // If your register endpoint returns a raw token, consider prefixing here too:
                 AuthTokenManager.SetToken(response.token);
                 sendOTPFunc(email);
             }
@@ -273,7 +285,7 @@ public class Register : MonoBehaviour
     private IEnumerator SendOtpCoroutine(string email)
     {
         string jsonData = JsonUtility.ToJson(new EmailData(email));
-        string token = AuthTokenManager.GetToken();
+        string token = AuthTokenManager.GetToken(); // should already contain "Bearer <token>"
 
         using (UnityWebRequest request = new UnityWebRequest(baseURL + sendOtpEndPoint, "POST"))
         {
