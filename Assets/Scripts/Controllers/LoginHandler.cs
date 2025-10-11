@@ -90,7 +90,8 @@ public class LoginHandler : MonoBehaviour
         Label signUpLabel = root.Q<Label>("SignUpLabel");
         signUpLabel.RegisterCallback<ClickEvent>(evt => ShowRegisterScreen());
 
-        PlayerPrefs.DeleteAll();
+        // Check for existing auth token and auto-login if valid
+        CheckAutoLogin();
     }
 
     private void TogglePasswordVisibility()
@@ -133,6 +134,23 @@ public class LoginHandler : MonoBehaviour
     {
         warningPasswordText.text = "";
         warningPasswordText.RemoveFromClassList("show");
+    }
+
+    private void CheckAutoLogin()
+    {
+        string token = AuthTokenManager.GetToken();
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            Debug.Log("[AUTO-LOGIN] Token found, attempting to navigate to home screen");
+            // Token exists, attempt auto-login by navigating to home screen
+            UIManager.Instance.OpenScreen(UIScreenType.Home);
+            scriptHandler.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("[AUTO-LOGIN] No token found, user needs to login");
+        }
     }
 
     private void LoginUser()
