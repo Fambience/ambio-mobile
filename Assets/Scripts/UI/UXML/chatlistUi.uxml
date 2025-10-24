@@ -1,0 +1,18 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/ChatListUI.uss?fileID=7433441132597879392&amp;guid=e5daf692b4c454531846e19904865e7b&amp;type=3#ChatListUI" />
+    <ui:VisualElement name="chat-ui" class="chat-ui">
+        <ui:VisualElement name="icon-container" class="icon-container">
+            <ui:Label name="icon-label" text="H" class="icon-label" />
+        </ui:VisualElement>
+        <ui:VisualElement name="text-container" class="text-container">
+            <ui:VisualElement name="text-container-header" class="text-container-header">
+                <ui:Label name="chat-name" text="Chat Name" class="chat-name" />
+                <ui:Label name="timestamp" text="now" class="timestamp" />
+            </ui:VisualElement>
+            <ui:Label name="last-message" text="Last message preview..." class="last-message" />
+        </ui:VisualElement>
+        <ui:Button name="open-chat-arrow" class="open-chat-arrow">
+            <ui:Image class="back-icon" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

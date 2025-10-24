@@ -1,0 +1,22 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/NewChatScreen.uss?fileID=7433441132597879392&amp;guid=a64951033b3ca40e8927ad6a05dc3fad&amp;type=3#NewChatScreen" />
+    <ui:VisualElement name="new-chat-container" class="new-chat-container">
+        <ui:VisualElement name="new-chat-ui" class="new-chat-ui">
+            <ui:VisualElement name="new-chat-header" class="new-chat-header">
+                <ui:Label name="new-chat-title" text="Start New Conversation" class="new-chat-title" />
+                <ui:Button name="under-line" class="under-line"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="chat-ui" class="chat-ui">
+                <ui:VisualElement name="icon-container" class="icon-container">
+                    <ui:Label name="icon-label" text="H" class="icon-label" />
+                </ui:VisualElement>
+                <ui:VisualElement name="text-container" class="text-container">
+                    <ui:VisualElement name="text-container-header" class="text-container-header">
+                        <ui:Label name="chat-name" text="Chat Name" class="chat-name" />
+                    </ui:VisualElement>
+                    <ui:Label name="last-message" text="Start a new conversation" class="last-message" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

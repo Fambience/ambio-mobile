@@ -1,0 +1,99 @@
+/* Date Separator Styles */
+.date-separator-container {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.date-label {
+    background-color: #E8E8E8;
+    color: #666666;
+    font-size: 35px;
+    padding: 20px 40px;
+    border-radius: 50px;
+    -unity-text-align: middle-center;
+    letter-spacing: 1px;
+}
+
+/* Message Bubble Container Styles */
+.message-bubble-container {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.message-received-container {
+    align-items: flex-start;
+}
+
+.message-sent-container {
+    align-items: flex-end;
+}
+
+/* Message Bubble Styles */
+.message-bubble {
+    max-width: 70%;
+    padding: 30px 40px;
+    border-radius: 30px;
+    margin-bottom: 10px;
+}
+
+.message-received {
+    background-color: #FFFFFF;
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+}
+
+.message-sent {
+    background-color: #986047;
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+}
+
+/* Message Text Styles */
+.message-text {
+    font-size: 45px;
+    color: #000000;
+    white-space: normal;
+    -unity-text-align: upper-left;
+}
+
+.message-text-sent {
+    color: #FFFFFF;
+}
+
+/* Time and Status Container */
+.time-status-container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: 10px;
+}
+
+/* Message Time Styles */
+.message-time {
+    font-size: 32px;
+    color: #505050;
+    margin-left: 10px;
+}
+
+.message-time-received {
+    align-self: flex-start;
+    margin-left: 10px;
+}
+
+.message-time-sent {
+    color: #986047;
+    margin-right: 8px;
+}
+
+/* Checkmark Styles */
+.checkmark {
+    font-size: 35px;
+    color: #986047;
+    -unity-text-align: middle-center;
+}

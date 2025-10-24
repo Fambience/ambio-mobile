@@ -1,0 +1,23 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/ChatHomeScreen.uss?fileID=7433441132597879392&amp;guid=af5a5b0f0906b45949ebe62b71004e67&amp;type=3#ChatHomeScreen" />
+    <ui:VisualElement name="chat-home-screen" class="chat-home-screen">
+        <ui:VisualElement name="chat-header" class="header-section">
+            <ui:Button name="backButton" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+            <ui:Label text="Messages" class="title" />
+            <ui:VisualElement name="chat-header-icon" class="header-icon-section">
+                <!-- <ui:Button name="refresh-chat" class="refresh-chat"> -->
+                <!--     <ui:Image class="refresh-icon" /> -->
+                <!-- </ui:Button> -->
+                <ui:Button name="new-chat" class="new-chat">
+                    <ui:Image class="add-icon" />
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:ScrollView name="chat-list" class="chat-list" />
+        <ui:Button name="refresh-fab" class="refresh-fab">
+            <ui:Image name="refresh-fab-icon" class="refresh-fab-icon" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>
