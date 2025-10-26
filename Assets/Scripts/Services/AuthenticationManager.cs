@@ -18,7 +18,7 @@ public class AuthenticationManager : MonoBehaviour
     [Header("Config")]
     [SerializeField] private string webClientId =
         "506296903677-nju0s3rig8bklqvjetovua8u4v74v12d.apps.googleusercontent.com"; // Firebase → Web client ID
-    [SerializeField] private string backendBaseUrl = baseScript.stageBaseURL; // or leave empty to auto-use baseScript.baseURL
+    [SerializeField] private string backendBaseUrl = baseScript.baseURL; // or leave empty to auto-use baseScript.baseURL
     [SerializeField] private bool mockBackend = false; // flip to false when your backend is ready
 
     private const string AuthSessionPath = "/api/v1/auth/google/firebase-login";
@@ -238,6 +238,8 @@ public class AuthenticationManager : MonoBehaviour
         if (data.TryGetValue("intent", out var it)) r.intent = S(it);
         if (data.TryGetValue("tokenType", out var tt)) r.tokenType = S(tt);
         if (data.TryGetValue("token", out var tk)) r.token = S(tk);
+        AuthTokenManager.SetToken(r.token);
+        Debug.Log("token from backend: " + r.token);
         if (data.TryGetValue("error", out var er)) r.error = S(er);
         if (data.TryGetValue("errorCode", out var ec)) r.errorCode = S(ec);
 
