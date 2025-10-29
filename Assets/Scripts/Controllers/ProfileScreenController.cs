@@ -43,6 +43,7 @@ public class UserProfileScreenController : MonoBehaviour
 
     void OnEnable()
     {
+        Debug.Log("Himanshu Kumar Mahto");
         root = uiDocument ? uiDocument.rootVisualElement : GetComponent<UIDocument>().rootVisualElement;
 
         scrollView = root.Q<ScrollView>("scroll-container");
@@ -83,7 +84,21 @@ public class UserProfileScreenController : MonoBehaviour
         if (savedTab != null) savedTab.clicked += ShowSavedTab;
         if (aboutTab != null) aboutTab.clicked += ShowAboutTab;
 
+        StartCoroutine(ShowNavigationAfterDelay());
         StartCoroutine(WaitAndPopulate());
+    }
+
+    private IEnumerator ShowNavigationAfterDelay()
+    {
+        yield return new WaitForSeconds(0.1f);
+        
+        Debug.Log("Showing navigation bar for Profile screen");
+        
+        NavigationManager.ToggleNavigationBar(true);
+        NavigationManager.UpdateSelectedIcon(NavScreen.Profile);
+        
+        yield return new WaitForSeconds(0.1f);
+        Debug.Log($"Navigation bar visible: {NavigationManager.IsNavigationBarVisible()}");
     }
 
     private IEnumerator WaitAndPopulate()

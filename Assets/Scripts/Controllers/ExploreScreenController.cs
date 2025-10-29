@@ -304,10 +304,10 @@ public class ExploreScreenController : MonoBehaviour
         {
             // Set the designer card template before creating search screen
             SearchScreenUIBuilder.SetDesignerCardTemplate(designerCardVisualTree);
-        
+
             // Create the search screen using your UXML template
             searchScreen = SearchScreenUIBuilder.CreateSearchScreen(
-                OnSearchBackClicked, 
+                OnSearchBackClicked,
                 searchScreenVisualTree
             );
     
@@ -627,33 +627,55 @@ public class ExploreScreenController : MonoBehaviour
         Debug.Log($"=== Post {index + 1} Clicked ===");
         Debug.Log($"Post ID: {postData.postId}");
         Debug.Log($"Designer: {postData.designerId}");
-        Debug.Log($"Title: {postData.postTitle}");
-        Debug.Log($"Description: {postData.description}");
-        Debug.Log($"Design Style: {postData.designStyle}");
-        Debug.Log($"Room Type: {postData.roomType}");
-        Debug.Log($"Likes: {postData.likesCount}");
-        Debug.Log($"Comments: {postData.commentsCount}");
-        Debug.Log($"Bookmarks: {postData.bookmarksCount}");
-        Debug.Log($"User Role: {postData.userRole}");
-        Debug.Log($"Media URLs Count: {postData.mediaUrls?.Count ?? 0}");
-        
+        Debug.Log($"Opening post screen...");
+
+        // Convert PostData to Post and show the post screen
+        Post post = ConvertPostDataToPost(postData);
+        PostScreenDataHandler.ShowPostStatic(post, gameObject);
+    }
+
+    // Helper method to convert PostData to Post
+    private Post ConvertPostDataToPost(PostData postData)
+    {
+        Post post = new Post();
+
+        // Convert basic fields
+        post.postId = postData.postId.ToString();
+        post.description = postData.description;
+        post.caption = postData.postTitle;
+        post.designStyle = postData.designStyle;
+        post.roomType = postData.roomType;
+        post.likesCount = postData.likesCount;
+        post.commentsCount = postData.commentsCount;
+        post.bookmarksCount = postData.bookmarksCount;
+        post.liked = postData.liked;
+        post.bookmarked = postData.bookmarked;
+
+        // Convert media URLs to PostMedia list
+        post.postMedia = new List<PostMedia>();
         if (postData.mediaUrls != null && postData.mediaUrls.Count > 0)
         {
-            Debug.Log("Media URLs:");
-            for (int i = 0; i < postData.mediaUrls.Count; i++)
+            foreach (string url in postData.mediaUrls)
             {
-                Debug.Log($"  [{i + 1}] {postData.mediaUrls[i]}");
+                post.postMedia.Add(new PostMedia { filePath = url });
             }
         }
-        
-        if (!string.IsNullOrEmpty(postData.userAvatar))
+
+        // Create User object from designer info
+        post.author = new User
         {
-            Debug.Log($"User Avatar: {postData.userAvatar}");
-        }
-        
-        Debug.Log($"Liked: {postData.liked}");
-        Debug.Log($"Bookmarked: {postData.bookmarked}");
-        Debug.Log("========================");
+            userName = postData.designerId,
+            avatar = postData.userAvatar
+        };
+
+        // Initialize other fields with default values
+        post.status = "published";
+        post.createdAt = System.DateTime.Now.ToString();
+        post.category = postData.roomType;
+        post.tags = new List<string>();
+        post.media = new List<Media>();
+
+        return post;
     }
     
     void OnFilterClicked()

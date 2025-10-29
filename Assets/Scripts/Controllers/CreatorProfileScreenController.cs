@@ -20,6 +20,7 @@ public class CreatorProfileScreenController : MonoBehaviour
     private TextElement followerCount;          // name="creator-followerCount"
     private TextElement postCount;              // name="creator-postCount"
     private Image profilePic;                   // name="creator-profilePic"
+    private Image settingsIcon;
 
     // Tabs
     private Button designsTab;   // name="creator-designsTab"
@@ -64,6 +65,7 @@ public class CreatorProfileScreenController : MonoBehaviour
         followerCount      = root.Q<TextElement>("creator-followerCount");
         postCount          = root.Q<TextElement>("creator-postCount");
         profilePic         = root.Q<Image>("creator-profilePic");
+        settingsIcon       = root.Q<Image>("creator-settings");
 
         // Tabs
         designsTab         = root.Q<Button>("creator-designsTab");
@@ -86,12 +88,44 @@ public class CreatorProfileScreenController : MonoBehaviour
         tabContentContainer = new VisualElement { name = "tabContentContainer" };
         tabContentContainer.AddToClassList("tab-content");
         scrollView?.Add(tabContentContainer);
+        
+        // if (settingsIcon != null)
+        // {
+        //     Debug.Log("Settings icon found in CreatorProfileScreen.");
+        //     settingsIcon.RegisterCallback<ClickEvent>(evt => OnSettingsIconClicked());
+        // }
+        // else
+        // {
+        //     Debug.Log("Warning: settingsIcon not found in CreatorProfileScreen.");
+        // }
+        
+        settingsIcon?.RegisterCallback<ClickEvent>(evt => OnSettingsIconClicked());
 
         if (designsTab != null) designsTab.clicked += ShowDesignsTab;
         if (savedTab   != null) savedTab.clicked   += ShowSavedTab;
         if (aboutTab   != null) aboutTab.clicked   += ShowAboutTab;
 
+        StartCoroutine(ShowNavigationAfterDelay());
         StartCoroutine(WaitAndPopulate());
+    }
+
+    private IEnumerator ShowNavigationAfterDelay()
+    {
+        yield return new WaitForSeconds(0.1f);
+        
+        Debug.Log("Showing navigation bar for Profile screen");
+        
+        NavigationManager.ToggleNavigationBar(true);
+        NavigationManager.UpdateSelectedIcon(NavScreen.Profile);
+        
+        yield return new WaitForSeconds(0.1f);
+        Debug.Log($"Navigation bar visible: {NavigationManager.IsNavigationBarVisible()}");
+    }
+    
+    private void OnSettingsIconClicked()
+    {
+        Debug.Log("Settings icon clicked - navigating to Profile Settings screen.");
+        UIManager.Instance.TransitionScreens(UIScreenType.Profile, UIScreenType.ProfileSetting);
     }
 
     private IEnumerator WaitAndPopulate()
@@ -246,5 +280,6 @@ public class CreatorProfileScreenController : MonoBehaviour
         if (designsTab != null) designsTab.clicked -= ShowDesignsTab;
         if (savedTab   != null) savedTab.clicked   -= ShowSavedTab;
         if (aboutTab   != null) aboutTab.clicked   -= ShowAboutTab;
+        settingsIcon?.UnregisterCallback<ClickEvent>(evt => OnSettingsIconClicked());
     }
 }

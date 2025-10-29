@@ -208,9 +208,9 @@ public class HomeUIController : MonoBehaviour
         if (cardImage != null)
         {
             cardImage.pickingMode = PickingMode.Position;
-            cardImage.RegisterCallback<PointerUpEvent>(evt => 
+            cardImage.RegisterCallback<PointerUpEvent>(evt =>
             {
-                PostScreenDataHandler.ShowPostStatic(post);
+                PostScreenDataHandler.ShowPostStatic(post, gameObject);
                 evt.StopPropagation();
             });
         }
@@ -219,9 +219,9 @@ public class HomeUIController : MonoBehaviour
         if (commentSection != null)
         {
             commentSection.pickingMode = PickingMode.Position;
-            commentSection.RegisterCallback<PointerUpEvent>(evt => 
+            commentSection.RegisterCallback<PointerUpEvent>(evt =>
             {
-                PostScreenDataHandler.ShowPostStatic(post);
+                PostScreenDataHandler.ShowPostStatic(post, gameObject);
                 evt.StopPropagation();
             });
         }
