@@ -349,6 +349,25 @@ public class HomeUIController : MonoBehaviour
         }
     }
 
+    public void RestoreScrollPosition()
+    {
+        Vector2 savedScrollPos = ScreenStateManager.Instance.GetScrollPosition("Home");
+        if (container != null && savedScrollPos != Vector2.zero)
+        {
+            // Delay scroll restoration to ensure UI is fully rendered
+            container.schedule.Execute(() =>
+            {
+                container.scrollOffset = savedScrollPos;
+                Debug.Log($"[HomeUIController] Restored scroll position: {savedScrollPos}");
+            }).ExecuteLater(100);
+        }
+    }
+
+    public ScrollView GetContainer()
+    {
+        return container;
+    }
+
     private void OnScroll(WheelEvent evt)
     {
         if (container.scrollOffset.y <= 0 && evt.delta.y < 0 && !isRefreshing)
@@ -547,8 +566,13 @@ public class HomeUIController : MonoBehaviour
 
     private void OnDisable()
     {
+        // Save scroll position when leaving screen
         if (container != null)
         {
+            Vector2 currentScrollPos = container.scrollOffset;
+            ScreenStateManager.Instance.SaveScrollPosition("Home", currentScrollPos);
+            Debug.Log($"[HomeUIController] Saved scroll position: {currentScrollPos}");
+
             container.UnregisterCallback<WheelEvent>(OnScroll);
             container.UnregisterCallback<PointerDownEvent>(OnPointerDown);
             container.UnregisterCallback<PointerMoveEvent>(OnPointerMove);

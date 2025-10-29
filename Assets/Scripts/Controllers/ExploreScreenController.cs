@@ -53,8 +53,19 @@ public class ExploreScreenController : MonoBehaviour
         {
             HideSearchScreen();
         }
-        StartCoroutine(ShowNavigationAfterDelay());   
-        Invoke("InitializeExploreScreen", 0.1f);
+        StartCoroutine(ShowNavigationAfterDelay());
+
+        // Check if we should reload or use cached data
+        if (ScreenStateManager.Instance.ShouldLoadData("Explore"))
+        {
+            Debug.Log("[ExploreScreen] Loading initial data (not cached or expired)");
+            Invoke("InitializeExploreScreen", 0.1f);
+        }
+        else
+        {
+            Debug.Log("[ExploreScreen] Using cached data");
+            Invoke("RestoreExploreScreenFromCache", 0.1f);
+        }
     }
     
     private IEnumerator ShowNavigationAfterDelay()
@@ -80,14 +91,59 @@ public class ExploreScreenController : MonoBehaviour
             Debug.LogError("UIDocument component not found!");
             return;
         }
-        
+
         Debug.Log("Initializing Explore Screen...");
-        
+
         InitializeUI();
         SetupPullToRefresh();
         InitializeFilterPopup();
         LoadTrendingPosts(); // Changed from GenerateAndLoadPosts
         CreateScrollableContent();
+
+        // Mark as initialized after successful load
+        ScreenStateManager.Instance.MarkScreenInitialized("Explore");
+    }
+
+    void RestoreExploreScreenFromCache()
+    {
+        uiDocument = GetComponent<UIDocument>();
+        if (uiDocument == null)
+        {
+            Debug.LogError("UIDocument component not found!");
+            return;
+        }
+
+        Debug.Log("Restoring Explore Screen from cache...");
+
+        InitializeUI();
+        SetupPullToRefresh();
+        InitializeFilterPopup();
+
+        // Restore cached data
+        List<PostData> cachedPosts = DataCache.Instance.GetCachedPostDataList("Explore_CurrentPosts");
+        if (cachedPosts != null)
+        {
+            allPosts = cachedPosts;
+            Debug.Log($"[ExploreScreen] Restored {allPosts.Count} posts from cache");
+        }
+        else
+        {
+            // Fallback to loading if cache is missing
+            LoadTrendingPosts();
+        }
+
+        CreateScrollableContent();
+
+        // Restore scroll position
+        Vector2 savedScrollPos = ScreenStateManager.Instance.GetScrollPosition("Explore");
+        if (mainScrollView != null && savedScrollPos != Vector2.zero)
+        {
+            mainScrollView.schedule.Execute(() =>
+            {
+                mainScrollView.scrollOffset = savedScrollPos;
+                Debug.Log($"[ExploreScreen] Restored scroll position: {savedScrollPos}");
+            }).ExecuteLater(100);
+        }
     }
     
     void InitializeUI()
@@ -364,7 +420,26 @@ public class ExploreScreenController : MonoBehaviour
     private IEnumerator FetchPostsByTagCoroutine(string tagType, int tagId, bool isInitialLoad = false)
     {
         Debug.Log($"Fetching posts for tag type: {tagType} (Initial: {isInitialLoad})");
-        
+
+        // Check cache first for non-initial loads
+        string cacheKey = $"Explore_Tag_{tagType}";
+        if (!isInitialLoad)
+        {
+            List<PostData> cachedPosts = DataCache.Instance.GetCachedPostDataList(cacheKey);
+            if (cachedPosts != null)
+            {
+                Debug.Log($"[ExploreScreen] Using cached posts for tag: {tagType} ({cachedPosts.Count} posts)");
+                allPosts = cachedPosts;
+                totalRows = Mathf.CeilToInt((float)allPosts.Count / postsPerRow);
+                UpdatePostsDisplay(allPosts);
+                ExploreHeaderUIBuilder.OnDataLoadSuccess(tagId);
+
+                // Save tag selection
+                ScreenStateManager.Instance.SaveSelectedTag("Explore", tagType, tagId);
+                yield break;
+            }
+        }
+
         bool apiCallCompleted = false;
         List<PostData> fetchedPosts = null;
         string errorMessage = null;
@@ -374,12 +449,12 @@ public class ExploreScreenController : MonoBehaviour
             baseURL,
             authToken,
             tagType,
-            onSuccess: (posts) => 
+            onSuccess: (posts) =>
             {
                 fetchedPosts = posts;
                 apiCallCompleted = true;
             },
-            onError: (error) => 
+            onError: (error) =>
             {
                 errorMessage = error;
                 apiCallCompleted = true;
@@ -394,10 +469,17 @@ public class ExploreScreenController : MonoBehaviour
             allPosts = fetchedPosts;
             totalRows = Mathf.CeilToInt((float)allPosts.Count / postsPerRow);
             Debug.Log($"Successfully loaded {allPosts.Count} posts for tag: {tagType}");
-            
+
+            // Cache the results
+            DataCache.Instance.CachePostDataList(cacheKey, new List<PostData>(allPosts));
+            DataCache.Instance.CachePostDataList("Explore_CurrentPosts", new List<PostData>(allPosts));
+
+            // Save tag selection
+            ScreenStateManager.Instance.SaveSelectedTag("Explore", tagType, tagId);
+
             // Update the posts display
             UpdatePostsDisplay(allPosts);
-            
+
             // Only notify header about loading completion for non-initial loads
             if (!isInitialLoad)
             {
@@ -407,7 +489,7 @@ public class ExploreScreenController : MonoBehaviour
         else
         {
             Debug.LogError($"Failed to fetch posts for tag {tagType}: {errorMessage}");
-            
+
             // Show error state only for non-initial loads
             if (!isInitialLoad)
             {
@@ -507,11 +589,16 @@ public class ExploreScreenController : MonoBehaviour
     private IEnumerator RefreshContent()
     {
         Debug.Log("Starting refresh - fetching data from API...");
-        
+
+        // Invalidate cache for manual refresh
+        Debug.Log("[ExploreScreen] Manual refresh requested - invalidating cache");
+        ScreenStateManager.Instance.InvalidateScreen("Explore");
+        DataCache.Instance.InvalidateScreen("Explore");
+
         // Start the API call
         bool apiCallCompleted = false;
         bool apiCallSuccessful = false;
-        
+
         if (useDummyData)
         {
             // For dummy data, simulate a quick load
@@ -524,30 +611,33 @@ public class ExploreScreenController : MonoBehaviour
         else
         {
             // Fetch real data from API
-            StartCoroutine(FetchDataForRefresh(() => 
+            StartCoroutine(FetchDataForRefresh(() =>
             {
                 apiCallCompleted = true;
                 apiCallSuccessful = allPosts != null && allPosts.Count > 0;
             }));
-            
+
             // Wait until API call completes
             yield return new WaitUntil(() => apiCallCompleted);
         }
-        
+
         // Recreate the content with new data
         if (apiCallSuccessful)
         {
             CreateScrollableContent();
             Debug.Log("Refresh completed - data loaded successfully!");
+
+            // Mark as initialized again after refresh
+            ScreenStateManager.Instance.MarkScreenInitialized("Explore");
         }
         else
         {
             Debug.LogWarning("Refresh completed - failed to load data, keeping existing content");
         }
-        
+
         // Small delay before hiding the indicator
         yield return new WaitForSeconds(0.2f);
-        
+
         ResetPullIndicator();
         isRefreshing = false;
     }
@@ -676,7 +766,22 @@ public class ExploreScreenController : MonoBehaviour
     private IEnumerator FetchFilteredPostsCoroutine(FilterData filterData)
     {
         Debug.Log($"Fetching filtered posts - Room Type: {filterData.RoomType}, Design Style: {filterData.DesignStyle}, Sort By: {filterData.SortBy}");
-    
+
+        // Check cache first
+        string cacheKey = $"Explore_Filter_{filterData.RoomType}_{filterData.DesignStyle}_{filterData.SortBy}";
+        List<PostData> cachedPosts = DataCache.Instance.GetCachedPostDataList(cacheKey);
+        if (cachedPosts != null)
+        {
+            Debug.Log($"[ExploreScreen] Using cached filtered posts ({cachedPosts.Count} posts)");
+            allPosts = cachedPosts;
+            totalRows = Mathf.CeilToInt((float)allPosts.Count / postsPerRow);
+            UpdatePostsDisplay(allPosts);
+
+            // Save filter data
+            ScreenStateManager.Instance.SaveFilterData("Explore", filterData);
+            yield break;
+        }
+
         bool apiCallCompleted = false;
         List<PostData> fetchedPosts = null;
         string errorMessage = null;
@@ -688,12 +793,12 @@ public class ExploreScreenController : MonoBehaviour
             roomType: filterData.RoomType,
             designStyle: filterData.DesignStyle,
             sortBy: filterData.SortBy,
-            onSuccess: (posts) => 
+            onSuccess: (posts) =>
             {
                 fetchedPosts = posts;
                 apiCallCompleted = true;
             },
-            onError: (error) => 
+            onError: (error) =>
             {
                 errorMessage = error;
                 apiCallCompleted = true;
@@ -708,14 +813,21 @@ public class ExploreScreenController : MonoBehaviour
             allPosts = fetchedPosts;
             totalRows = Mathf.CeilToInt((float)allPosts.Count / postsPerRow);
             Debug.Log($"Successfully loaded {allPosts.Count} filtered posts from API");
-        
+
+            // Cache the filtered results
+            DataCache.Instance.CachePostDataList(cacheKey, new List<PostData>(allPosts));
+            DataCache.Instance.CachePostDataList("Explore_CurrentPosts", new List<PostData>(allPosts));
+
+            // Save filter data
+            ScreenStateManager.Instance.SaveFilterData("Explore", filterData);
+
             // Update the posts display with filtered results
             UpdatePostsDisplay(allPosts);
         }
         else
         {
             Debug.LogError($"Failed to fetch filtered posts: {errorMessage}");
-        
+
             // Show error message to user or keep existing posts
             if (allPosts.Count == 0)
             {
@@ -794,6 +906,17 @@ public class ExploreScreenController : MonoBehaviour
         LoadTrendingPosts();
     }
     
+    void OnDisable()
+    {
+        // Save scroll position when leaving the screen
+        if (mainScrollView != null)
+        {
+            Vector2 currentScrollPos = mainScrollView.scrollOffset;
+            ScreenStateManager.Instance.SaveScrollPosition("Explore", currentScrollPos);
+            Debug.Log($"[ExploreScreen] Saved scroll position: {currentScrollPos}");
+        }
+    }
+
     void OnDestroy()
     {
         // Unregister events to prevent memory leaks
@@ -804,13 +927,13 @@ public class ExploreScreenController : MonoBehaviour
             mainScrollView.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
             mainScrollView.UnregisterCallback<PointerUpEvent>(OnPointerUp);
         }
-    
+
         // Unsubscribe from events to prevent memory leaks
         if (filterPopupHandler != null)
         {
             filterPopupHandler.OnFiltersApplied -= OnFiltersApplied;
         }
-    
+
         // Clean up search screen
         if (searchScreen != null && searchScreen.parent != null)
         {

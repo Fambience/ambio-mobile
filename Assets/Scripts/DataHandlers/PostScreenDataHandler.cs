@@ -931,6 +931,7 @@ public class PostScreenDataHandler : MonoBehaviour
 
     private void OnBackButtonClicked(ClickEvent evt)
     {
+        Debug.Log("[PostScreen] Back button clicked - returning to previous screen");
         HidePostScreen();
     }
 
@@ -1145,12 +1146,16 @@ public class PostScreenDataHandler : MonoBehaviour
 
     public void HidePostScreen()
     {
+        Debug.Log("[PostScreen] Hiding post screen - returning to previous screen");
         gameObject.SetActive(false);
 
         if (homeScreenGameObject != null)
         {
             homeScreenGameObject.SetActive(true);
         }
+
+        // Note: We don't invalidate cache here - the home/explore screens
+        // will use cached data when they become active again
     }
 
     public void ShowPostWithScreenSwitch(Post post)
