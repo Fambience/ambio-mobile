@@ -2,10 +2,15 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System;
 
 public class ChatAPIService : MonoBehaviour
 {
     private string TokenEndpointURL = $"{baseScript.baseURL}/api/v1/chat/stream-token";
+
+    private List<FollowingUserData> cachedFollowingList;
+    private DateTime followingListCacheTime;
+    private const int FOLLOWING_CACHE_DURATION_MINUTES = 5;
 
     [System.Serializable]
     private class TokenResponseWrapper
@@ -79,10 +84,43 @@ public class ChatAPIService : MonoBehaviour
         }
     }
 
+    // Gets following list with caching - returns cached data if fresh, otherwise fetches from API
     public async Task<List<FollowingUserData>> GetFollowingListAsync(string username, int page = 1, int limit = 20)
     {
+        if (IsCacheValid())
+        {
+            Debug.Log("Returning cached following list");
+            return cachedFollowingList;
+        }
+
+        return await FetchFollowingListFromAPIAsync(username, page, limit);
+    }
+
+    // Forces refresh of following list, ignoring cache
+    public async Task<List<FollowingUserData>> ForceRefreshFollowingListAsync(string username, int page = 1, int limit = 20)
+    {
+        InvalidateFollowingCache();
+        return await FetchFollowingListFromAPIAsync(username, page, limit);
+    }
+
+    public void InvalidateFollowingCache()
+    {
+        cachedFollowingList = null;
+        followingListCacheTime = DateTime.MinValue;
+    }
+
+    private bool IsCacheValid()
+    {
+        if (cachedFollowingList == null) return false;
+
+        var cacheAge = DateTime.Now - followingListCacheTime;
+        return cacheAge.TotalMinutes < FOLLOWING_CACHE_DURATION_MINUTES;
+    }
+
+    private async Task<List<FollowingUserData>> FetchFollowingListFromAPIAsync(string username, int page = 1, int limit = 20)
+    {
         var url = $"{baseScript.baseURL}/api/v1/profile/{username}/following?page={page}&limit={limit}";
-        Debug.Log($"Fetching following list from: {url}");
+        Debug.Log($"Fetching following list from API: {url}");
 
         using (var request = UnityWebRequest.Get(url))
         {
@@ -98,7 +136,7 @@ public class ChatAPIService : MonoBehaviour
             if (request.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError($"Error fetching following list: {request.error}");
-                return new List<FollowingUserData>();
+                return cachedFollowingList ?? new List<FollowingUserData>();
             }
 
             var jsonResponse = request.downloadHandler.text;
@@ -108,10 +146,12 @@ public class ChatAPIService : MonoBehaviour
 
             if (response.success && response.data != null)
             {
-                return new List<FollowingUserData>(response.data);
+                cachedFollowingList = new List<FollowingUserData>(response.data);
+                followingListCacheTime = DateTime.Now;
+                return cachedFollowingList;
             }
 
-            return new List<FollowingUserData>();
+            return cachedFollowingList ?? new List<FollowingUserData>();
         }
     }
 }

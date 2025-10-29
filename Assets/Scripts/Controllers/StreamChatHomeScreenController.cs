@@ -13,7 +13,6 @@ public class ChatHomeScreenController : MonoBehaviour
     [SerializeField] private VisualTreeAsset chatListItemTemplate;
     [SerializeField] private GameObject messageScreenObject;
 
-    // Reference to New Chat Screen GameObject (assigned in Inspector)
     [SerializeField] private GameObject newChatScreenObject;
 
     private ScrollView chatListScrollView;
@@ -28,6 +27,10 @@ public class ChatHomeScreenController : MonoBehaviour
     private bool isAnimating = false;
     private bool isRefreshing = false;
 
+    private List<IStreamChannel> cachedChannels;
+    private DateTime channelsCacheTime;
+    private const int CHANNELS_CACHE_DURATION_MINUTES = 2;
+
     private async void OnEnable()
     {
         var root = uiDocument.rootVisualElement;
@@ -41,8 +44,15 @@ public class ChatHomeScreenController : MonoBehaviour
         newChatButton.clicked += OnNewChatClicked;
         refreshFab.clicked += OnRefreshFabClicked;
 
-        // Show loading skeleton
-        ShowLoadingSkeleton();
+        if (IsChannelsCacheValid())
+        {
+            channels = cachedChannels;
+            PopulateChatList();
+        }
+        else
+        {
+            ShowLoadingSkeleton();
+        }
 
         await WaitForStreamChatManager();
 
@@ -87,14 +97,38 @@ public class ChatHomeScreenController : MonoBehaviour
         }
     }
 
+    // Loads channels with cache support - silently updates if cache exists
     private void LoadChannels()
     {
         if (StreamChatManager.Instance == null || !StreamChatManager.Instance.IsConnected)
             return;
 
-        channels = StreamChatManager.Instance.GetAllChannels();
-        HideLoadingSkeleton();
+        var freshChannels = StreamChatManager.Instance.GetAllChannels();
+
+        if (!IsChannelsCacheValid())
+        {
+            HideLoadingSkeleton();
+        }
+
+        channels = freshChannels;
+        cachedChannels = new List<IStreamChannel>(freshChannels);
+        channelsCacheTime = DateTime.Now;
+
         PopulateChatList();
+    }
+
+    public void InvalidateChannelsCache()
+    {
+        cachedChannels = null;
+        channelsCacheTime = DateTime.MinValue;
+    }
+
+    private bool IsChannelsCacheValid()
+    {
+        if (cachedChannels == null) return false;
+
+        var cacheAge = DateTime.Now - channelsCacheTime;
+        return cacheAge.TotalMinutes < CHANNELS_CACHE_DURATION_MINUTES;
     }
 
     private void PopulateChatList()
@@ -297,6 +331,7 @@ public class ChatHomeScreenController : MonoBehaviour
         isRefreshing = true;
         StartFabSpinAnimation();
 
+        InvalidateChannelsCache();
         await StreamChatManager.Instance.RefreshChannelsAsync();
         LoadChannels();
 

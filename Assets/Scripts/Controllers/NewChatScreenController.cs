@@ -27,7 +27,6 @@ public class NewChatScreenController : MonoBehaviour
     {
         root = uiDocument.rootVisualElement;
 
-        // Get references
         newChatContainer = root.Q<VisualElement>("new-chat-container");
         newChatPanel = root.Q<VisualElement>("new-chat-ui");
 
@@ -39,18 +38,14 @@ public class NewChatScreenController : MonoBehaviour
             Debug.LogError("ChatAPIService not found!");
         }
 
-        // Setup empty scroll view first
         SetupScrollView();
 
-        // Fetch and filter following list
         await LoadUnmessagedUsers();
 
         newChatContainer.RegisterCallback<ClickEvent>(evt =>
         {
-            // Check if the click target or any of its parents is inside newChatPanel
             VisualElement target = evt.target as VisualElement;
 
-            // Walk up the hierarchy to see if we're inside newChatPanel
             VisualElement current = target;
             bool isInsidePanel = false;
 
@@ -64,12 +59,11 @@ public class NewChatScreenController : MonoBehaviour
                 current = current.parent;
             }
 
-            // Only close if the click is outside the panel
             if (!isInsidePanel)
             {
                 homeController.HideNewChatSheet();
             }
-        }, TrickleDown.TrickleDown); // Use TrickleDown to catch it before children
+        }, TrickleDown.TrickleDown);
     }
 
     private void SetupScrollView()
@@ -106,9 +100,9 @@ public class NewChatScreenController : MonoBehaviour
         loadingContainer.style.display = DisplayStyle.None; // Hidden by default
     }
 
+    // Loads unmessaged users with caching support - uses cached data if available
     private async Task LoadUnmessagedUsers()
     {
-        // Show loading state
         ShowLoading();
 
         if (chatAPIService == null)
@@ -118,7 +112,6 @@ public class NewChatScreenController : MonoBehaviour
             return;
         }
 
-        // Get current user's username
         var username = Services.UserData.userName;
         if (string.IsNullOrEmpty(username))
         {
@@ -127,11 +120,9 @@ public class NewChatScreenController : MonoBehaviour
             return;
         }
 
-        // Fetch following list from API
         var followingList = await chatAPIService.GetFollowingListAsync(username);
         Debug.Log($"Fetched {followingList.Count} following users");
 
-        // Get existing channel user IDs
         var channelUserIds = new HashSet<string>();
         if (StreamChatManager.Instance != null && StreamChatManager.Instance.IsConnected)
         {
@@ -151,11 +142,9 @@ public class NewChatScreenController : MonoBehaviour
 
         Debug.Log($"Found {channelUserIds.Count} users already in channels");
 
-        // Filter out users who are already in channels
         unMessagedUsers = followingList.Where(user => !channelUserIds.Contains(user.userId)).ToList();
         Debug.Log($"Showing {unMessagedUsers.Count} unmessaged users");
 
-        // Hide loading and populate the scroll view
         HideLoading();
         PopulateUserList();
     }
@@ -226,9 +215,16 @@ public class NewChatScreenController : MonoBehaviour
         }
     }
 
+    // Navigates to Explore page and invalidates cache so fresh following list is fetched on return
     private void OnFindNewUserClicked()
     {
         homeController.HideNewChatSheet();
+
+        if (chatAPIService != null)
+        {
+            chatAPIService.InvalidateFollowingCache();
+        }
+
         UIManager.Instance.TransitionScreens(UIScreenType.Messages, UIScreenType.Explore);
     }
 
@@ -300,7 +296,6 @@ public class NewChatScreenController : MonoBehaviour
             return;
         }
 
-        // Create or get existing channel with this user
         var channel = await StreamChatManager.Instance.CreateOrGetDirectMessageChannelAsync(user.userId);
 
         if (channel != null && messageScreenObject != null)
@@ -308,16 +303,14 @@ public class NewChatScreenController : MonoBehaviour
             var messageController = messageScreenObject.GetComponent<ChatMessageScreenController>();
             if (messageController != null)
             {
-                // Close new chat modal
                 homeController.HideNewChatSheet();
 
-                // Hide chat home screen
                 if (homeController != null)
                 {
+                    homeController.InvalidateChannelsCache();
                     homeController.gameObject.SetActive(false);
                 }
 
-                // Open message screen with the channel
                 messageScreenObject.SetActive(true);
                 messageController.LoadChannel(channel);
             }
