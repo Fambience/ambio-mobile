@@ -591,6 +591,32 @@ public partial class ProfileDataHandlers : MonoBehaviour
         }
     }
 
+    public void ClearCache()
+    {
+        try
+        {
+            // Clear in-memory profile data
+            ProfileData = null;
+
+            // Clear followers and following lists
+            FollowersList.Clear();
+            FollowingList.Clear();
+
+            // Delete cache file if it exists
+            if (File.Exists(cachePath))
+            {
+                File.Delete(cachePath);
+                Debug.Log("[ProfileDataHandlers] Profile cache file deleted successfully.");
+            }
+
+            Debug.Log("[ProfileDataHandlers] All profile data cleared successfully.");
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[ProfileDataHandlers] Failed to clear cache: {e}");
+        }
+    }
+
     private ProfileCache ParseProfileData(Dictionary<string, object> dict)
     {
         Debug.Log("[ProfileDataHandlers] Starting to parse profile data with MiniJSON...");

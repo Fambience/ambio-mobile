@@ -171,7 +171,27 @@ public class ProfileSettingsController : MonoBehaviour
     
     private void OnSignOutButtonClicked()
     {
-        Debug.Log("[ProfileSettingsController] Sign out button clicked");
+        Debug.Log("[ProfileSettingsController] Sign out button clicked - Logging out user");
+
+        // Clear authentication token
+        AuthTokenManager.ClearToken();
+
+        // Clear cached profile data
+        if (ProfileDataHandlers.Instance != null)
+        {
+            ProfileDataHandlers.Instance.ClearCache();
+        }
+
+        // Clear user data
+        Services.UserData.Email = null;
+        Services.UserData.userName = null;
+        Services.UserData.Role = null;
+        Services.UserData.ResetToken = null;
+
+        Debug.Log("[ProfileSettingsController] User data cleared, navigating to login screen");
+
+        // Navigate to login screen
+        UIManager.Instance.OpenScreen(UIScreenType.Login);
     }
     
     private void OnEditProfileClicked()
