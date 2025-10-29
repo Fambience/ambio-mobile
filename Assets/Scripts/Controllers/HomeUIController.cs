@@ -15,6 +15,7 @@ public class HomeUIController : MonoBehaviour
     private ScrollView container;
     private VisualElement refreshIndicator;
     private VisualElement refreshContainer;
+    private Button messageButton;
     private Image refreshIcon;
     private bool isRefreshing = false;
     private bool isPulling = false;
@@ -39,6 +40,7 @@ public class HomeUIController : MonoBehaviour
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
         container = root.Q<ScrollView>("main-container");
+        messageButton = root.Q<Button>("newChatButton");
         uploadProgressSection = root.Q<VisualElement>("uploadProgressSection");
         uploadProgressController = GetComponent<UploadProgressController>();
         if (uploadProgressController == null)
@@ -48,6 +50,7 @@ public class HomeUIController : MonoBehaviour
 
         SetupPullToRefresh();
         StartCoroutine(ShowNavigationAfterDelay());
+        messageButton?.RegisterCallback<ClickEvent>(evt => OnMessageButtonClick());
     }
 
     private IEnumerator ShowNavigationAfterDelay()
@@ -562,6 +565,11 @@ public class HomeUIController : MonoBehaviour
             uploadProgressSection.style.display = DisplayStyle.None;
             uploadProgressSection.RemoveFromClassList("show");
         }
+    }
+
+    private void OnMessageButtonClick()
+    {
+        UIManager.Instance.TransitionScreens(UIScreenType.Home, UIScreenType.Messages);
     }
 
     private void OnDisable()

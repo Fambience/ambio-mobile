@@ -1,0 +1,26 @@
+﻿using StreamChat.Core.Helpers;
+using StreamChat.Core.InternalDTO.Events;
+using StreamChat.Core.InternalDTO.Models;
+using StreamChat.Core.LowLevelClient.Models;
+
+namespace StreamChat.Core.LowLevelClient.Events
+{
+    public sealed class EventUserUpdated : EventBase,
+        ILoadableFrom<UserUpdatedEventInternalDTO, EventUserUpdated>
+    {
+        public string Type { get; set; }
+
+        public User User { get; set; }
+
+        EventUserUpdated ILoadableFrom<UserUpdatedEventInternalDTO, EventUserUpdated>.LoadFromDto(
+            UserUpdatedEventInternalDTO dto)
+        {
+            CreatedAt = dto.CreatedAt;
+            Type = dto.Type;
+            User = User.TryLoadFromDto<UserEventPayloadInternalDTO, User>(dto.User);
+            AdditionalProperties = dto.AdditionalProperties;
+
+            return this;
+        }
+    }
+}

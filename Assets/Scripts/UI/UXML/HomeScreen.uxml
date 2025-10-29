@@ -1,7 +1,12 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/USS/HomeScreen.uss?fileID=7433441132597879392&amp;guid=ab479883c74bc405fa4593489611a361&amp;type=3#HomeScreen" />
     <ui:VisualElement name="homeScreen" class="home-screen">
-        <ui:Image name="ambioLogo" class="ambio-logo"/>
+        <ui:VisualElement name="headerSection" class="header-section">
+            <ui:Image name="ambioLogo" class="ambio-logo"/>
+            <ui:Button name="newChatButton" class="new-chat-button">
+                <ui:Image class="new-chat-icon" />
+            </ui:Button>
+        </ui:VisualElement>
         <ui:VisualElement name="uploadProgressSection" class="upload-progress-section">
             <ui:VisualElement class="main-containers">
                 <ui:Image name="uploadIcon" class="upload-icon" />

@@ -37,4 +37,6 @@ public enum UIScreenType
     LoggedInFollowing,
     CreatorFollowing,
     UserFollowing,
+    Messages,
+    Chatting,
 }

@@ -1,0 +1,6 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/MessageBubble.uss?fileID=7433441132597879392&amp;guid=47599417f8e2b4be785550072a14cf2b&amp;type=3#MessageBubble" />
+    <ui:VisualElement name="date-separator-container" class="date-separator-container">
+        <ui:Label name="date-label" text="TODAY" class="date-label" />
+    </ui:VisualElement>
+</ui:UXML>

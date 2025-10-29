@@ -1,0 +1,200 @@
+.chat-home-screen {
+    background-color: #F5F0ED;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    overflow: hidden;
+}
+
+.header-section {
+    width: 100%;
+    margin-top: 15%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 50px;
+    margin-bottom: 80px;
+}
+
+.back-button {
+    width: 45px;
+    height: 45px;
+    background-color: transparent;
+    border-width: 0;
+    font-size: 18px;
+    color: #333333;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+}
+
+.back-icon {
+    width: 45px;
+    height: 45px;
+    background-image: resource("back-icon");
+    background-repeat: no-repeat;
+    background-size: contain;
+    scale: 2.5;
+}
+
+.title {
+    font-size: 60px;
+    -unity-font-style: bold;
+    color: #333333;
+    white-space: normal;
+}
+
+.header-icon-section {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.refresh-chat{
+    width: 80px;
+    height: 80px;
+    background-color: transparent;
+    border-width: 0;
+    font-size: 18px;
+    color: #333333;
+    padding: 0;
+    margin-right: 30px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.new-chat{
+    width: 60px;
+    height: 60px;
+    background-color: transparent;
+    border-width: 0;
+    font-size: 18px;
+    color: #333333;
+    padding: 0;
+    margin: 0;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.refresh-icon {
+    width: 80px;
+    height: 80px;
+    background-image: resource("refresh_icon");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.add-icon {
+    width: 60px;
+    height: 60px;
+    background-image: resource("plus");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.chat-list {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* Skeleton Loading Styles */
+.skeleton-chat-item {
+    width: 100%;
+    background-color: #F5F0ED;
+    flex-direction: row;
+    align-items: center;
+    padding: 50px;
+    border-bottom-width: 5px;
+    border-color: #e5e5e5;
+}
+
+.skeleton-icon {
+    width: 180px;
+    height: 180px;
+    background-color: #d5d5d5;
+    border-radius: 20%;
+}
+
+.skeleton-text-container {
+    margin-left: 50px;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.skeleton-name {
+    width: 60%;
+    height: 45px;
+    background-color: #d5d5d5;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.skeleton-message {
+    width: 80%;
+    height: 40px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+}
+
+/* Empty State Styles */
+.empty-state-container {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 200px;
+    padding-bottom: 200px;
+}
+
+.empty-state-text {
+    font-size: 50px;
+    color: #666666;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-bottom: 20px;
+}
+
+.empty-state-subtext {
+    font-size: 40px;
+    color: #999999;
+    -unity-text-align: middle-center;
+    white-space: normal;
+    max-width: 80%;
+}
+
+/* Floating Action Button (FAB) */
+.refresh-fab {
+    position: absolute;
+    bottom: 100px;
+    right: 80px;
+    width: 140px;
+    height: 140px;
+    background-color: #8B4C39;
+    border-radius: 70px;
+    border-width: 0;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+
+.refresh-fab:hover {
+    background-color: #6B3629;
+    scale: 1.05;
+}
+
+.refresh-fab:active {
+    background-color: #5A2A1F;
+    scale: 0.95;
+}
+
+.refresh-fab-icon {
+    width: 80px;
+    height: 80px;
+    background-image: resource("refresh_icon");
+    background-repeat: no-repeat;
+    background-size: contain;
+}

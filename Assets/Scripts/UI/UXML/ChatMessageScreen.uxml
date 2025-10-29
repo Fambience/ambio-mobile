@@ -1,0 +1,23 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/USS/ChatMessageScreen.uss?fileID=7433441132597879392&amp;guid=29cf775febc594b2296f9fa53303f8a8&amp;type=3#ChatMessageScreen" />
+    <ui:VisualElement name="chat-message-screen" class="chat-message-screen">
+        <ui:VisualElement name="message-header" class="header-section">
+            <ui:Button name="back-button" class="back-button">
+                <ui:Image class="back-icon" />
+            </ui:Button>
+            <ui:Label name="chat-name" text="Chat Name" class="chat-name" />
+            <ui:VisualElement name="message-header-icon" class="header-icon-section">
+                <ui:Button name="options-button" class="options-button">
+                    <ui:Image class="options-icon" />
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:ScrollView name="message-list" class="message-list" />
+        <ui:VisualElement name="message-input-section" class="message-input-section">
+            <ui:TextField name="message-input" class="message-input" multiline="true" placeholder-text="Send Message..." />
+            <ui:Button name="send-button" class="send-button">
+                <ui:Image class="send-icon" />
+            </ui:Button>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

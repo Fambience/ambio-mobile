@@ -1,0 +1,80 @@
+.chat-ui {
+    background-color: #F5F0ED;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    overflow: hidden;
+    padding: 50px;
+    border-bottom-width: 5px;
+    border-color: #d5d5d5;
+}
+
+.icon-container {
+    width: 180px;
+    height: 180px;
+    background-color: #986047;
+    border-radius: 20%;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-label {
+    font-size: 100px;
+    color: white;
+}
+
+.text-container {
+    margin-left: 20px;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: flex-start;
+}
+
+.text-container-header {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%
+}
+
+.chat-name {
+    font-size: 45px;
+    -unity-font-style: bold;
+    margin-left: 30px;
+}
+
+.timestamp {
+    font-size: 35px;
+    align-self: center;
+    justify-content: center;
+    margin-right: 50px;
+}
+
+.last-message {
+    font-size: 40px;
+    color: #666666;
+    margin-left: 30px;
+}
+
+.open-chat-arrow {
+    width: 80px;
+    height: 80px;
+    background-color: transparent;
+    border-width: 0;
+    font-size: 18px;
+    color: #333333;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+}
+
+.back-icon {
+    width: 80px;
+    height: 80px;
+    rotate: 180deg;
+    background-image: resource("back-icon");
+    background-repeat: no-repeat;
+    background-size: contain;
+    scale: 1.5;
+}
