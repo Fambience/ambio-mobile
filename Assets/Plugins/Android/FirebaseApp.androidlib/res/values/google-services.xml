@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/gcm_defaultSenderId,@string/google_storage_bucket,@string/project_id,@string/google_api_key,@string/google_crash_reporting_api_key,@string/google_app_id,@string/default_web_client_id">
-  <string name="gcm_defaultSenderId" translatable="false">506296903677</string>
-  <string name="google_storage_bucket" translatable="false">ambio-backend.firebasestorage.app</string>
-  <string name="project_id" translatable="false">ambio-backend</string>
-  <string name="google_api_key" translatable="false">AIzaSyB4GoAEcmWw9qPiTNA3eV_GKwT8rkikuRg</string>
-  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyB4GoAEcmWw9qPiTNA3eV_GKwT8rkikuRg</string>
-  <string name="google_app_id" translatable="false">1:506296903677:android:5eb861e332ee559e1e1b94</string>
-  <string name="default_web_client_id" translatable="false">506296903677-nju0s3rig8bklqvjetovua8u4v74v12d.apps.googleusercontent.com</string>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/gcm_defaultSenderId,@string/google_storage_bucket,@string/project_id,@string/google_api_key,@string/google_crash_reporting_api_key,@string/google_app_id">
+  <string name="gcm_defaultSenderId" translatable="false">594930010097</string>
+  <string name="google_storage_bucket" translatable="false">ambio-app-6.firebasestorage.app</string>
+  <string name="project_id" translatable="false">ambio-app-6</string>
+  <string name="google_api_key" translatable="false">AIzaSyArs7ELdVMcZhDfqf6y-aHRkJGTc6aAHnA</string>
+  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyArs7ELdVMcZhDfqf6y-aHRkJGTc6aAHnA</string>
+  <string name="google_app_id" translatable="false">1:594930010097:android:42808b905bf8e15368e650</string>
 </resources>
