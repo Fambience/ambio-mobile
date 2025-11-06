@@ -146,11 +146,53 @@ public class LoginHandler : MonoBehaviour
             // Token exists, attempt auto-login by navigating to home screen
             UIManager.Instance.OpenScreen(UIScreenType.Home);
             scriptHandler.SetActive(true);
+
+            // Initialize Firebase Messaging for push notifications
+            InitializeFirebaseMessaging();
         }
         else
         {
             Debug.Log("[AUTO-LOGIN] No token found, user needs to login");
         }
+    }
+
+    /// <summary>
+    /// Initialize Firebase Cloud Messaging for push notifications
+    /// </summary>
+    private void InitializeFirebaseMessaging()
+    {
+        Debug.Log("[FCM] Initializing Firebase Messaging...");
+
+        // Initialize Firebase Messaging Manager
+        FirebaseMessagingManager.Instance.Initialize();
+
+        // Initialize Notification Handler
+        var notificationHandler = NotificationHandler.Instance;
+
+        // Request notification permissions (Android 13+)
+        notificationHandler.RequestNotificationPermissions();
+
+        // Check for any pending notification actions (app opened from notification)
+        FirebaseMessagingManager.Instance.CheckPendingNotificationActions();
+
+        // Subscribe to token received event
+        FirebaseMessagingManager.Instance.OnTokenReceived += OnFCMTokenReceived;
+
+        Debug.Log("[FCM] Firebase Messaging initialization complete");
+    }
+
+    /// <summary>
+    /// Called when FCM token is received or refreshed
+    /// </summary>
+    private void OnFCMTokenReceived(string token)
+    {
+        Debug.Log($"[FCM] Token received in LoginHandler: {token}");
+
+        // TODO: When Stream Chat is integrated, register the token with Stream
+        // FirebaseMessagingManager.Instance.RegisterTokenWithStreamChat();
+
+        // TODO: When backend integration is ready, send token to backend
+        // StartCoroutine(FirebaseMessagingManager.Instance.SendTokenToBackend(token));
     }
 
     private void LoginUser()
@@ -268,8 +310,12 @@ public class LoginHandler : MonoBehaviour
 
                 case "ONBOARDING_COMPLETED":
                     if (!string.IsNullOrEmpty(response.token))
+                    {
                         UIManager.Instance.OpenScreen(UIScreenType.Home);
                         scriptHandler.SetActive(true);
+                        // Initialize Firebase Messaging after successful login
+                        InitializeFirebaseMessaging();
+                    }
                     break;
 
                 case "BASIC_DETAILS":
@@ -298,9 +344,12 @@ public class LoginHandler : MonoBehaviour
 
                case "ONBOARDING_COMPLETED":
                    if (!string.IsNullOrEmpty(response.token))
+                   {
                        UIManager.Instance.OpenScreen(UIScreenType.Home);
-                        
-                   scriptHandler.SetActive(true);
+                       scriptHandler.SetActive(true);
+                       // Initialize Firebase Messaging after successful login
+                       InitializeFirebaseMessaging();
+                   }
                    break;
 
                case "BASIC_DETAILS":
