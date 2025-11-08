@@ -2715,6 +2715,10 @@ GameObject:
   - component: {fileID: 1850489381}
   - component: {fileID: 1850489380}
   - component: {fileID: 1850489383}
+  - component: {fileID: 1850489387}
+  - component: {fileID: 1850489386}
+  - component: {fileID: 1850489385}
+  - component: {fileID: 1850489384}
   m_Layer: 0
   m_Name: loginScreen
   m_TagString: Untagged
@@ -2784,6 +2788,55 @@ MonoBehaviour:
   register: {fileID: 484351386}
   registerUXMLAsset: {fileID: 9197481963319205126, guid: 7f35ecdb1095729448b12ec13b17cfd9, type: 3}
   scriptHandler: {fileID: 1831942536}
+--- !u!114 &1850489384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1850489379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b916a008af5f049608c285247332a150, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1850489385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1850489379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98b2bd187359140c3ac37fd6b0560a18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1850489386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1850489379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2030f98a49f0c4b19a304de5ff4355b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1850489387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1850489379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac152ed8ce6a4de5ba7b556386e4ba2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tokenRegistrationEndpoint: https://your-backend-api.com/api/fcm/register
 --- !u!1 &1894395652
 GameObject:
   m_ObjectHideFlags: 0
